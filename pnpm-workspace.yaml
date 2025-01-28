@@ -1,0 +1,5 @@
+packages:
+  - 'client'
+  - 'server'
+  # exclude packages that are inside test directories
+  - '!server/bin/Debug/net**'

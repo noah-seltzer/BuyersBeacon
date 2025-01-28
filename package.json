@@ -1,0 +1,16 @@
+{
+  "name": "BuyersBeacon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "pnpm -r run dev",
+    "dev-client": "pnpm -r run dev --filter \"client\"",
+    "dev-server": "pnpm -r run dev --filter \"server\"",
+    "start": "echo starting\n"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
