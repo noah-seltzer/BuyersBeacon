@@ -11,6 +11,7 @@ namespace server.Models
 
 
         [Required]
+        [MaxLength(100)]
         public string CategoryName { get; set; }
 
         public ICollection<Beacon> Beacons { get; set; } = new List<Beacon>();
