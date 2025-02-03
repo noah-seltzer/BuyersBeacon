@@ -1,18 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace server.Models
 {
-    public class User
+    public class Category
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid UserId { get; set; }
+        public Guid CategoryId { get; set; }
+
 
         [Required]
-        public string ClerkId { get; set; }
+        public string CategoryName { get; set; }
 
-        public ICollection<Beacon>? Beacons { get; set; } = new List<Beacon>();
+        public ICollection<Beacon> Beacons { get; set; } = new List<Beacon>();
     }
 }

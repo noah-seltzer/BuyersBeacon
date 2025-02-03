@@ -10,8 +10,9 @@ namespace server.Data
 
 
         public DbSet<User> Users { get; set; }
-
-
-
+        public DbSet<Beacon> Beacons { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<ImageSet> ImageSets { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
