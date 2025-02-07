@@ -20,6 +20,11 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API documentation for BuyersBeacon server"
     });
+    
+    // Enable XML comments in Swagger
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();

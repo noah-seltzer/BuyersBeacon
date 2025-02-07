@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Models.DTOs;
 
 namespace server.Controllers
 {
-    public class BeaconsController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BeaconsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -19,148 +21,209 @@ namespace server.Controllers
             _context = context;
         }
 
-        // GET: Beacons
-        public async Task<IActionResult> Index()
+        /// <summary>
+        /// Gets all beacons
+        /// </summary>
+        /// <returns>A list of all beacons</returns>
+        /// <response code="200">Returns the list of beacons</response>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<BeaconDto>>> GetBeacons()
         {
-            var applicationDbContext = _context.Beacons.Include(b => b.Category).Include(b => b.User);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: Beacons/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var beacon = await _context.Beacons
-                .Include(b => b.Category)
-                .Include(b => b.User)
-                .FirstOrDefaultAsync(m => m.BeaconId == id);
-            if (beacon == null)
-            {
-                return NotFound();
-            }
-
-            return View(beacon);
-        }
-
-        // GET: Beacons/Create
-        public IActionResult Create()
-        {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "ClerkId");
-            return View();
-        }
-
-        // POST: Beacons/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BeaconId,UserId,CategoryId,DateCreate,DateUpdate,ItemName,ItemDescription,ItemPrice,LocCity,LocRegion,LocCountry,LocPostalCode")] Beacon beacon)
-        {
-            if (ModelState.IsValid)
-            {
-                beacon.BeaconId = Guid.NewGuid();
-                _context.Add(beacon);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", beacon.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "ClerkId", beacon.UserId);
-            return View(beacon);
-        }
-
-        // GET: Beacons/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var beacon = await _context.Beacons.FindAsync(id);
-            if (beacon == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", beacon.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "ClerkId", beacon.UserId);
-            return View(beacon);
-        }
-
-        // POST: Beacons/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("BeaconId,UserId,CategoryId,DateCreate,DateUpdate,ItemName,ItemDescription,ItemPrice,LocCity,LocRegion,LocCountry,LocPostalCode")] Beacon beacon)
-        {
-            if (id != beacon.BeaconId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+            var beacons = await _context.Beacons
+                .Select(b => new BeaconDto
                 {
-                    _context.Update(beacon);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BeaconExists(beacon.BeaconId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", beacon.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "ClerkId", beacon.UserId);
-            return View(beacon);
+                    BeaconId = b.BeaconId,
+                    UserId = b.UserId,
+                    CategoryId = b.CategoryId,
+                    DateCreate = b.DateCreate,
+                    DateUpdate = b.DateUpdate,
+                    ItemName = b.ItemName,
+                    ItemDescription = b.ItemDescription,
+                    ItemPrice = b.ItemPrice,
+                    LocCity = b.LocCity,
+                    LocRegion = b.LocRegion,
+                    LocCountry = b.LocCountry,
+                    LocPostalCode = b.LocPostalCode
+                })
+                .ToListAsync();
+
+            return beacons;
         }
 
-        // GET: Beacons/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        /// <summary>
+        /// Gets a specific beacon by its ID
+        /// </summary>
+        /// <param name="id">The GUID of the beacon to retrieve</param>
+        /// <returns>The requested beacon</returns>
+        /// <response code="200">Returns the requested beacon</response>
+        /// <response code="404">If the beacon is not found</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<BeaconDto>> GetBeacon(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var beacon = await _context.Beacons
-                .Include(b => b.Category)
-                .Include(b => b.User)
-                .FirstOrDefaultAsync(m => m.BeaconId == id);
+                .Where(b => b.BeaconId == id)
+                .Select(b => new BeaconDto
+                {
+                    BeaconId = b.BeaconId,
+                    UserId = b.UserId,
+                    CategoryId = b.CategoryId,
+                    DateCreate = b.DateCreate,
+                    DateUpdate = b.DateUpdate,
+                    ItemName = b.ItemName,
+                    ItemDescription = b.ItemDescription,
+                    ItemPrice = b.ItemPrice,
+                    LocCity = b.LocCity,
+                    LocRegion = b.LocRegion,
+                    LocCountry = b.LocCountry,
+                    LocPostalCode = b.LocPostalCode
+                })
+                .FirstOrDefaultAsync();
+
             if (beacon == null)
             {
                 return NotFound();
             }
 
-            return View(beacon);
+            return beacon;
         }
 
-        // POST: Beacons/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        /// <summary>
+        /// Creates a new beacon
+        /// </summary>
+        /// <param name="beaconDto">The beacon to create</param>
+        /// <returns>The created beacon</returns>
+        /// <response code="201">Returns the newly created beacon</response>
+        /// <response code="400">If the beacon data is invalid or if Category/User doesn't exist</response>
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<BeaconDto>> CreateBeacon(BeaconDto beaconDto)
         {
-            var beacon = await _context.Beacons.FindAsync(id);
-            if (beacon != null)
+            if (!ModelState.IsValid)
             {
-                _context.Beacons.Remove(beacon);
+                return BadRequest(ModelState);
             }
 
+            // Validate that Category exists
+            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == beaconDto.CategoryId);
+            if (!categoryExists)
+            {
+                ModelState.AddModelError("CategoryId", "Specified category does not exist");
+                return BadRequest(ModelState);
+            }
+
+            // Validate that User exists
+            var userExists = await _context.Users.AnyAsync(u => u.UserId == beaconDto.UserId);
+            if (!userExists)
+            {
+                ModelState.AddModelError("UserId", "Specified user does not exist");
+                return BadRequest(ModelState);
+            }
+
+            var beacon = new Beacon
+            {
+                BeaconId = Guid.NewGuid(),
+                UserId = beaconDto.UserId,
+                CategoryId = beaconDto.CategoryId,
+                DateCreate = DateTime.UtcNow,
+                DateUpdate = DateTime.UtcNow,
+                ItemName = beaconDto.ItemName,
+                ItemDescription = beaconDto.ItemDescription,
+                ItemPrice = beaconDto.ItemPrice,
+                LocCity = beaconDto.LocCity,
+                LocRegion = beaconDto.LocRegion,
+                LocCountry = beaconDto.LocCountry,
+                LocPostalCode = beaconDto.LocPostalCode
+            };
+
+            _context.Beacons.Add(beacon);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            beaconDto.BeaconId = beacon.BeaconId;
+            beaconDto.DateCreate = beacon.DateCreate;
+            beaconDto.DateUpdate = beacon.DateUpdate;
+
+            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, beaconDto);
+        }
+
+        /// <summary>
+        /// Updates an existing beacon
+        /// </summary>
+        /// <param name="id">The GUID of the beacon to update</param>
+        /// <param name="beaconDto">The updated beacon data</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">If the beacon was successfully updated</response>
+        /// <response code="400">If the beacon data is invalid</response>
+        /// <response code="404">If the beacon is not found</response>
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateBeacon(Guid id, BeaconDto beaconDto)
+        {
+            if (id != beaconDto.BeaconId)
+            {
+                return BadRequest();
+            }
+
+            var beacon = await _context.Beacons.FindAsync(id);
+            if (beacon == null)
+            {
+                return NotFound();
+            }
+
+            beacon.UserId = beaconDto.UserId;
+            beacon.CategoryId = beaconDto.CategoryId;
+            beacon.DateUpdate = DateTime.UtcNow;
+            beacon.ItemName = beaconDto.ItemName;
+            beacon.ItemDescription = beaconDto.ItemDescription;
+            beacon.ItemPrice = beaconDto.ItemPrice;
+            beacon.LocCity = beaconDto.LocCity;
+            beacon.LocRegion = beaconDto.LocRegion;
+            beacon.LocCountry = beaconDto.LocCountry;
+            beacon.LocPostalCode = beaconDto.LocPostalCode;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BeaconExists(id))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Deletes a specific beacon
+        /// </summary>
+        /// <param name="id">The GUID of the beacon to delete</param>
+        /// <returns>No content if successful</returns>
+        /// <response code="204">If the beacon was successfully deleted</response>
+        /// <response code="404">If the beacon is not found</response>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteBeacon(Guid id)
+        {
+            var beacon = await _context.Beacons.FindAsync(id);
+            if (beacon == null)
+            {
+                return NotFound();
+            }
+
+            _context.Beacons.Remove(beacon);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private bool BeaconExists(Guid id)
