@@ -1,11 +1,11 @@
 'use client'
 import { FC } from 'react'
 import { useFormik } from 'formik'
-import { useCreateBeaconMutation } from '@/redux/api'
+// import { useCreateBeaconMutation } from '@/redux/api'
 
 const CreateBeaconPage: FC = () => {
 
-    const [createBeacon] = useCreateBeaconMutation()
+    // const [createBeacon] = useCreateBeaconMutation()
 
     const formik = useFormik({
         initialValues: {

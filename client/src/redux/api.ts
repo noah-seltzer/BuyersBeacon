@@ -1,7 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Beacon } from '../types/beacon'
-
-console.log('api', process.env.API_URL)
+import { Beacon } from '@/types/beacon'
 
 export const beaconApi = createApi({
     tagTypes: ['Beacon'],

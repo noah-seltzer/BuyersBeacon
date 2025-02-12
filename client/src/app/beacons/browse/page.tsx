@@ -1,6 +1,6 @@
 'use client'
 import { useGetBeaconsQuery } from "@/redux/api"
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { Beacon } from "@/types/beacon"
 import { Image, MapPin } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -21,13 +21,11 @@ const BeaconThumbnail: FC<{beacon: Beacon}> = ({beacon}) => {
                     </div>
             </div>
         </div>
-
     </Card>
-
 }
 
 const BrowseBeaconsPage: FC = () => {
-    const { data: beacons, isLoading: beaconsLoading, error: beaconError } = useGetBeaconsQuery()
+    const { data: beacons } = useGetBeaconsQuery()
 
     return <div className='w-3/4 mx-auto'>
 

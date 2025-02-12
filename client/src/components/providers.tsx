@@ -8,16 +8,16 @@ import { store } from '@/redux/store'
 const Providers: FC<PropsWithChildren> = ({ children }) => {
     return (
         <Provider store={store}>
-        <ThemeProvider
-            attribute='class'
-            defaultTheme='dark'
-            enableSystem={false}
-            disableTransitionOnChange
+            <ThemeProvider
+                attribute='class'
+                defaultTheme='dark'
+                enableSystem={false}
+                disableTransitionOnChange
             >
-            <Navbar />
-            <main className='pt-16'>{children}</main>
-        </ThemeProvider>
-            </Provider>
+                <Navbar />
+                <main className='pt-16'>{children}</main>
+            </ThemeProvider>
+        </Provider>
     )
 }
 
