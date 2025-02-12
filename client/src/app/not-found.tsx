@@ -15,8 +15,8 @@ const NotFound: FC = () => (
                         Beacon Lost in Space
                     </h1>
                     <p className='text-lg text-foreground/80 mb-8 max-w-md'>
-                        The page you're looking for seems to have drifted away.
-                        Let's help you find your way back.
+                        {`The page you\'re looking for seems to have drifted away.
+                        Let\'s help you find your way back.`}
                     </p>
                     <Button
                         asChild

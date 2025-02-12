@@ -11,7 +11,7 @@ export const beaconApi = createApi({
     endpoints: (builder) => ({
         getBeacons: builder.query<Beacon[], void>({
             query: () => 'beacons',
-            providesTags: (result, error, id) => [{ type: 'Beacon', id: 'LIST'}]
+            providesTags: () => [{ type: 'Beacon', id: 'LIST'}]
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {

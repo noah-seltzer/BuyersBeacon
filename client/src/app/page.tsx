@@ -15,9 +15,9 @@ const Home: FC = () => (
                             Sellers
                         </h1>
                         <p className='text-xl text-foreground/80 leading-relaxed'>
-                            BuyersBeacon helps you discover local sellers and
+                            {`BuyersBeacon helps you discover local sellers and
                             find exactly what you're looking for. Post your
-                            needs and let sellers come to you.
+                            needs and let sellers come to you.`}
                         </p>
                     </div>
 
