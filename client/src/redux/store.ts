@@ -1,4 +1,4 @@
-import { configureStore, createListenerMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { beaconApi } from "./api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
