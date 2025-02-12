@@ -1,44 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navbar";
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
+import { Navbar } from '@/components/navbar'
+import { PropsWithChildren, FC } from 'react'
+import { store } from '@/redux/store'
+import { Provider } from 'react-redux'
+import Providers from './providers'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+    variable: '--font-geist-sans',
+    subsets: ['latin']
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+    variable: '--font-geist-mono',
+    subsets: ['latin']
+})
 
 export const metadata: Metadata = {
-  title: "BuyersBeacon",
-  description: "Connect with buyers and sellers in your area",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="pt-16">
-            {children}
-          </main>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+    title: 'BuyersBeacon',
+    description: 'Connect with buyers and sellers in your area'
 }
+
+const RootLayout: FC<PropsWithChildren> = ({ children }) => {
+    return (
+        <html lang='en'>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    )
+}
+
+export default RootLayout
