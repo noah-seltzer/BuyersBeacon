@@ -13,15 +13,7 @@ export const beaconApi = createApi({
     endpoints: (builder) => ({
         getBeacons: builder.query<Beacon[], void>({
             query: () => 'beacons',
-            
-            // transformResponse: (response: any) => {
-            //     console.log('response', response)
-            //     return response
-            // },
             providesTags: (result, error, id) => [{ type: 'Beacon', id: 'LIST'}]
-            // transformResponse: (response: { data: any }, meta, arg) => response
-            // providesTags: () => [{ type: 'Beacons', id: 'LIST' }]
-            // providesTags: () => [{ type: 'Beacons', id: LIST_ID }]
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
@@ -31,14 +23,7 @@ export const beaconApi = createApi({
                     body: payload
                 }
             },
-            // transformResponse: (response: any) => {
-            //     console.log('response', response)
-            //     return response
-            // },
             invalidatesTags: () => [{ type: 'Beacon', id: 'LIST'}]
-            // transformResponse: (response: { data: any }, meta, arg) => response
-            // providesTags: () => [{ type: 'Beacons', id: 'LIST' }]
-            // providesTags: () => [{ type: 'Beacons', id: LIST_ID }]
         }),
     })
 })

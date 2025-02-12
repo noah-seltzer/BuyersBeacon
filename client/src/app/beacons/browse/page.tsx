@@ -2,8 +2,6 @@
 import { useGetBeaconsQuery } from "@/redux/api"
 import { FC, useEffect } from "react"
 import { Beacon } from "@/types/beacon"
-// import { Box, Image, Card, Flex, Avatar,  } from "lucide-react"
-// import { Box } from 'radix-ui'
 import { Image, MapPin } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
@@ -31,15 +29,10 @@ const BeaconThumbnail: FC<{beacon: Beacon}> = ({beacon}) => {
 const BrowseBeaconsPage: FC = () => {
     const { data: beacons, isLoading: beaconsLoading, error: beaconError } = useGetBeaconsQuery()
 
-    useEffect(() => {
-        console.log('beacons', beacons)
-    }, [beacons])
-    // console.log('isLoading', Beacons)
     return <div className='w-3/4 mx-auto'>
 
         <div className='container px-4 pt-6 text-center items-center justify-center bg-gray-600 h-auto'>
             <div>Search goes here</div>
-            {/* <button onClick={() => getBeacons2()}>Refetch</button> */}
         </div>
         
         <h1 className="text-5xl mt-8 font-bold text-primary">Vancouver Beacons</h1>

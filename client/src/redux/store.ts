@@ -14,9 +14,6 @@ export const store = configureStore({
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()
-          // NOTE: Since this can receive actions with functions inside,
-          // it should go before the serializability check middleware
-        //   .prepend(listenerMiddleware.middleware)
           .concat(beaconApi.middleware),
 })
 

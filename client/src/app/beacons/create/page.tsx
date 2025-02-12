@@ -1,7 +1,7 @@
 'use client'
 import { FC } from 'react'
 import { useFormik } from 'formik'
-import { useCreateBeaconMutation } from '../../../redux/api'
+import { useCreateBeaconMutation } from '@/redux/api'
 
 const CreateBeaconPage: FC = () => {
 
@@ -19,7 +19,6 @@ const CreateBeaconPage: FC = () => {
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
-                <div >
 
                 <input
                     id="itemName"
@@ -28,14 +27,7 @@ const CreateBeaconPage: FC = () => {
                     onChange={formik.handleChange}
                     onKeyUp={formik.handleBlur}
                     />
-                <input
-                    id="itemDescription"
-                    name="itemDescription"
-                    value={formik.values.itemDescription}
-                    onChange={formik.handleChange}
-                    onKeyUp={formik.handleBlur}
-                    />
-                </div>
+
             </form>
         </div>
     )
