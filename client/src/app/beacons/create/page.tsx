@@ -1,8 +1,9 @@
 'use client'
 import { FC } from 'react'
-import { useFormik } from 'formik'
+import { FormikHelpers, useFormik } from 'formik'
 import CreateBeaconTemplate from '@/components/templates/create-beacon-template'
 import { Beacon } from '@/types/beacon'
+import { useCreateBeaconMutation } from '@/redux/api'
 // import { useCreateBeaconMutation } from '@/redux/api'
 
 const DEFAULT_CATEGORY_OPTIONS: { label: string, value: string }[] = [
@@ -14,15 +15,17 @@ const DEFAULT_CATEGORY_OPTIONS: { label: string, value: string }[] = [
 ]
 
 const CreateBeaconPage: FC = () => {
+    const [createBeacon, { isLoading, isError, error }] = useCreateBeaconMutation();
 
     // const [createBeacon] = useCreateBeaconMutation()
 
-    const { handleChange, handleSubmit, values, errors, touched } = useFormik({
+    const { handleChange, handleSubmit, values, errors, touched, isSubmitting } = useFormik({
         initialValues: {
             category: DEFAULT_CATEGORY_OPTIONS[0].value
         } as unknown as Beacon,
-        onSubmit: (result) => {
-            console.log('result', result)
+        onSubmit: async (result: Beacon, helpers: FormikHelpers<Beacon>) => {
+            const res = await createBeacon(result).unwrap()
+            console.log(res);
         }
     })
 
@@ -33,6 +36,7 @@ const CreateBeaconPage: FC = () => {
         errors={errors}
         touched={touched}
         categoryOptions={DEFAULT_CATEGORY_OPTIONS}
+        submitting={isLoading}
     />
 }
 export default CreateBeaconPage

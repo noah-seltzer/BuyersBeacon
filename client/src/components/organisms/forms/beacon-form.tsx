@@ -14,6 +14,7 @@ interface BeaconFormProps {
     errors: FormikErrors<Beacon>;
     touched: FormikTouched<Beacon>;
     categoryOptions: { label: string; value: string }[];
+    submitting: boolean
 }
 
 const BeaconForm = ({
@@ -23,6 +24,7 @@ const BeaconForm = ({
     errors,
     touched,
     categoryOptions,
+    submitting
 }: BeaconFormProps) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -60,8 +62,8 @@ const BeaconForm = ({
                 />
             </div>
             <ButtonContainer>
-                <Button variant="default" size="sm">
-                    Submit
+                <Button variant="default" size="sm" disabled={submitting}>
+                    {submitting ? "Submitting...." : 'Submit'}
                 </Button>
             </ButtonContainer>
         </form>

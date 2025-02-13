@@ -10,6 +10,7 @@ interface CreateBeaconTemplateProps {
     errors: FormikErrors<Beacon>
     touched: FormikTouched<Beacon>
     categoryOptions: { label: string, value: string }[]
+    submitting: boolean
 }
 
 const CreateBeaconTemplate: React.FC<CreateBeaconTemplateProps> = ({
@@ -18,7 +19,8 @@ const CreateBeaconTemplate: React.FC<CreateBeaconTemplateProps> = ({
     values,
     errors,
     touched,
-    categoryOptions
+    categoryOptions,
+    submitting
 }) => {
 
     return (
