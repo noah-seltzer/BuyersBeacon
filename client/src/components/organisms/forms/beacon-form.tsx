@@ -1,47 +1,71 @@
-import TextInput from "@/components/molecules/inputs/text-inputs"
+import { Button } from "@/components/atoms/button";
+import ButtonContainer from "@/components/molecules/containers/button-container";
+import NumberInput from "@/components/molecules/inputs/number-input";
+import SelectInput from "@/components/molecules/inputs/select-input";
+import MultilineInput from "@/components/molecules/inputs/text-area-input";
+import TextInput from "@/components/molecules/inputs/text-inputs";
 import { Beacon } from "@/types/beacon";
 import { FormikErrors, FormikTouched } from "formik";
 
 interface BeaconFormProps {
     handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
     handleChange: (e: React.ChangeEvent) => void;
-    values: Beacon,
-    errors: FormikErrors<Beacon>
-    touched: FormikTouched<Beacon>
+    values: Beacon;
+    errors: FormikErrors<Beacon>;
+    touched: FormikTouched<Beacon>;
+    categoryOptions: { label: string; value: string }[];
 }
 
-const BeaconForm = ({ handleSubmit, handleChange, values, errors, touched }: BeaconFormProps) => {
+const BeaconForm = ({
+    handleSubmit,
+    handleChange,
+    values,
+    errors,
+    touched,
+    categoryOptions,
+}: BeaconFormProps) => {
+    return (
+        <form onSubmit={handleSubmit} className="space-y-8">
+            <TextInput
+                label={"Title"}
+                value={values.itemName}
+                name={"itemName"}
+                onChange={handleChange}
+                error={errors.itemName}
+            />
+            <MultilineInput
+                label={"Description"}
+                value={values.itemDescription}
+                name={"itemDescription"}
+                onChange={handleChange}
+                error={errors.itemDescription}
+            />
+            <div className="flex gap-4">
+                <SelectInput
+                    label={"Category"}
+                    value={values.category?.category_name}
+                    name={"category"}
+                    onChange={handleChange}
+                    error={errors.category?.category_name}
+                    options={categoryOptions}
+                    className="flex-1 w-full"
+                />
+                <NumberInput
+                    label={"Price"}
+                    value={values.itemPrice}
+                    name={"itemPrice"}
+                    onChange={handleChange}
+                    error={errors.itemPrice}
+                    className="flex-1 w-full"
+                />
+            </div>
+            <ButtonContainer>
+                <Button variant="default" size="sm">
+                    Submit
+                </Button>
+            </ButtonContainer>
+        </form>
+    );
+};
 
-    return <form>
-        <TextInput
-            label={"Title"}
-            value={values.itemName}
-            name={"itemName"}
-            onChange={handleChange}
-            error={errors.itemName}
-        />
-        <TextInput
-            label={"Description"}
-            value={values.itemDescription}
-            name={"itemDescription"}
-            onChange={handleChange}
-            error={errors.itemDescription}
-        />
-        <TextInput
-            label={"Category"}
-            value={values.category?.category_name}
-            name={"category"}
-            onChange={handleChange}
-            error={errors.category?.category_name}
-        />
-        <TextInput
-            label={"Prioe"}
-            value={values.itemPrice?.toString()}
-            name={"itemPrice"}
-            onChange={handleChange}
-            error={errors.itemPrice}
-        />
-    </form>
-}
-
-export default BeaconForm
+export default BeaconForm;

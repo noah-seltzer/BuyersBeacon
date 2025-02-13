@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/atoms/button'
 import { ArrowRight, Search, MessageSquare, Bell } from 'lucide-react'
 import { FC } from 'react'
 
