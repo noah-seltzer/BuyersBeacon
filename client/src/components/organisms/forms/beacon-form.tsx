@@ -22,7 +22,6 @@ const BeaconForm = ({
     handleChange,
     values,
     errors,
-    touched,
     categoryOptions,
     submitting
 }: BeaconFormProps) => {

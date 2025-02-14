@@ -33,6 +33,7 @@ const CreateBeaconTemplate: React.FC<CreateBeaconTemplateProps> = ({
                     values={values}
                     errors={errors}
                     touched={touched}
+                    submitting={submitting}
                     categoryOptions={categoryOptions}
                 />
             </div>
