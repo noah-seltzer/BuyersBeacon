@@ -50,7 +50,7 @@ export function Navbar() {
                         BuyersBeacon
                     </Link>
                     <div className='hidden md:flex items-center gap-6'>
-                        <NavLink href='/browse'>Browse</NavLink>
+                        <NavLink href='/beacons/browse'>Browse</NavLink>
                         <NavLink href='/categories'>Categories</NavLink>
                         <NavLink href='/about'>About</NavLink>
                     </div>
