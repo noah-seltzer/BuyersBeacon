@@ -21,7 +21,12 @@ const CreateBeaconPage: FC = () => {
             category: DEFAULT_CATEGORY_OPTIONS[0].value
         } as unknown as Beacon,
         onSubmit: async (result: Beacon) => {
-            const res = await createBeacon(result).unwrap()
+            const payload = {
+                ...result,
+                "CategoryId": "bcd6ea2e-8d4d-4826-bf0e-7ab471903d49",
+                "UserId": "dad51545-5ca5-4762-8c7f-f2f676970387",
+            }
+            const res = await createBeacon(payload).unwrap()
             console.log(res);
         }
     })
