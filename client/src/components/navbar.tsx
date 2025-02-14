@@ -7,6 +7,7 @@ import { Moon, Sun, Search, Menu, X, Bell } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { SignedOut, SignIn, SignUp, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 
 export function Navbar() {
     const { theme, setTheme } = useTheme()
@@ -84,6 +85,28 @@ export function Navbar() {
                             <Moon className='h-5 w-5' />
                         )}
                     </Button>
+                    <SignedOut>
+                        <SignInButton>
+                        <Button
+                            variant='default'
+                            className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
+                        >
+                            Sign In
+                        </Button>
+                        </SignInButton>
+                        <SignUpButton>
+                        <Button
+                            variant='default'
+                            className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
+                        >
+                            Sign Up
+                        </Button>
+                        </SignUpButton>
+                    </SignedOut>
+
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
                     <Link href='/beacons/create' className='btn btn-primary'>
                         <Button
                             variant='default'

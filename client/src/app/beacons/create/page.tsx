@@ -29,6 +29,7 @@ const CreateBeaconPage: FC = () => {
                 "UserId": "dad51545-5ca5-4762-8c7f-f2f676970387",
             }
             const res = await createBeacon(payload).unwrap()
+            console.log('res', res)
             router.push('/beacons/browse')
         }
     })
