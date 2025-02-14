@@ -4,24 +4,25 @@ import { Beacon } from '@/types/beacon'
 export const beaconApi = createApi({
     tagTypes: ['Beacon'],
     reducerPath: 'beaconApi',
-    baseQuery: fetchBaseQuery({ 
+    baseQuery: fetchBaseQuery({
         mode: 'cors',
-        baseUrl: process.env.API_URL }),
-    
+        baseUrl: process.env.API_URL
+    }),
+
     endpoints: (builder) => ({
         getBeacons: builder.query<Beacon[], void>({
             query: () => 'beacons',
-            providesTags: () => [{ type: 'Beacon', id: 'LIST'}]
+            providesTags: () => [{ type: 'Beacon', id: 'LIST' }]
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
                 return {
-                    url: 'beacons',
+                    url: 'api/beacons',
                     method: 'POST',
                     body: payload
                 }
             },
-            invalidatesTags: () => [{ type: 'Beacon', id: 'LIST'}]
+            invalidatesTags: () => [{ type: 'Beacon', id: 'LIST' }]
         }),
     })
 })
