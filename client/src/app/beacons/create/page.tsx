@@ -1,6 +1,6 @@
 'use client'
 import { FC } from 'react'
-import { FormikHelpers, useFormik } from 'formik'
+import { useFormik } from 'formik'
 import CreateBeaconTemplate from '@/components/templates/create-beacon-template'
 import { Beacon } from '@/types/beacon'
 import { useCreateBeaconMutation } from '@/redux/api'

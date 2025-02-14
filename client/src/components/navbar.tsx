@@ -91,7 +91,6 @@ export function Navbar() {
                         >
                             Post Beacon
                         </Button>
-                        Post Beacon
                     </Link>
                     <Button
                         variant='ghost'
@@ -117,7 +116,7 @@ export function Navbar() {
             >
                 <div className='container mx-auto px-4 py-4 flex flex-col gap-4'>
                     <NavLink
-                        href='/browse'
+                        href='/beacons/browse'
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Browse
