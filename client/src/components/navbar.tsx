@@ -7,7 +7,7 @@ import { Moon, Sun, Search, Menu, X, Bell } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
-import { SignedOut, SignIn, SignUp, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
+import { SignedOut, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 
 export function Navbar() {
     const { theme, setTheme } = useTheme()
