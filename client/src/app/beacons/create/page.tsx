@@ -4,6 +4,7 @@ import { useFormik } from 'formik'
 import CreateBeaconTemplate from '@/components/templates/create-beacon-template'
 import { Beacon } from '@/types/beacon'
 import { useCreateBeaconMutation } from '@/redux/api'
+import { useRouter } from 'next/navigation'
 
 const DEFAULT_CATEGORY_OPTIONS: { label: string, value: string }[] = [
     { label: 'Automotive', value: 'automotive' },
@@ -14,7 +15,8 @@ const DEFAULT_CATEGORY_OPTIONS: { label: string, value: string }[] = [
 ]
 
 const CreateBeaconPage: FC = () => {
-    const [createBeacon, { isLoading, }] = useCreateBeaconMutation();
+    const [createBeacon, { isLoading }] = useCreateBeaconMutation();
+    const router = useRouter()
 
     const { handleChange, handleSubmit, values, errors, touched, } = useFormik({
         initialValues: {
@@ -27,7 +29,7 @@ const CreateBeaconPage: FC = () => {
                 "UserId": "dad51545-5ca5-4762-8c7f-f2f676970387",
             }
             const res = await createBeacon(payload).unwrap()
-            console.log(res);
+            router.push('/beacons/browse')
         }
     })
 
