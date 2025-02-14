@@ -10,3 +10,5 @@ If running on WSL, clone repo into home directory. Hot reloading may not work wi
 4. Open a terminal and cd into project directory and run `pnpm install`. 
 5. Run `pnpm dev` This will start both the client and the server in the same terminal.
 
+
+
