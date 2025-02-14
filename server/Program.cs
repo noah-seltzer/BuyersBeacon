@@ -38,7 +38,9 @@ builder.Services.AddCors(options =>
                             "http://localhost:3000",
                             "http://localhost:3000", 
                             "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
-                            "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app");
+                            "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
                       });
 });
 
