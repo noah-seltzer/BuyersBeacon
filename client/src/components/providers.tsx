@@ -9,7 +9,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 const Providers: FC<PropsWithChildren> = ({ children }) => {
     return (
         <Provider store={store}>
-            <ClerkProvider>
+            <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
                 <ThemeProvider
                     attribute='class'
                     defaultTheme='dark'
