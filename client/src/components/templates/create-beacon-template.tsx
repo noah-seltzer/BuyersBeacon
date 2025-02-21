@@ -1,5 +1,6 @@
 import { Beacon } from "@/types/beacon";
 import BeaconForm from "../organisms/forms/beacon-form";
+import { BeaconPreview } from "../organisms/beacon-preview";
 import { FormikErrors, FormikTouched } from "formik";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../atoms/button";
@@ -27,8 +28,8 @@ export function CreateBeaconTemplate({
   return (
     <div className="min-h-[calc(100vh-4rem)] py-8">
       <div className="container mx-auto px-4">
-        {/* Header Section */}
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
           <div className="flex items-center gap-4 mb-8">
             <Button
               variant="ghost"
@@ -50,17 +51,25 @@ export function CreateBeaconTemplate({
             </div>
           </div>
 
-          {/* Form Card */}
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <BeaconForm
-              handleSubmit={handleSubmit}
-              handleChange={handleChange}
-              values={values}
-              errors={errors}
-              touched={touched}
-              categoryOptions={categoryOptions}
-              submitting={submitting}
-            />
+          {/* Form and Preview Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Form Section */}
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
+              <BeaconForm
+                handleSubmit={handleSubmit}
+                handleChange={handleChange}
+                values={values}
+                errors={errors}
+                touched={touched}
+                categoryOptions={categoryOptions}
+                submitting={submitting}
+              />
+            </div>
+
+            {/* Preview Section - Sticky on desktop */}
+            <div className="lg:sticky lg:top-8">
+              <BeaconPreview beacon={values} />
+            </div>
           </div>
         </div>
       </div>
