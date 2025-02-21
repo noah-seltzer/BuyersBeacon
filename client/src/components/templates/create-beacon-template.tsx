@@ -14,6 +14,7 @@ interface CreateBeaconTemplateProps {
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
   submitting: boolean;
+  setFieldValue: (field: string, value: any) => void;
 }
 
 export function CreateBeaconTemplate({
@@ -24,6 +25,7 @@ export function CreateBeaconTemplate({
   touched,
   categoryOptions,
   submitting,
+  setFieldValue,
 }: CreateBeaconTemplateProps) {
   return (
     <div className="min-h-[calc(100vh-4rem)] py-8">
@@ -63,6 +65,7 @@ export function CreateBeaconTemplate({
                 touched={touched}
                 categoryOptions={categoryOptions}
                 submitting={submitting}
+                setFieldValue={setFieldValue}
               />
             </div>
 
