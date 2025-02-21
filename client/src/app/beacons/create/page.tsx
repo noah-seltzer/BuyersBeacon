@@ -15,17 +15,23 @@ const DEFAULT_CATEGORY_OPTIONS: { label: string, value: string }[] = [
 ]
 
 const CreateBeaconPage: FC = () => {
-    const [createBeacon, { isLoading, isError, error }] = useCreateBeaconMutation();
+    const [createBeacon, { isLoading }] = useCreateBeaconMutation();
 
     // const [createBeacon] = useCreateBeaconMutation()
 
-    const { handleChange, handleSubmit, values, errors, touched, isSubmitting } = useFormik({
+    const { handleChange, handleSubmit, values, errors, touched } = useFormik({
         initialValues: {
-            category: DEFAULT_CATEGORY_OPTIONS[0].value
-        } as unknown as Beacon,
-        onSubmit: async (result: Beacon, helpers: FormikHelpers<Beacon>) => {
-            const res = await createBeacon(result).unwrap()
-            console.log(res);
+            title: '',
+            category: DEFAULT_CATEGORY_OPTIONS[0].value,
+            description: '',
+        } as Beacon,
+        onSubmit: async (values: Beacon, helpers: FormikHelpers<Beacon>) => {
+            try {
+                const res = await createBeacon(values).unwrap()
+                console.log(res);
+            } catch (error) {
+                console.error('Failed to create beacon:', error);
+            }
         }
     })
 

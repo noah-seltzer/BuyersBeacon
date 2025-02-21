@@ -91,7 +91,6 @@ export function Navbar() {
                         >
                             Post Beacon
                         </Button>
-                        Post Beacon
                     </Link>
                     <Button
                         variant='ghost'
