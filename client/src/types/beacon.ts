@@ -1,23 +1,18 @@
-import { User } from "@/types/user"
+import { User } from "@/types/user";
+
+export interface BeaconImage {
+  file: File | string;
+  isCover: boolean;
+}
 
 export interface Beacon {
-    beaconId: string,
-    dateCreate: Date,
-    dateUpdate: Date,
-    itemName: string,
-    itemDescription: string,
-    itemPrice: number,
-    locCity: string,
-    locRegion: string,
-    locCountry: string,
-    locPostal_code: string,
-    contactEmail: string,
-    contactPhone: string,
-    category: Category,
-    user: User
+  title: string;
+  category: string;
+  description: string;
+  images: BeaconImage[];
 }
 
 export interface Category {
-    category_id: string
-    category_name: string
+  category_id: string;
+  category_name: string;
 }
