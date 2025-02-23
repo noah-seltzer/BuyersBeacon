@@ -7,6 +7,7 @@ import { Moon, Sun, Search, Menu, X, Bell } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { SignedOut, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 
 export function Navbar() {
     const { theme, setTheme } = useTheme()
@@ -49,7 +50,7 @@ export function Navbar() {
                         BuyersBeacon
                     </Link>
                     <div className='hidden md:flex items-center gap-6'>
-                        <NavLink href='/browse'>Browse</NavLink>
+                        <NavLink href='/beacons/browse'>Browse</NavLink>
                         <NavLink href='/categories'>Categories</NavLink>
                         <NavLink href='/about'>About</NavLink>
                     </div>
@@ -84,6 +85,28 @@ export function Navbar() {
                             <Moon className='h-5 w-5' />
                         )}
                     </Button>
+                    <SignedOut>
+                        <SignInButton>
+                        <Button
+                            variant='default'
+                            className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
+                        >
+                            Sign In
+                        </Button>
+                        </SignInButton>
+                        <SignUpButton>
+                        <Button
+                            variant='default'
+                            className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
+                        >
+                            Sign Up
+                        </Button>
+                        </SignUpButton>
+                    </SignedOut>
+
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
                     <Link href='/beacons/create' className='btn btn-primary'>
                         <Button
                             variant='default'
@@ -116,7 +139,7 @@ export function Navbar() {
             >
                 <div className='container mx-auto px-4 py-4 flex flex-col gap-4'>
                     <NavLink
-                        href='/browse'
+                        href='/beacons/browse'
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Browse

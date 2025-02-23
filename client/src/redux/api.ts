@@ -17,7 +17,7 @@ export const beaconApi = createApi({
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
                 return {
-                    url: 'api/beacons',
+                    url: 'beacons',
                     method: 'POST',
                     body: payload
                 }
