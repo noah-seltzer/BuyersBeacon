@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
-using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -24,10 +23,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of categories</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
             return await _context.Categories
-                .Select(c => new CategoryDto
+                .Select(c => new Category
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName
@@ -45,11 +44,11 @@ namespace server.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CategoryDto>> GetCategory(Guid id)
+        public async Task<ActionResult<Category>> GetCategory(Guid id)
         {
             var category = await _context.Categories
                 .Where(c => c.CategoryId == id)
-                .Select(c => new CategoryDto
+                .Select(c => new Category
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName
@@ -74,7 +73,7 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CategoryDto>> CreateCategory(CategoryDto categoryDto)
+        public async Task<ActionResult<Category>> CreateCategory(Category categoryDto)
         {
             if (!ModelState.IsValid)
             {
@@ -108,7 +107,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateCategory(Guid id, CategoryDto categoryDto)
+        public async Task<IActionResult> UpdateCategory(Guid id, Category categoryDto)
         {
             if (id != categoryDto.CategoryId)
             {

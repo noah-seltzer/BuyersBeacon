@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
-using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -28,10 +27,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<BeaconDto>>> GetBeacons()
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
         {
             var beacons = await _context.Beacons
-                .Select(b => new BeaconDto
+                .Select(b => new Beacon
                 {
                     BeaconId = b.BeaconId,
                     UserId = b.UserId,
@@ -61,11 +60,11 @@ namespace server.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BeaconDto>> GetBeacon(Guid id)
+        public async Task<ActionResult<Beacon>> GetBeacon(Guid id)
         {
             var beacon = await _context.Beacons
                 .Where(b => b.BeaconId == id)
-                .Select(b => new BeaconDto
+                .Select(b => new Beacon
                 {
                     BeaconId = b.BeaconId,
                     UserId = b.UserId,
@@ -100,7 +99,7 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<BeaconDto>> CreateBeacon(BeaconDto beaconDto)
+        public async Task<ActionResult<Beacon>> CreateBeacon(Beacon beaconDto)
         {
             if (!ModelState.IsValid)
             {
@@ -162,7 +161,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateBeacon(Guid id, BeaconDto beaconDto)
+        public async Task<IActionResult> UpdateBeacon(Guid id, Beacon beaconDto)
         {
             if (id != beaconDto.BeaconId)
             {

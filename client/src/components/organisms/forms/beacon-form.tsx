@@ -1,11 +1,13 @@
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Textarea } from "@/components/atoms/textarea";
-import { Select } from "@/components/atoms/select";
 import { Beacon } from "@/types/beacon";
 import { FormikErrors, FormikTouched } from "formik";
 import { Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/molecules/image-upload";
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import SelectInput from "@/components/molecules/inputs/select-input";
 
 interface BeaconFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -14,6 +16,8 @@ interface BeaconFormProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
+  categoryOptionsIsLoading: boolean,
+  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined,
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
 }
@@ -25,6 +29,8 @@ export function BeaconForm({
   errors,
   touched,
   categoryOptions,
+  categoryOptionsIsLoading,
+  categtorOptionsError,
   submitting,
   setFieldValue,
 }: BeaconFormProps) {
@@ -47,21 +53,15 @@ export function BeaconForm({
           )}
         </div>
 
-        <div>
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Category
-          </label>
-          <Select
-            name="category"
-            options={categoryOptions}
-            value={values.category}
-            onChange={handleChange}
-            className="mt-2"
-          />
-          {touched.category && errors.category && (
-            <p className="text-sm text-destructive mt-1">{errors.category}</p>
-          )}
-        </div>
+        <SelectInput
+          name={"category"}
+          value={values.category}
+          onChange={handleChange}
+          options={categoryOptions}
+          categoryOptionsIsLoading={categoryOptionsIsLoading}
+          categtorOptionsError={categtorOptionsError}
+          label="Category"
+        />
 
         <div>
           <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -95,7 +95,7 @@ export function BeaconForm({
             maxImages={6}
           />
           {touched.images && errors.images && (
-            <p className="text-sm text-destructive mt-1">{errors.images}</p>
+            <p className="text-sm text-destructive mt-1">{errors.images.toString()}</p>
           )}
         </div>
       </div>

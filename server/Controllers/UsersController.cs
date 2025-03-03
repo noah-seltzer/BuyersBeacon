@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
-using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -24,10 +23,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of users</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users
-                .Select(u => new UserDto
+                .Select(u => new User
                 {
                     UserId = u.UserId,
                     ClerkId = u.ClerkId
@@ -45,11 +44,11 @@ namespace server.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDto>> GetUser(Guid id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
             var user = await _context.Users
                 .Where(u => u.UserId == id)
-                .Select(u => new UserDto
+                .Select(u => new User
                 {
                     UserId = u.UserId,
                     ClerkId = u.ClerkId
@@ -74,11 +73,11 @@ namespace server.Controllers
         [HttpGet("clerk/{clerkId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDto>> GetUserByClerkId(string clerkId)
+        public async Task<ActionResult<User>> GetUserByClerkId(string clerkId)
         {
             var user = await _context.Users
                 .Where(u => u.ClerkId == clerkId)
-                .Select(u => new UserDto
+                .Select(u => new User
                 {
                     UserId = u.UserId,
                     ClerkId = u.ClerkId
@@ -103,7 +102,7 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<UserDto>> CreateUser(UserDto userDto)
+        public async Task<ActionResult<User>> CreateUser(User userDto)
         {
             if (!ModelState.IsValid)
             {
@@ -145,7 +144,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateUser(Guid id, UserDto userDto)
+        public async Task<IActionResult> UpdateUser(Guid id, User userDto)
         {
             if (id != userDto.UserId)
             {

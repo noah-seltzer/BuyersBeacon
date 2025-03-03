@@ -1,8 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { Beacon } from '@/types/beacon'
+import { Beacon, Category } from '@/types/beacon'
+
+export enum ENDPOINTS {
+    CATEGORIES = 'Categories',
+    BEACONS = 'Beacons',
+}
+enum CACHES {
+    BEACONS = "Beacon",
+    CATEGORIES = 'Categories'
+}
+
 
 export const beaconApi = createApi({
-    tagTypes: ['Beacon'],
+    tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES],
     reducerPath: 'beaconApi',
     baseQuery: fetchBaseQuery({
         mode: 'cors',
@@ -11,20 +21,24 @@ export const beaconApi = createApi({
 
     endpoints: (builder) => ({
         getBeacons: builder.query<Beacon[], void>({
-            query: () => 'beacons',
-            providesTags: () => [{ type: 'Beacon', id: 'LIST' }]
+            query: () => ENDPOINTS.BEACONS,
+            providesTags: () => [{ type: CACHES.BEACONS, id: 'LIST' }]
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
                 return {
-                    url: 'beacons',
+                    url: ENDPOINTS.BEACONS,
                     method: 'POST',
                     body: payload
                 }
             },
-            invalidatesTags: () => [{ type: 'Beacon', id: 'LIST' }]
+            invalidatesTags: () => [{ type: CACHES.BEACONS, id: 'LIST' }]
         }),
+        getAllCategories: builder.query<Category[], void>({
+            query: () => ENDPOINTS.CATEGORIES,
+            providesTags: () => [{ type: CACHES.CATEGORIES, id: "LIST" }]
+        })
     })
 })
 
-export const { useGetBeaconsQuery, useCreateBeaconMutation } = beaconApi
+export const { useGetBeaconsQuery, useCreateBeaconMutation, useGetAllCategoriesQuery } = beaconApi
