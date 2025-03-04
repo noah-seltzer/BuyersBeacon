@@ -7,9 +7,6 @@ import { useCreateBeaconMutation, useGetAllCategoriesQuery } from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
 
-// import { useCreateBeaconMutation } from '@/redux/api'
-
-
 const CreateBeaconPage: FC = () => {
   const [createBeacon] = useCreateBeaconMutation();
   const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);

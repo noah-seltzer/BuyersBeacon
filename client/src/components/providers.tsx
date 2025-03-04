@@ -5,6 +5,7 @@ import { Navbar } from '@/components/navbar'
 import { Provider } from 'react-redux'
 import { store } from '@/redux/store'
 import { ClerkProvider } from '@clerk/nextjs'
+import { ToastContainer } from 'react-toastify'
 
 const Providers: FC<PropsWithChildren> = ({ children }) => {
     return (
@@ -16,6 +17,7 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
                     enableSystem={false}
                     disableTransitionOnChange
                 >
+                    <ToastContainer />
                     <Navbar />
                     <main className='pt-16'>{children}</main>
                 </ThemeProvider>

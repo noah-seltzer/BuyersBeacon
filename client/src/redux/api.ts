@@ -37,8 +37,18 @@ export const beaconApi = createApi({
         getAllCategories: builder.query<Category[], void>({
             query: () => ENDPOINTS.CATEGORIES,
             providesTags: () => [{ type: CACHES.CATEGORIES, id: "LIST" }]
+        }),
+        getBeacon: builder.query<Beacon, string>({
+            query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
+            providesTags: ([{ type: CACHES.BEACONS, id: "" }])
         })
     })
 })
 
-export const { useGetBeaconsQuery, useCreateBeaconMutation, useGetAllCategoriesQuery } = beaconApi
+export const {
+    useGetBeaconsQuery,
+    useCreateBeaconMutation,
+    useGetAllCategoriesQuery,
+    useGetBeaconQuery
+} = beaconApi
+

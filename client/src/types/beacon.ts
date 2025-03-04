@@ -6,6 +6,7 @@ export interface BeaconImage {
 }
 
 export interface Beacon {
+  Category?: Category;
   BeaconId?: string;
   ItemName: string;
   CategoryId: string;

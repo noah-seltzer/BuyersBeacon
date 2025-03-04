@@ -69,6 +69,7 @@ namespace server.Controllers
                     BeaconId = b.BeaconId,
                     UserId = b.UserId,
                     CategoryId = b.CategoryId,
+                    Category = b.Category,
                     DateCreate = b.DateCreate,
                     DateUpdate = b.DateUpdate,
                     ItemName = b.ItemName,

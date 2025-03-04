@@ -21,6 +21,7 @@ namespace server.Models
         public Guid CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
+        [JsonPropertyName("Category")]
         public Category? Category { get; set; }
 
         [Required]
