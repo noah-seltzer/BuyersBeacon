@@ -6,13 +6,14 @@ export interface BeaconImage {
 }
 
 export interface Beacon {
-  title: string;
-  category: string;
-  description: string;
-  images: BeaconImage[];
+  BeaconId?: string;
+  ItemName: string;
+  CategoryId: string;
+  ItemDescription: string;
+  Images: BeaconImage[];
 }
 
 export interface Category {
-  categoryId: string;
-  categoryName: string;
+  CategoryName: string;
+  CategoryId: string;
 }

@@ -42,24 +42,25 @@ export function BeaconForm({
             Title
           </label>
           <Input
-            name="title"
+            name="ItemName"
             placeholder="What are you looking for?"
             onChange={handleChange}
-            value={values.title}
+            value={values.ItemName}
             className="mt-2"
           />
-          {touched.title && errors.title && (
-            <p className="text-sm text-destructive mt-1">{errors.title}</p>
+          {touched.ItemName && errors.ItemName && (
+            <p className="text-sm text-destructive mt-1">{errors.ItemName}</p>
           )}
         </div>
 
         <SelectInput
-          name={"category"}
-          value={values.category}
+          name={"CategoryId"}
+          value={values.CategoryId}
           onChange={handleChange}
           options={categoryOptions}
           categoryOptionsIsLoading={categoryOptionsIsLoading}
           categtorOptionsError={categtorOptionsError}
+          error={errors.CategoryId}
           label="Category"
         />
 
@@ -68,15 +69,15 @@ export function BeaconForm({
             Description
           </label>
           <Textarea
-            name="description"
+            name="ItemDescription"
             placeholder="Describe what you're looking for in detail..."
             onChange={handleChange}
-            value={values.description}
+            value={values.ItemDescription}
             className="mt-2 min-h-[150px]"
           />
-          {touched.description && errors.description && (
+          {touched.ItemDescription && errors.ItemDescription && (
             <p className="text-sm text-destructive mt-1">
-              {errors.description}
+              {errors.ItemDescription}
             </p>
           )}
         </div>
@@ -90,12 +91,12 @@ export function BeaconForm({
           </p>
           <ImageUpload
             onChange={(images) => setFieldValue("images", images)}
-            value={values.images || []}
+            value={values.Images || []}
             className="mt-2"
             maxImages={6}
           />
-          {touched.images && errors.images && (
-            <p className="text-sm text-destructive mt-1">{errors.images.toString()}</p>
+          {touched.Images && errors.Images && (
+            <p className="text-sm text-destructive mt-1">{errors.Images.toString()}</p>
           )}
         </div>
       </div>

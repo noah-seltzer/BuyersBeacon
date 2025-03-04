@@ -1,23 +1,20 @@
 "use client";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 import { FormikHelpers, useFormik } from "formik";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
-import { Beacon, Category } from "@/types/beacon";
+import { Beacon } from "@/types/beacon";
 import { useCreateBeaconMutation, useGetAllCategoriesQuery } from "@/redux/api";
+import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
+import { useRouter } from "next/navigation";
+
 // import { useCreateBeaconMutation } from '@/redux/api'
 
-const DEFAULT_CATEGORY_OPTIONS: { label: string; value: string }[] = [
-  { label: "Automotive", value: "automotive" },
-  { label: "Comics", value: "comics" },
-  { label: "Clothing", value: "clothing" },
-  { label: "Heavy Duty", value: "heavy duty" },
-  { label: "watches", value: "watches" },
-];
 
 const CreateBeaconPage: FC = () => {
   const [createBeacon] = useCreateBeaconMutation();
   const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
   const { data: categoies, error, isLoading, } = useGetAllCategoriesQuery();
+  const router = useRouter();
 
   // Set category options
   useEffect(() => {
@@ -25,36 +22,33 @@ const CreateBeaconPage: FC = () => {
     const res: { label: string; value: string }[] = [];
 
     for (let i = 0; i < categoies.length; i++) {
-      const name = categoies[i].categoryName.charAt(0).toUpperCase() + categoies[i].categoryName.substring(1);
+      const name = categoies[i].CategoryName.charAt(0).toUpperCase() + categoies[i].CategoryName.substring(1);
       res.push({
         label: name,
-        value: categoies[i].categoryId
+        value: categoies[i].CategoryId
       })
     }
 
     setCategoryOptions(res);
   }, [categoies])
 
-  const processSubmit = async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
+  const processSubmit = useCallback(async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
     try {
       // THIS IS WHERE WE WILL upload the image to S3 first and then send the URL with the beacon data
       helpers.setSubmitting(true)
-      await createBeacon(beacon).unwrap();
+      const res = await createBeacon(beacon).unwrap();
+      console.log(res);
+      navigateToBeaconDetailsPage(router, res);
     } catch (error) {
       console.error("Failed to create beacon:", error);
     } finally {
       helpers.setSubmitting(false)
     }
-  }
+  }, [createBeacon, navigateToBeaconDetailsPage, router])
 
   const { handleChange, handleSubmit, values, errors, touched, setFieldValue, isSubmitting } =
     useFormik({
-      initialValues: {
-        title: "",
-        category: DEFAULT_CATEGORY_OPTIONS[0].value,
-        description: "",
-        image: null,
-      } as unknown as Beacon,
+      initialValues: {} as Beacon,
       onSubmit: processSubmit
     })
 
