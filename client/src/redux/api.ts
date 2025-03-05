@@ -40,7 +40,7 @@ export const beaconApi = createApi({
         }),
         getBeacon: builder.query<Beacon, string>({
             query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
-            providesTags: ([{ type: CACHES.BEACONS, id: "" }])
+            providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }]
         })
     })
 })

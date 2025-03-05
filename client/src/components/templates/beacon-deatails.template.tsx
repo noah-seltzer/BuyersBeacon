@@ -1,16 +1,20 @@
-import { Beacon } from "@/types/beacon";
+'use client'
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
-import Title from "../atoms/text/title";
-import DetailedBeacon from "../organisms/beacons/detailed-beacon";
+import Title from "@/components/atoms/text/title";
+import DetailedBeacon from "@/components/organisms/beacons/detailed-beacon";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetBeaconQuery } from "@/redux/api";
 
 
 interface BeaconDetailsPageTemplate {
-    beacon?: Beacon,
-    isLoading: boolean,
+    beaconId?: string,
+    // isLoading: boolean,
 }
 
 
-const BeaconDetailsPageTemplate = ({ beacon, isLoading }: BeaconDetailsPageTemplate) => {
+const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
+    const { data: beacon, error, isLoading } = useGetBeaconQuery(beaconId ?? skipToken);
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center py-8">
             <div className="container mx-auto px-4">

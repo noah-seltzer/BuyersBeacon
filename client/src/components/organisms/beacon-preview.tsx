@@ -14,9 +14,9 @@ interface BeaconPreviewProps {
 
 export function BeaconPreview({ beacon }: BeaconPreviewProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const hasImages = beacon.images && beacon.images.length > 0;
-  const currentImage = beacon.images?.[currentImageIndex];
-  const totalImages = beacon.images?.length || 0;
+  const hasImages = beacon.Images && beacon.Images.length > 0;
+  const currentImage = beacon.Images?.[currentImageIndex];
+  const totalImages = beacon.Images?.length || 0;
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % totalImages);
@@ -37,7 +37,7 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
                 ? currentImage.file
                 : URL.createObjectURL(currentImage.file)
             }
-            alt={beacon.title || "Beacon image"}
+            alt={beacon.ItemName || "Beacon image"}
             fill
             className="object-cover"
           />
@@ -97,7 +97,7 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
           <div className="flex items-start justify-between">
             <div className="space-y-1">
               <h3 className="text-xl font-semibold line-clamp-2">
-                {beacon.title || "Your beacon title"}
+                {beacon.ItemName || "Your beacon title"}
               </h3>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <User2 className="h-4 w-4" />
@@ -105,11 +105,11 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
               </div>
             </div>
             <Badge variant="secondary" className="capitalize">
-              {beacon.category || "Category"}
+              {beacon.Category?.CategoryName || "Category"}
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            {beacon.description ||
+            {beacon.ItemDescription ||
               "Your beacon description will appear here..."}
           </p>
         </div>

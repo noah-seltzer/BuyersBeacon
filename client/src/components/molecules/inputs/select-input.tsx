@@ -1,5 +1,6 @@
 import { SerializedError } from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { twMerge } from 'tailwind-merge'
 
 interface SelectInputProps {
     label?: string;
@@ -24,7 +25,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
     error
 }) => {
     return (
-        <div className={`space-y-4 ${className}`}>
+        <div className={twMerge([`space-y-4`, className])}>
             {label && <label htmlFor={name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{label}</label>}
             <select
                 name={name}

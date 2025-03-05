@@ -1,39 +1,19 @@
-"use client";
-import { useGetBeaconQuery } from "@/redux/api";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useTheme } from "next-themes";
+import { Suspense } from "react";
 import BeaconDetailsPageTemplate from "@/components/templates/beacon-deatails.template";
 
-const BeaconDetailsPage = () => {
-    const path = usePathname();
-    const router = useRouter();
-    const [beaconId, setBeaconId] = useState<string | undefined>(undefined);
-    const { data: beacon, error, isLoading } = useGetBeaconQuery(beaconId ?? "", {
-        skip: !beaconId,
-    });
+interface BeaconDetailsPageProps {
+    params: Promise<{ id: string }>
+}
 
-    useEffect(() => {
-        const pathArr = path.split("/");
-        if (pathArr.length < 3) {
-            toast("Id not found.", {
-                type: "error",
-            });
-            router.back();
-            return;
-        }
-
-        setBeaconId(pathArr[2]);
-    }, [path]);
+const BeaconDetailsPage = async (props: BeaconDetailsPageProps) => {
+    const { id } = await props.params;
 
 
-    console.log("BEACON", beacon)
-
-    return <BeaconDetailsPageTemplate
-        beacon={beacon}
-        isLoading={isLoading}
-    />;
+    return <Suspense fallback={<div>Fallback</div>}>
+        <BeaconDetailsPageTemplate
+            beaconId={id}
+        />;
+    </Suspense>
 };
 
 export default BeaconDetailsPage;
