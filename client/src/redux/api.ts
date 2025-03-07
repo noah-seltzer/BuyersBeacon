@@ -32,7 +32,6 @@ export const beaconApi = createApi({
                 formData.append('CategoryId', payload.CategoryId);
 
                 for (let i = 0; i < payload.Images.length; i++) {
-                    console.log(i);
                     formData.append("Images", payload.Images[i].file);
                 }
 

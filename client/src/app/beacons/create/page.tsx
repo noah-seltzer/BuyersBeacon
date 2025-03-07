@@ -32,8 +32,6 @@ const CreateBeaconPage: FC = () => {
   const processSubmit = useCallback(async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
     try {
       // THIS IS WHERE WE WILL upload the image to S3 first and then send the URL with the beacon data
-      console.log("BEACON", beacon);
-
       helpers.setSubmitting(true)
       const res = await createBeacon(beacon).unwrap();
       navigateToBeaconDetailsPage(router, res);
