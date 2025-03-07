@@ -5,6 +5,8 @@ import { FormikErrors, FormikTouched } from "formik";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../atoms/button";
 import Link from "next/link";
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 interface CreateBeaconTemplateProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -13,8 +15,11 @@ interface CreateBeaconTemplateProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
+  categoryOptionsIsLoading: boolean,
+  categoryOptionsError: FetchBaseQueryError | SerializedError | undefined,
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
+
 }
 
 export function CreateBeaconTemplate({
@@ -24,6 +29,8 @@ export function CreateBeaconTemplate({
   errors,
   touched,
   categoryOptions,
+  categoryOptionsError,
+  categoryOptionsIsLoading,
   submitting,
   setFieldValue,
 }: CreateBeaconTemplateProps) {
@@ -64,6 +71,8 @@ export function CreateBeaconTemplate({
                 errors={errors}
                 touched={touched}
                 categoryOptions={categoryOptions}
+                categoryOptionsIsLoading={categoryOptionsIsLoading}
+                categtorOptionsError={categoryOptionsError}
                 submitting={submitting}
                 setFieldValue={setFieldValue}
               />

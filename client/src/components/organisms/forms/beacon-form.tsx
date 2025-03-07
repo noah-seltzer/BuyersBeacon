@@ -1,11 +1,13 @@
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Textarea } from "@/components/atoms/textarea";
-import { Select } from "@/components/atoms/select";
 import { Beacon } from "@/types/beacon";
 import { FormikErrors, FormikTouched } from "formik";
 import { Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/molecules/image-upload";
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import SelectInput from "@/components/molecules/inputs/select-input";
 
 interface BeaconFormProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -14,6 +16,8 @@ interface BeaconFormProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
+  categoryOptionsIsLoading: boolean,
+  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined,
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
 }
@@ -25,6 +29,8 @@ export function BeaconForm({
   errors,
   touched,
   categoryOptions,
+  categoryOptionsIsLoading,
+  categtorOptionsError,
   submitting,
   setFieldValue,
 }: BeaconFormProps) {
@@ -36,47 +42,42 @@ export function BeaconForm({
             Title
           </label>
           <Input
-            name="title"
+            name="ItemName"
             placeholder="What are you looking for?"
             onChange={handleChange}
-            value={values.title}
+            value={values.ItemName}
             className="mt-2"
           />
-          {touched.title && errors.title && (
-            <p className="text-sm text-destructive mt-1">{errors.title}</p>
+          {touched.ItemName && errors.ItemName && (
+            <p className="text-sm text-destructive mt-1">{errors.ItemName}</p>
           )}
         </div>
 
-        <div>
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Category
-          </label>
-          <Select
-            name="category"
-            options={categoryOptions}
-            value={values.category}
-            onChange={handleChange}
-            className="mt-2"
-          />
-          {touched.category && errors.category && (
-            <p className="text-sm text-destructive mt-1">{errors.category}</p>
-          )}
-        </div>
+        <SelectInput
+          name={"CategoryId"}
+          value={values.CategoryId}
+          onChange={handleChange}
+          options={categoryOptions}
+          categoryOptionsIsLoading={categoryOptionsIsLoading}
+          categtorOptionsError={categtorOptionsError}
+          error={errors.CategoryId}
+          label="Category"
+        />
 
         <div>
           <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Description
           </label>
           <Textarea
-            name="description"
+            name="ItemDescription"
             placeholder="Describe what you're looking for in detail..."
             onChange={handleChange}
-            value={values.description}
+            value={values.ItemDescription}
             className="mt-2 min-h-[150px]"
           />
-          {touched.description && errors.description && (
+          {touched.ItemDescription && errors.ItemDescription && (
             <p className="text-sm text-destructive mt-1">
-              {errors.description}
+              {errors.ItemDescription}
             </p>
           )}
         </div>
@@ -90,12 +91,12 @@ export function BeaconForm({
           </p>
           <ImageUpload
             onChange={(images) => setFieldValue("images", images)}
-            value={values.images || []}
+            value={values.Images || []}
             className="mt-2"
             maxImages={6}
           />
-          {touched.images && errors.images && (
-            <p className="text-sm text-destructive mt-1">{errors.images}</p>
+          {touched.Images && errors.Images && (
+            <p className="text-sm text-destructive mt-1">{errors.Images.toString()}</p>
           )}
         </div>
       </div>

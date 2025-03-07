@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace server.Models
 {
@@ -8,6 +9,7 @@ namespace server.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonPropertyName("BeaconId")]
         public Guid BeaconId { get; set; }
 
         public Guid UserId { get; set; }
@@ -15,9 +17,11 @@ namespace server.Models
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
+        [JsonPropertyName("CategoryId")]
         public Guid CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
+        [JsonPropertyName("Category")]
         public Category? Category { get; set; }
 
         [Required]
@@ -28,10 +32,12 @@ namespace server.Models
 
         [Required]
         [MaxLength(100)]
+        [JsonPropertyName("ItemName")]
         public string ItemName { get; set; }
 
         [Required]
         [MaxLength(500)]
+        [JsonPropertyName("ItemDescription")]
         public string ItemDescription { get; set; }
 
         [Required]

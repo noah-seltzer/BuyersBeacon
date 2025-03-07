@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
-using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -28,10 +27,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<BeaconDto>>> GetBeacons()
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
         {
             var beacons = await _context.Beacons
-                .Select(b => new BeaconDto
+                .Select(b => new Beacon
                 {
                     BeaconId = b.BeaconId,
                     UserId = b.UserId,
@@ -61,15 +60,16 @@ namespace server.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BeaconDto>> GetBeacon(Guid id)
+        public async Task<ActionResult<Beacon>> GetBeacon(Guid id)
         {
             var beacon = await _context.Beacons
                 .Where(b => b.BeaconId == id)
-                .Select(b => new BeaconDto
+                .Select(b => new Beacon
                 {
                     BeaconId = b.BeaconId,
                     UserId = b.UserId,
                     CategoryId = b.CategoryId,
+                    Category = b.Category,
                     DateCreate = b.DateCreate,
                     DateUpdate = b.DateUpdate,
                     ItemName = b.ItemName,
@@ -93,60 +93,66 @@ namespace server.Controllers
         /// <summary>
         /// Creates a new beacon
         /// </summary>
-        /// <param name="beaconDto">The beacon to create</param>
+        /// <param name="beacon">The beacon to create</param>
         /// <returns>The created beacon</returns>
         /// <response code="201">Returns the newly created beacon</response>
         /// <response code="400">If the beacon data is invalid or if Category/User doesn't exist</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<BeaconDto>> CreateBeacon(BeaconDto beaconDto)
+        public async Task<ActionResult<Beacon>> CreateBeacon(Beacon beacon)
         {
+            beacon.UserId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
             // Validate that Category exists
-            var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == beaconDto.CategoryId);
-            if (!categoryExists)
+            Category? category = await _context.Categories.Select(c => new Category {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName
+            }).FirstOrDefaultAsync((Category c) => c.CategoryId == beacon.CategoryId);
+            if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Specified category does not exist");
                 return BadRequest(ModelState);
             }
 
             // Validate that User exists
-            var userExists = await _context.Users.AnyAsync(u => u.UserId == beaconDto.UserId);
+            var userExists = await _context.Users.AnyAsync(u => u.UserId == beacon.UserId);
             if (!userExists)
             {
                 ModelState.AddModelError("UserId", "Specified user does not exist");
                 return BadRequest(ModelState);
             }
 
-            var beacon = new Beacon
+            var newBeacon = new Beacon
             {
                 BeaconId = Guid.NewGuid(),
-                UserId = beaconDto.UserId,
-                CategoryId = beaconDto.CategoryId,
+                UserId = beacon.UserId,
+                CategoryId = beacon.CategoryId,
                 DateCreate = DateTime.UtcNow,
                 DateUpdate = DateTime.UtcNow,
-                ItemName = beaconDto.ItemName,
-                ItemDescription = beaconDto.ItemDescription,
-                ItemPrice = beaconDto.ItemPrice,
-                LocCity = beaconDto.LocCity,
-                LocRegion = beaconDto.LocRegion,
-                LocCountry = beaconDto.LocCountry,
-                LocPostalCode = beaconDto.LocPostalCode
+                ItemName = beacon.ItemName,
+                ItemDescription = beacon.ItemDescription,
+                ItemPrice = beacon.ItemPrice,
+                LocCity = beacon.LocCity,
+                LocRegion = beacon.LocRegion,
+                LocCountry = beacon.LocCountry,
+                LocPostalCode = beacon.LocPostalCode
             };
 
-            _context.Beacons.Add(beacon);
+
+            var resB = _context.Beacons.Add(newBeacon);
             await _context.SaveChangesAsync();
 
-            beaconDto.BeaconId = beacon.BeaconId;
-            beaconDto.DateCreate = beacon.DateCreate;
-            beaconDto.DateUpdate = beacon.DateUpdate;
+        
+            resB.Entity.Category = category; 
 
-            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, beaconDto);
+
+
+            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, resB.Entity);
         }
 
         /// <summary>
@@ -162,7 +168,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateBeacon(Guid id, BeaconDto beaconDto)
+        public async Task<IActionResult> UpdateBeacon(Guid id, Beacon beaconDto)
         {
             if (id != beaconDto.BeaconId)
             {

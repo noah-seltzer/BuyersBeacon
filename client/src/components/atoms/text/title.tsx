@@ -6,7 +6,7 @@ type TitleProps = {
 };
 
 const Title: FC<TitleProps> = ({ children, className = '' }) => {
-    return <h1 className={`text-2xl font-bold ${className}`}>{children}</h1>;
+    return <h1 className={`text-5xl font-bold text-primary ${className}`}>{children}</h1>;
 };
 
 export default Title;
