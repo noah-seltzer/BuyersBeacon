@@ -34,7 +34,6 @@ const CreateBeaconPage: FC = () => {
       // THIS IS WHERE WE WILL upload the image to S3 first and then send the URL with the beacon data
       helpers.setSubmitting(true)
       const res = await createBeacon(beacon).unwrap();
-      console.log(res);
       navigateToBeaconDetailsPage(router, res);
     } catch (error) {
       console.error("Failed to create beacon:", error);
@@ -45,7 +44,12 @@ const CreateBeaconPage: FC = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, setFieldValue, isSubmitting } =
     useFormik({
-      initialValues: {} as Beacon,
+      initialValues: {
+        ItemName: "",
+        CategoryId: '',
+        ItemDescription: "",
+        Images: [],
+      } as Beacon,
       onSubmit: processSubmit
     })
 
