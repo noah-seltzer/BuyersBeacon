@@ -35,8 +35,6 @@ export const beaconApi = createApi({
                     formData.append("Images", payload.Images[i].file);
                 }
 
-                formData.entries().forEach(e => console.log(e[0], e[1]));
-
                 return {
                     url: ENDPOINTS.BEACONS,
                     method: 'POST',
