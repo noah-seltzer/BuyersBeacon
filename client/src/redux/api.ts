@@ -26,10 +26,25 @@ export const beaconApi = createApi({
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
+                var formData = new FormData();
+                formData.append('ItemName', payload.ItemName);
+                formData.append('ItemDescription', payload.ItemDescription);
+                formData.append('CategoryId', payload.CategoryId);
+
+                for (let i = 0; i < payload.Images.length; i++) {
+                    console.log(i);
+                    formData.append("Images", payload.Images[i].file);
+                }
+
+                formData.entries().forEach(e => console.log(e[0], e[1]));
+
                 return {
                     url: ENDPOINTS.BEACONS,
                     method: 'POST',
-                    body: payload
+                    headers: {
+                        'Content-Type': 'multipart/form-data;'
+                    },
+                    body: formData,
                 }
             },
             invalidatesTags: () => [{ type: CACHES.BEACONS, id: 'LIST' }]
