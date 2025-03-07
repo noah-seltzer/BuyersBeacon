@@ -90,7 +90,7 @@ export function BeaconForm({
             Add up to 6 images. First image will be the cover photo.
           </p>
           <ImageUpload
-            onChange={(images) => setFieldValue("images", images)}
+            onChange={(images) => setFieldValue("Images", images)}
             value={values.Images || []}
             className="mt-2"
             maxImages={6}
