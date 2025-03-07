@@ -45,7 +45,12 @@ const CreateBeaconPage: FC = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, setFieldValue, isSubmitting } =
     useFormik({
-      initialValues: {} as Beacon,
+      initialValues: {
+        ItemName: "",
+        CategoryId: '',
+        ItemDescription: "",
+        Images: [],
+      } as Beacon,
       onSubmit: processSubmit
     })
 
