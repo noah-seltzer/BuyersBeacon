@@ -3,7 +3,9 @@ import BodyText from "@/components/atoms/text/body"
 import SecondaryTitle from "@/components/atoms/text/secondary-title"
 import SubTitle from "@/components/atoms/text/sub-title"
 import Title from "@/components/atoms/text/title"
+import ImagePreview from "@/components/molecules/image-preview"
 import { Beacon, Category } from "@/types/beacon"
+import BeatLoader from "react-spinners/BeatLoader"
 
 interface DetailedBeaconProps {
     beacon: Beacon,
@@ -21,8 +23,28 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
                 {category.CategoryName}
             </SecondaryTitle>
         </div>
-        <div className="h-[500px] w-full bg-surface flex items-center justify-center">
-            IMAGES GO HERE
+        <div className="w-full flex items-center justify-center">
+            <ImagePreview
+                images={beacon.Images ?? [{
+                    file: "https://picsum.photos/800/600",
+                    isCover: true
+                },
+                {
+                    file: "https://picsum.photos/800/600",
+                    isCover: false
+                },
+                {
+                    file: "https://picsum.photos/800/600",
+                    isCover: false
+                },
+                {
+                    file: "https://picsum.photos/800/600",
+                    isCover: false
+                }
+                ]}
+                alt={beacon.ItemName}
+                emptyStatePrimaryText={"No images found"}
+            />
         </div>
         <div className="flex flex-col gap-5">
             <div className="flex justify-between items-center">
