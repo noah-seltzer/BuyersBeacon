@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Util;
+
 
 namespace server.Controllers
 {
@@ -14,6 +13,8 @@ namespace server.Controllers
     public class BeaconsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+
+        private AzureImageUploadManager azureFileUploadManager;
 
         public BeaconsController(ApplicationDbContext context)
         {
@@ -127,9 +128,11 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var Id = Guid.NewGuid();
+
             var newBeacon = new Beacon
             {
-                BeaconId = Guid.NewGuid(),
+                BeaconId = Id,
                 UserId = beacon.UserId,
                 CategoryId = beacon.CategoryId,
                 DateCreate = DateTime.UtcNow,
@@ -142,6 +145,21 @@ namespace server.Controllers
                 LocCountry = beacon.LocCountry,
                 LocPostalCode = beacon.LocPostalCode
             };
+
+            if (beacon.Images != null && beacon.Images.Length > 0)
+            {
+                beacon.ImageSet = new ImageSet();
+                beacon.ImageSet.Beacon = beacon;
+                foreach (var image in beacon.Images)
+                {
+                    var img = new Image();
+                    img.FileName = image.FileName;
+                    
+
+                    this.azureFileUploadManager.UploadBase64File(img.ExternalStorageId.ToString(), image.FileData);
+                    beacon.ImageSet.Images.Add(img);
+                }
+            }
 
 
             var resB = _context.Beacons.Add(newBeacon);

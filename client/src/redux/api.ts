@@ -63,4 +63,3 @@ export const {
     useGetAllCategoriesQuery,
     useGetBeaconQuery
 } = beaconApi
-

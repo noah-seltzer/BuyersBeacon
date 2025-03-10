@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using server.Types;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -57,5 +58,8 @@ namespace server.Models
         public string? LocPostalCode { get; set; }
 
         public ImageSet? ImageSet { get; set; }
+
+        [NotMapped]
+        public ImageUpload[]? Images {  get; set; }
     }
 }

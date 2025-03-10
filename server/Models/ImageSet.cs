@@ -13,10 +13,6 @@ namespace server.Models
         
         public Guid BeaconId { get; set; }
 
-        [Required]
-        [Range(0, int.MaxValue)]
-        public int NumImages { get; set; } = 0;
-
         [ForeignKey("BeaconId")]
         public Beacon? Beacon {  get; set; }
 
