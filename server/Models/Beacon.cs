@@ -57,5 +57,11 @@ namespace server.Models
         public string? LocPostalCode { get; set; }
 
         public ImageSet? ImageSet { get; set; }
+
+        [JsonPropertyName("IsDraft")]
+        public bool IsDraft { get; set; } = false;
+
+        [JsonPropertyName("LastDraftSave")]
+        public DateTime? LastDraftSave { get; set; }
     }
 }

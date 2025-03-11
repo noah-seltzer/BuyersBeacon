@@ -91,6 +91,25 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Gets all drafts for a user
+        /// </summary>
+        /// <returns>A list of all drafts for the user</returns>
+        /// <response code="200">Returns the list of drafts</response>
+        [HttpGet("drafts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
+        {
+            var userId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"); // Replace with actual user ID
+            var drafts = await _context.Beacons
+                .Where(b => b.UserId == userId && b.IsDraft)
+                .Include(b => b.Category)
+                .OrderByDescending(b => b.LastDraftSave)
+                .ToListAsync();
+
+            return drafts;
+        }
+
+        /// <summary>
         /// Creates a new beacon
         /// </summary>
         /// <param name="beacon">The beacon to create</param>
@@ -140,17 +159,15 @@ namespace server.Controllers
                 LocCity = beacon.LocCity,
                 LocRegion = beacon.LocRegion,
                 LocCountry = beacon.LocCountry,
-                LocPostalCode = beacon.LocPostalCode
+                LocPostalCode = beacon.LocPostalCode,
+                IsDraft = beacon.IsDraft,
+                LastDraftSave = beacon.IsDraft ? DateTime.UtcNow : null
             };
-
 
             var resB = _context.Beacons.Add(newBeacon);
             await _context.SaveChangesAsync();
 
-        
             resB.Entity.Category = category; 
-
-
 
             return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, resB.Entity);
         }

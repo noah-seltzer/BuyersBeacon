@@ -4,6 +4,7 @@ import { Beacon, Category } from '@/types/beacon'
 export enum ENDPOINTS {
     CATEGORIES = 'Categories',
     BEACONS = 'Beacons',
+    DRAFTS = 'Beacons/drafts'
 }
 enum CACHES {
     BEACONS = "Beacon",
@@ -53,7 +54,31 @@ export const beaconApi = createApi({
         getBeacon: builder.query<Beacon, string>({
             query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
             providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }]
-        })
+        }),
+        getDrafts: builder.query<Beacon[], void>({
+            query: () => ENDPOINTS.DRAFTS,
+            providesTags: () => [{ type: CACHES.BEACONS, id: 'DRAFTS' }]
+        }),
+        saveDraft: builder.mutation<Beacon, Beacon>({
+            query: (payload) => {
+                var formData = new FormData();
+                formData.append('ItemName', payload.ItemName);
+                formData.append('ItemDescription', payload.ItemDescription);
+                formData.append('CategoryId', payload.CategoryId);
+                formData.append('IsDraft', 'true');
+
+                for (let i = 0; i < (payload.Images?.length || 0); i++) {
+                    formData.append("Images", payload.Images[i].file);
+                }
+
+                return {
+                    url: ENDPOINTS.BEACONS,
+                    method: 'POST',
+                    body: formData,
+                }
+            },
+            invalidatesTags: () => [{ type: CACHES.BEACONS, id: 'DRAFTS' }]
+        }),
     })
 })
 
@@ -61,6 +86,8 @@ export const {
     useGetBeaconsQuery,
     useCreateBeaconMutation,
     useGetAllCategoriesQuery,
-    useGetBeaconQuery
+    useGetBeaconQuery,
+    useGetDraftsQuery,
+    useSaveDraftMutation
 } = beaconApi
 
