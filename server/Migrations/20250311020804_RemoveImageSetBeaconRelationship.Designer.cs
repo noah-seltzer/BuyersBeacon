@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server.Data;
 
@@ -11,9 +12,11 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250311020804_RemoveImageSetBeaconRelationship")]
+    partial class RemoveImageSetBeaconRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,18 +111,12 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ExternalImageId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ImageSetId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ImageId");
 
@@ -134,17 +131,10 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BeaconId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("NumImages")
                         .HasColumnType("int");
 
                     b.HasKey("ImageSetId");
-
-                    b.HasIndex("BeaconId")
-                        .IsUnique()
-                        .HasFilter("[BeaconId] IS NOT NULL");
 
                     b.ToTable("ImageSets");
                 });
@@ -191,20 +181,6 @@ namespace server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ImageSet");
-                });
-
-            modelBuilder.Entity("server.Models.ImageSet", b =>
-                {
-                    b.HasOne("server.Models.Beacon", "Beacon")
-                        .WithOne("ImageSet")
-                        .HasForeignKey("server.Models.ImageSet", "BeaconId");
-
-                    b.Navigation("Beacon");
-                });
-
-            modelBuilder.Entity("server.Models.Beacon", b =>
-                {
                     b.Navigation("ImageSet");
                 });
 

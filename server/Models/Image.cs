@@ -5,9 +5,6 @@ namespace server.Models
 {
     public class Image
     {
-           
-
-
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ImageId { get; set; }
@@ -18,6 +15,10 @@ namespace server.Models
         [Required]
         public string FileName  { get; set; }
 
+
+        public string? ImageUrl { get; set; }
+
+        public string? ExternalImageId {  get; set; }
 
         [ForeignKey("ImageSetId")]
         public ImageSet? ImageSet { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Util;
 
 namespace server.Controllers
 {
@@ -14,10 +15,12 @@ namespace server.Controllers
     public class BeaconsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private BlobServiceManager _blobServiceManager;
 
         public BeaconsController(ApplicationDbContext context)
         {
             _context = context;
+            _blobServiceManager = new BlobServiceManager();
         }
 
         /// <summary>
@@ -30,6 +33,8 @@ namespace server.Controllers
         public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
         {
             var beacons = await _context.Beacons
+                .Include(b => b.ImageSet)
+                .ThenInclude(i => i.Images)
                 .Select(b => new Beacon
                 {
                     BeaconId = b.BeaconId,
@@ -90,6 +95,73 @@ namespace server.Controllers
             return beacon;
         }
 
+
+        public string GenerateGuidFilename()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
+        public Image GenerateImage(IFormFile formFile, ImageSet? imageSet)
+        {
+            var fileId = Guid.NewGuid().ToString();
+            var image = new Image();
+            image.FileName = formFile.FileName;
+            image.ExternalImageId = fileId;
+            if (imageSet != null)
+            {
+                image.ImageSet = imageSet;
+                if (imageSet.Images == null)
+                {
+                    imageSet.Images = new List<Image>();
+                }
+                imageSet.Images.Add(image);
+            }
+            return image;
+        }
+
+        public async Task<ActionResult<Beacon>> CreateImagesetForNewBeacon(Beacon beacon, Beacon beaconInput)
+        {
+            if (beaconInput.Image == null && (beaconInput.Images == null || beaconInput.Images.Length == 0))
+            {
+                return beacon;
+            }
+
+            var imageSet = new ImageSet();
+            //beacon.ImageSet = imageSet;
+            //imageSet.Beacon = beacon;
+            imageSet.BeaconId = beacon.BeaconId;
+            _context.ImageSets.Add(imageSet);
+
+            if (beaconInput.Images != null && beaconInput.Images.Length > 0)
+            {
+                List<Task> uploadPromises = new List<Task>();
+                foreach (var image in beaconInput.Images)
+                {
+                    var imageModel = this.GenerateImage(image, imageSet);
+                    imageSet.Images.Add(imageModel);
+                    _context.Images.Add(imageModel);
+                    var promise = _blobServiceManager.uploadFile(imageModel.ExternalImageId, image.OpenReadStream());
+                    uploadPromises.Add(promise);
+                }
+                await Task.WhenAll(uploadPromises);
+            }
+
+            else if (beaconInput.Image != null)
+            {
+                var image = this.GenerateImage(beacon.Image, imageSet);
+                _context.Images.Add(image);
+                var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream());
+            }
+
+            await _context.SaveChangesAsync();
+
+            //beacon.ImageSet = imageSet;
+            //await _context.SaveChangesAsync();
+
+            return beacon;
+
+        }
+
         /// <summary>
         /// Creates a new beacon
         /// </summary>
@@ -100,16 +172,17 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Beacon>> CreateBeacon(Beacon beacon)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Beacon>> CreateBeacon([FromForm] Beacon beacon)
         {
-            beacon.UserId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
             // Validate that Category exists
-            Category? category = await _context.Categories.Select(c => new Category {
+            Category? category = await _context.Categories.Select(c => new Category
+            {
                 CategoryId = c.CategoryId,
                 CategoryName = c.CategoryName
             }).FirstOrDefaultAsync((Category c) => c.CategoryId == beacon.CategoryId);
@@ -126,6 +199,8 @@ namespace server.Controllers
                 ModelState.AddModelError("UserId", "Specified user does not exist");
                 return BadRequest(ModelState);
             }
+
+
 
             var newBeacon = new Beacon
             {
@@ -144,11 +219,32 @@ namespace server.Controllers
             };
 
 
+
+
             var resB = _context.Beacons.Add(newBeacon);
+
+
+            await this.CreateImagesetForNewBeacon(newBeacon, beacon);
+
             await _context.SaveChangesAsync();
 
-        
-            resB.Entity.Category = category; 
+            //if (beacon.Image != null)
+            //{
+            //    var fileName = Guid.NewGuid().ToString();
+            //    var imageSet = new ImageSet();
+            //    beacon.ImageSet = imageSet;
+            //    var image = new Image();
+            //    image.FileName = fileName;
+            //    image.ImageSet = imageSet;
+            //    imageSet.Images = [image];
+            //    _context.Images.Add(image);
+            //    _context.ImageSets.Add(imageSet);
+            //    var res = await this._blobServiceManager.uploadFile(fileName, beacon.Image.OpenReadStream());
+            //    await _context.SaveChangesAsync();
+            //}
+
+
+            resB.Entity.Category = category;
 
 
 
