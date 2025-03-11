@@ -1,5 +1,5 @@
 'use client'
-import { useGetDraftsQuery } from "@/redux/api"
+import { useGetDraftsQuery, useDeleteDraftMutation } from "@/redux/api"
 import { Card } from "@/components/atoms/card"
 import { Button } from "@/components/atoms/button"
 import { Edit2, Loader2, Trash2 } from "lucide-react"
@@ -8,6 +8,19 @@ import { formatDistanceToNow } from 'date-fns'
 
 export default function DraftsPage() {
     const { data: drafts, isLoading } = useGetDraftsQuery()
+    const [deleteDraft] = useDeleteDraftMutation()
+
+    const handleDelete = async (id: string) => {
+        try {
+            console.log('Attempting to delete draft with ID:', id);
+            await deleteDraft(id).unwrap();
+            console.log('Successfully deleted draft');
+        } catch (error) {
+            console.error('Failed to delete draft:', error);
+            // You might want to add some user feedback here
+            // For example, using a toast notification
+        }
+    }
 
     if (isLoading) {
         return (
@@ -50,6 +63,7 @@ export default function DraftsPage() {
                                     variant="ghost"
                                     size="icon"
                                     className="text-destructive"
+                                    onClick={() => draft.BeaconId && handleDelete(draft.BeaconId)}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>

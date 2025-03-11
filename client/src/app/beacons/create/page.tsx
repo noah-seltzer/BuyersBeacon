@@ -3,89 +3,100 @@ import { FC, useEffect, useState, useCallback } from "react";
 import { FormikHelpers, useFormik } from "formik";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
 import { Beacon } from "@/types/beacon";
-import { useCreateBeaconMutation, useGetAllCategoriesQuery, useSaveDraftMutation } from "@/redux/api";
+import {
+  useCreateBeaconMutation,
+  useGetAllCategoriesQuery,
+  useSaveDraftMutation,
+} from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
 
 const CreateBeaconPage: FC = () => {
   const [createBeacon] = useCreateBeaconMutation();
   const [saveDraft] = useSaveDraftMutation();
-  const [autoSaveTimeout, setAutoSaveTimeout] = useState<NodeJS.Timeout>();
-  const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
-  const { data: categoies, error, isLoading, } = useGetAllCategoriesQuery();
+  const [categoryOptions, setCategoryOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const { data: categories, error, isLoading } = useGetAllCategoriesQuery();
   const router = useRouter();
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
 
   // Set category options
   useEffect(() => {
-    if (!categoies) return;
+    if (!categories) return;
     const res: { label: string; value: string }[] = [];
 
-    for (let i = 0; i < categoies.length; i++) {
-      const name = categoies[i].CategoryName.charAt(0).toUpperCase() + categoies[i].CategoryName.substring(1);
+    for (let i = 0; i < categories.length; i++) {
+      const name =
+        categories[i].CategoryName.charAt(0).toUpperCase() +
+        categories[i].CategoryName.substring(1);
       res.push({
         label: name,
-        value: categoies[i].CategoryId
-      })
+        value: categories[i].CategoryId,
+      });
     }
 
     setCategoryOptions(res);
-  }, [categoies])
+  }, [categories]);
 
-  const processSubmit = useCallback(async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
-    try {
-      // THIS IS WHERE WE WILL upload the image to S3 first and then send the URL with the beacon data
-      helpers.setSubmitting(true)
-      const res = await createBeacon(beacon).unwrap();
-      navigateToBeaconDetailsPage(router, res);
-    } catch (error) {
-      console.error("Failed to create beacon:", error);
-    } finally {
-      helpers.setSubmitting(false)
-    }
-  }, [createBeacon, navigateToBeaconDetailsPage, router])
+  const processSubmit = useCallback(
+    async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
+      try {
+        helpers.setSubmitting(true);
+        const res = await createBeacon(beacon).unwrap();
+        navigateToBeaconDetailsPage(router, res);
+      } catch (error) {
+        console.error("Failed to create beacon:", error);
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    },
+    [createBeacon, router]
+  );
 
-  const handleAutoSave = useCallback(async (values: Beacon) => {
+  const handleSaveDraft = async () => {
     try {
-      await saveDraft({
+      setDraftError(null);
+
+      // Save whatever data we have, no validation needed
+      const draftData = {
         ...values,
-        IsDraft: true
-      }).unwrap();
+        ItemPrice: values.ItemPrice || 0,
+        // Don't set a default CategoryId
+      };
+
+      await saveDraft(draftData).unwrap();
+      setDraftSaved(true);
+      setTimeout(() => setDraftSaved(false), 3000);
     } catch (error) {
       console.error("Failed to save draft:", error);
+      setDraftError("Failed to save draft. Please try again.");
     }
-  }, [saveDraft]);
-
-  const { handleChange, handleSubmit, values, errors, touched, setFieldValue, isSubmitting } =
-    useFormik({
-      initialValues: {
-        ItemName: "",
-        CategoryId: '',
-        ItemDescription: "",
-        Images: [],
-      } as Beacon,
-      onSubmit: processSubmit
-    })
-
-  const handleChangeWithAutoSave = (e: React.ChangeEvent) => {
-    handleChange(e);
-    
-    // Clear existing timeout
-    if (autoSaveTimeout) {
-      clearTimeout(autoSaveTimeout);
-    }
-    
-    // Set new timeout for auto-save
-    const timeout = setTimeout(() => {
-      handleAutoSave(values);
-    }, 2000); // Auto-save after 2 seconds of no changes
-    
-    setAutoSaveTimeout(timeout);
   };
+
+  const {
+    handleChange,
+    handleSubmit,
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    isSubmitting,
+  } = useFormik({
+    initialValues: {
+      ItemName: "",
+      CategoryId: "",
+      ItemDescription: "",
+      Images: [],
+    } as Beacon,
+    onSubmit: processSubmit,
+  });
 
   return (
     <CreateBeaconTemplate
       handleSubmit={handleSubmit}
-      handleChange={handleChangeWithAutoSave}
+      handleChange={handleChange}
       values={values}
       errors={errors}
       touched={touched}
@@ -94,6 +105,9 @@ const CreateBeaconPage: FC = () => {
       categoryOptionsError={error}
       submitting={isSubmitting}
       setFieldValue={setFieldValue}
+      onSaveDraft={handleSaveDraft}
+      draftSaved={draftSaved}
+      draftError={draftError}
     />
   );
 };

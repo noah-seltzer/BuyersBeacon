@@ -9,7 +9,7 @@ export interface Beacon {
   Category?: Category;
   BeaconId?: string;
   ItemName: string;
-  CategoryId: string;
+  CategoryId?: string;
   ItemDescription: string;
   Images: BeaconImage[];
   ItemPrice?: number;

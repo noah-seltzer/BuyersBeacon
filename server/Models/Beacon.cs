@@ -18,7 +18,7 @@ namespace server.Models
         public User? User { get; set; }
 
         [JsonPropertyName("CategoryId")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         [JsonPropertyName("Category")]
