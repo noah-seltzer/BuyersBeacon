@@ -18,12 +18,6 @@ interface ImagePreviewProps {
 
 const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isClient, setIsClient] = useState(false)
- 
-    // don't look at me
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
 
     const nextImage = () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
