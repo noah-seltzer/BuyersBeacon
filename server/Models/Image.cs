@@ -20,6 +20,8 @@ namespace server.Models
 
         public string? ExternalImageId {  get; set; }
 
+        public string? MimeType { get; set; }
+
         [ForeignKey("ImageSetId")]
         public ImageSet? ImageSet { get; set; }
 

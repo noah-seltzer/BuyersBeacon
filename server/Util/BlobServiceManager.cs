@@ -9,7 +9,6 @@ namespace server.Util
         public BlobServiceManager()
         {
             var str = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
-            Console.WriteLine(str);
             this.Client = new BlobServiceClient(str);
                 //new Uri("https://buyersbeaconstorage.blob.core.windows.net"),
                 //new DefaultAzureCredential());
@@ -21,10 +20,11 @@ namespace server.Util
         private BlobContainerClient ImagesContainerClient;
         //private IConfiguration config;
 
-        public async Task<BlobContentInfo> uploadFile(string name, Stream fileStream)
+        public async Task<BlobContentInfo> uploadFile(string name, Stream fileStream, string MimeType)
         {
             BlobClient blobClient = this.ImagesContainerClient.GetBlobClient(name);
-            return await blobClient.UploadAsync(fileStream);
+            var blobHeader = new BlobHttpHeaders { ContentType = MimeType };
+            return await blobClient.UploadAsync(fileStream, new BlobUploadOptions { HttpHeaders = blobHeader });
         }
     }
 }

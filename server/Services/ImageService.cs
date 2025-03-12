@@ -1,18 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Util;
 
-namespace server.Util
+
+
+namespace server.Services
 {
-    public class ImageSetManager
+    public class ImageService: IImageService
     {
+        const string BlobStorageURLBase = "https://buyersbeaconstorage.blob.core.windows.net/images";
         private readonly ApplicationDbContext _context;
         private BlobServiceManager _blobServiceManager;
 
-        public ImageSetManager(ApplicationDbContext context)
+        public ImageService(ApplicationDbContext context)
         {
             _context = context;
             _blobServiceManager = new BlobServiceManager();
+
         }
 
         public string GenerateGuidFilename()
@@ -26,6 +32,9 @@ namespace server.Util
             var image = new Image();
             image.FileName = formFile.FileName;
             image.ExternalImageId = fileId;
+            image.MimeType = formFile.ContentType;
+            
+            image.ImageUrl = $"{BlobStorageURLBase}/{fileId}";
             if (imageSet != null)
             {
                 image.ImageSet = imageSet;
@@ -38,36 +47,36 @@ namespace server.Util
             return image;
         }
 
-        public async Task<ActionResult<Beacon>> CreateImagesetForNewBeacon(Beacon beacon, Beacon beaconInput)
+        public async Task<Beacon> CreateImagesetForNewBeacon(Beacon beacon, Beacon beaconInput)
         {
-            if (beaconInput.Image == null || (beaconInput.Images == null || beaconInput.Images.Length == 0)) {
+            if (beaconInput.Image == null && (beaconInput.Images == null || beaconInput.Images.Length == 0))
+            {
                 return beacon;
             }
 
             var imageSet = new ImageSet();
-            beacon.ImageSet = imageSet;
-            imageSet.Beacon = beacon;
             imageSet.BeaconId = beacon.BeaconId;
             _context.ImageSets.Add(imageSet);
 
-            if (beaconInput.Images != null && beaconInput.Images.Length > 0) {
+            if (beaconInput.Images != null && beaconInput.Images.Length > 0)
+            {
                 List<Task> uploadPromises = new List<Task>();
-                foreach (var image in beacon.Images)
+                foreach (var image in beaconInput.Images)
                 {
                     var imageModel = this.GenerateImage(image, imageSet);
                     imageSet.Images.Add(imageModel);
                     _context.Images.Add(imageModel);
-                    var promise = _blobServiceManager.uploadFile(imageModel.ExternalImageId, image.OpenReadStream());
+                    var promise = _blobServiceManager.uploadFile(imageModel.ExternalImageId, image.OpenReadStream(), image.ContentType);
                     uploadPromises.Add(promise);
                 }
                 await Task.WhenAll(uploadPromises);
             }
 
-            if (beaconInput.Image != null)
+            else if (beaconInput.Image != null)
             {
                 var image = this.GenerateImage(beacon.Image, imageSet);
                 _context.Images.Add(image);
-                var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream());
+                var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream(), beacon.Image.ContentType);
             }
 
             await _context.SaveChangesAsync();

@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         hostname: 'fastly.picsum.photos',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'buyersbeaconstorage.blob.core.windows.net',
+        pathname: '/**',
+      }
     ]
   }
   /* config options here */

@@ -121,6 +121,9 @@ namespace server.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MimeType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ImageId");
 
                     b.HasIndex("ImageSetId");

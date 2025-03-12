@@ -3,6 +3,7 @@ using server.Data;
 using server.Models;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,10 @@ builder.Services.AddCors(options =>
                             .AllowAnyMethod();
                       });
 });
+
+builder.Services.AddScoped<ICategoryService, CategoryService>()
+    .AddScoped<IBeaconService, BeaconService>()
+    .AddScoped<IImageService, ImageService>();
 
 var app = builder.Build();
 

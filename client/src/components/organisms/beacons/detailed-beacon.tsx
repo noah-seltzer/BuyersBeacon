@@ -25,7 +25,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
         </div>
         <div className="w-full flex items-center justify-center">
             <ImagePreview
-                images={beacon.Images ?? [{
+                images={beacon.imageSet.images ?? [{
                     file: "https://picsum.photos/800/600",
                     isCover: true
                 },
