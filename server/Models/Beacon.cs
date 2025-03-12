@@ -57,5 +57,11 @@ namespace server.Models
         public string? LocPostalCode { get; set; }
 
         public ImageSet? ImageSet { get; set; }
-    }
+
+        [NotMapped]
+        public IFormFile? Image { get; set; }
+
+        [NotMapped]
+        public IFormFile[]? Images {get;set;}
+}
 }
