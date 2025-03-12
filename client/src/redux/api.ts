@@ -30,16 +30,20 @@ export const beaconApi = createApi({
                 formData.append('ItemName', payload.ItemName);
                 formData.append('ItemDescription', payload.ItemDescription);
                 formData.append('CategoryId', payload.CategoryId);
-
-                for (let i = 0; i < payload.Images.length; i++) {
-                    formData.append("Images", payload.Images[i].file);
+                formData.append('UserId', 'D11FAABB-2B72-4E25-88B5-1B9AD7B8A530')
+                if (payload.Images.length > 0) {
+                    payload.Images.forEach(image => {
+                            formData.append("Images", image.file);
+                    });
+                    formData.append('Image', payload.Images[0].file)
                 }
 
                 return {
                     url: ENDPOINTS.BEACONS,
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'multipart/form-data;'
+                        // set undefined so that browser can dynamically calculate
+                        'Content-Type': undefined
                     },
                     body: formData,
                 }
