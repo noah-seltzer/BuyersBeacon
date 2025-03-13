@@ -57,7 +57,7 @@ namespace server.Util
                     var imageModel = this.GenerateImage(image, imageSet);
                     imageSet.Images.Add(imageModel);
                     _context.Images.Add(imageModel);
-                    var promise = _blobServiceManager.uploadFile(imageModel.ExternalImageId, image.OpenReadStream());
+                    var promise = _blobServiceManager.uploadFile(imageModel.ExternalImageId, image.OpenReadStream(), image.ContentType);
                     uploadPromises.Add(promise);
                 }
                 await Task.WhenAll(uploadPromises);
@@ -67,7 +67,7 @@ namespace server.Util
             {
                 var image = this.GenerateImage(beacon.Image, imageSet);
                 _context.Images.Add(image);
-                var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream());
+                var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream(), beacon.Image.ContentType);
             }
 
             await _context.SaveChangesAsync();
