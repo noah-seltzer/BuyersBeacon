@@ -33,5 +33,17 @@ namespace server.Services
                 .ToListAsync();
             return beacons;
         }
+
+        public async Task<IEnumerable<Beacon>> SearchList(string searchText, string searchCategory)
+        {
+            var beacons = await _context.Beacons
+                .Where(b => b.ItemName.Contains(searchText))
+                .Where(b => b.Category.CategoryName == searchCategory)
+                .Include(b => b.Category)
+                .Include(b => b.ImageSet)
+                .ThenInclude(i => i.Images)
+                .ToListAsync();
+            return beacons;
+        }
     }
 }

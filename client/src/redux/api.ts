@@ -10,6 +10,8 @@ enum CACHES {
     CATEGORIES = 'Categories'
 }
 
+export interface GetAllBeaconsQuery {searchQuery: string, selectedOption: string }
+
 
 export const beaconApi = createApi({
     tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES],
@@ -57,7 +59,17 @@ export const beaconApi = createApi({
         getBeacon: builder.query<Beacon, string>({
             query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
             providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }]
+        }),
+        getSearchResults: builder.query<Beacon[], GetAllBeaconsQuery>({
+            query: (payload) => {
+                return {
+                    url: `${ENDPOINTS.BEACONS}/search`,
+                    method: `GET`,
+                    body: payload
+                }
+            }
         })
+
     })
 })
 
@@ -65,6 +77,7 @@ export const {
     useGetBeaconsQuery,
     useCreateBeaconMutation,
     useGetAllCategoriesQuery,
-    useGetBeaconQuery
+    useGetBeaconQuery,
+    useGetSearchResultsQuery
 } = beaconApi
 

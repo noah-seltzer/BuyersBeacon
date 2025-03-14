@@ -47,6 +47,23 @@ namespace server.Controllers
         }
 
         /// <summary>
+        /// Gets all beacons matching search criteria
+        /// </summary>
+        /// <returns>A list of all beacons matching search criteria</returns>
+        /// <response code="200">Returns the list of filtered beacons</response>
+        [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Beacon>>> SearchBeacons([FromBody] Dictionary<string, string> request)
+        {
+             if (request.TryGetValue("searchQuery", out var searchQuery) && 
+            request.TryGetValue("selectedOption", out var selectedOption)) {
+                var beacons = await _beaconService.SearchList(searchQuery, selectedOption);
+                return Ok(beacons);
+            }
+            return RedirectToAction("GetBeacons");
+        }
+
+        /// <summary>
         /// Gets a specific beacon by its ID
         /// </summary>
         /// <param name="id">The GUID of the beacon to retrieve</param>
