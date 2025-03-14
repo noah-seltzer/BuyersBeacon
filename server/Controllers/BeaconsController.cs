@@ -65,9 +65,28 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            return beacon;
+            return Ok(beacon);
         }
 
+
+        /// <summary>
+        /// Gets all drafts for a user
+        /// </summary>
+        /// <returns>A list of all drafts for the user</returns>
+        /// <response code="200">Returns the list of drafts</response>
+        [HttpGet("drafts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
+        {
+            var userId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"); // Replace with actual user ID
+            var drafts = await _context.Beacons
+                .Where(b => b.UserId == userId && b.IsDraft)
+                .Include(b => b.Category)
+                .OrderByDescending(b => b.LastDraftSave)
+                .ToListAsync();
+
+            return drafts;
+        }
 
         /// <summary>
         /// Creates a new beacon
@@ -119,7 +138,9 @@ namespace server.Controllers
                 LocCity = beacon.LocCity,
                 LocRegion = beacon.LocRegion,
                 LocCountry = beacon.LocCountry,
-                LocPostalCode = beacon.LocPostalCode
+                LocPostalCode = beacon.LocPostalCode,
+                IsDraft = beacon.IsDraft,
+                LastDraftSave = beacon.IsDraft ? DateTime.UtcNow : null
             };
 
 
@@ -202,16 +223,136 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBeacon(Guid id)
         {
-            var beacon = await _context.Beacons.FindAsync(id);
-            if (beacon == null)
+            try
             {
-                return NotFound();
+                var beacon = await _context.Beacons
+                    .FirstOrDefaultAsync(b => b.BeaconId == id);
+
+                if (beacon == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Beacons.Remove(beacon);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to delete beacon", message = ex.Message });
+            }
+        }
 
-            _context.Beacons.Remove(beacon);
-            await _context.SaveChangesAsync();
+        /// <summary>
+        /// Creates a new draft beacon
+        /// </summary>
+        [HttpPost("drafts")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Beacon>> CreateDraft([FromForm] Beacon beacon)
+        {
+            try 
+            {
+                var userId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8");
+                
+                // Check if default user exists, create if not
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        UserId = userId,
+                        ClerkId = "default_clerk_id"
+                    };
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
 
-            return NoContent();
+                var newBeacon = new Beacon
+                {
+                    BeaconId = Guid.NewGuid(),
+                    UserId = userId,
+                    CategoryId = null, // Drafts don't require a category
+                    DateCreate = DateTime.UtcNow,
+                    DateUpdate = DateTime.UtcNow,
+                    ItemName = string.IsNullOrEmpty(beacon.ItemName) ? "Untitled Draft" : beacon.ItemName,
+                    ItemDescription = string.IsNullOrEmpty(beacon.ItemDescription) ? "Draft description" : beacon.ItemDescription,
+                    ItemPrice = beacon.ItemPrice,
+                    LocCity = beacon.LocCity,
+                    LocRegion = beacon.LocRegion,
+                    LocCountry = beacon.LocCountry,
+                    LocPostalCode = beacon.LocPostalCode,
+                    IsDraft = true,
+                    LastDraftSave = DateTime.UtcNow
+                };
+
+                _context.Beacons.Add(newBeacon);
+                await _context.SaveChangesAsync();
+
+                // Update the response to include BeaconId
+                var response = new
+                {
+                    BeaconId = newBeacon.BeaconId,
+                    UserId = newBeacon.UserId,
+                    ItemName = newBeacon.ItemName,
+                    ItemDescription = newBeacon.ItemDescription,
+                    ItemPrice = newBeacon.ItemPrice,
+                    IsDraft = newBeacon.IsDraft,
+                    LastDraftSave = newBeacon.LastDraftSave,
+                    DateCreate = newBeacon.DateCreate,
+                    DateUpdate = newBeacon.DateUpdate
+                };
+
+                // Fix the CreatedAtAction call to use newBeacon.BeaconId
+                return CreatedAtAction(nameof(GetBeacon), new { id = newBeacon.BeaconId }, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to save draft", message = ex.Message });
+            }
+        }
+
+        // Add this endpoint to handle draft deletion
+        [HttpDelete("drafts/{id}")]
+        public async Task<IActionResult> DeleteDraft(Guid id)
+        {
+            try
+            {
+                // Add logging to debug the incoming ID
+                Console.WriteLine($"Attempting to delete draft with ID: {id}");
+
+                var draft = await _context.Beacons
+                    .FirstOrDefaultAsync(b => b.BeaconId == id && b.IsDraft);
+
+                if (draft == null)
+                {
+                    // Add more detailed logging for the 404 case
+                    Console.WriteLine($"Draft not found with ID: {id}");
+                    
+                    // Check if beacon exists but isn't a draft
+                    var nonDraftBeacon = await _context.Beacons
+                        .FirstOrDefaultAsync(b => b.BeaconId == id);
+                        
+                    if (nonDraftBeacon != null)
+                    {
+                        Console.WriteLine("Beacon exists but is not marked as draft");
+                        return BadRequest("Beacon exists but is not a draft");
+                    }
+                    
+                    return NotFound($"No draft found with ID: {id}");
+                }
+
+                _context.Beacons.Remove(draft);
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine($"Successfully deleted draft with ID: {id}");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting draft: {ex.Message}");
+                return StatusCode(500, new { error = "Failed to delete draft", message = ex.Message });
+            }
         }
 
         private bool BeaconExists(Guid id)

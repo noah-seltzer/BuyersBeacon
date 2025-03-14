@@ -53,6 +53,7 @@ export function Navbar() {
                         <NavLink href='/beacons/browse'>Browse</NavLink>
                         <NavLink href='/categories'>Categories</NavLink>
                         <NavLink href='/about'>About</NavLink>
+                        <NavLink href='/beacons/drafts'>Drafts</NavLink>
                     </div>
                 </div>
 
@@ -152,6 +153,12 @@ export function Navbar() {
                     </NavLink>
                     <NavLink href='/about' onClick={() => setIsMenuOpen(false)}>
                         About
+                    </NavLink>
+                    <NavLink
+                        href='/beacons/drafts'
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Drafts
                     </NavLink>
                     <Link href='/beacons/create' className='btn btn-primary'>
                         <Button

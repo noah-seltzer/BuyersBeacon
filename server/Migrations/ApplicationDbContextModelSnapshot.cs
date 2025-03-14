@@ -29,7 +29,7 @@ namespace server.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasAnnotation("Relational:JsonPropertyName", "BeaconId");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier")
                         .HasAnnotation("Relational:JsonPropertyName", "CategoryId");
 
@@ -38,6 +38,10 @@ namespace server.Migrations
 
                     b.Property<DateTime>("DateUpdate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDraft")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "IsDraft");
 
                     b.Property<string>("ItemDescription")
                         .IsRequired()
@@ -53,6 +57,10 @@ namespace server.Migrations
 
                     b.Property<decimal>("ItemPrice")
                         .HasColumnType("decimal(18, 2)");
+
+                    b.Property<DateTime?>("LastDraftSave")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "LastDraftSave");
 
                     b.Property<string>("LocCity")
                         .HasMaxLength(100)
@@ -171,9 +179,7 @@ namespace server.Migrations
                 {
                     b.HasOne("server.Models.Category", "Category")
                         .WithMany("Beacons")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("server.Models.User", "User")
                         .WithMany("Beacons")

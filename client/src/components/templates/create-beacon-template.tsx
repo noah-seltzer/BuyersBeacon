@@ -7,6 +7,7 @@ import { Button } from "../atoms/button";
 import Link from "next/link";
 import { SerializedError } from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { FC } from "react";
 
 interface CreateBeaconTemplateProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -15,25 +16,32 @@ interface CreateBeaconTemplateProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
-  categoryOptionsIsLoading: boolean,
-  categoryOptionsError: FetchBaseQueryError | SerializedError | undefined,
+  categoryOptionsIsLoading: boolean;
+  categoryOptionsError: FetchBaseQueryError | SerializedError | undefined;
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
-
+  onSaveDraft?: () => void;
+  draftSaved?: boolean;
+  draftError?: string | null;
+  isEditing?: boolean;
 }
 
-export function CreateBeaconTemplate({
+const CreateBeaconTemplate: FC<CreateBeaconTemplateProps> = ({
   handleSubmit,
   handleChange,
   values,
   errors,
   touched,
   categoryOptions,
-  categoryOptionsError,
   categoryOptionsIsLoading,
+  categoryOptionsError,
   submitting,
   setFieldValue,
-}: CreateBeaconTemplateProps) {
+  onSaveDraft,
+  draftSaved,
+  draftError,
+  isEditing = false,
+}) => {
   return (
     <div className="min-h-[calc(100vh-4rem)] py-8">
       <div className="container mx-auto px-4">
@@ -52,7 +60,7 @@ export function CreateBeaconTemplate({
             </Button>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                Post a Beacon
+                {isEditing ? "Edit Beacon" : "Create New Beacon"}
               </h1>
               <p className="text-foreground/60 mt-1">
                 Let sellers know what you're looking for
@@ -75,6 +83,9 @@ export function CreateBeaconTemplate({
                 categtorOptionsError={categoryOptionsError}
                 submitting={submitting}
                 setFieldValue={setFieldValue}
+                onSaveDraft={onSaveDraft}
+                draftSaved={draftSaved}
+                draftError={draftError}
               />
             </div>
 
@@ -87,6 +98,6 @@ export function CreateBeaconTemplate({
       </div>
     </div>
   );
-}
+};
 
 export default CreateBeaconTemplate;

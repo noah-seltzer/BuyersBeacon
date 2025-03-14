@@ -18,7 +18,7 @@ namespace server.Models
         public User? User { get; set; }
 
         [JsonPropertyName("CategoryId")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         [JsonPropertyName("Category")]
@@ -62,6 +62,12 @@ namespace server.Models
         public IFormFile? Image { get; set; }
 
         [NotMapped]
-        public IFormFile[]? Images {get;set;}
-}
+        public IFormFile[]? Images { get; set; }
+
+        [JsonPropertyName("IsDraft")]
+        public bool IsDraft { get; set; } = false;
+
+        [JsonPropertyName("LastDraftSave")]
+        public DateTime? LastDraftSave { get; set; }
+    }
 }

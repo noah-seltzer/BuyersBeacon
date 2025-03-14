@@ -30,14 +30,14 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
-                      {
-                          policy.WithOrigins(
+        policy =>
+        {
+           policy.WithOrigins(
                             "http://localhost:3000",
                             "http://localhost:3000", 
                             "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
@@ -47,6 +47,12 @@ builder.Services.AddCors(options =>
                             .AllowAnyMethod();
                       });
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 builder.Services.AddScoped<ICategoryService, CategoryService>()
     .AddScoped<IBeaconService, BeaconService>()

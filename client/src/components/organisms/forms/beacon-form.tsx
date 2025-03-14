@@ -16,10 +16,13 @@ interface BeaconFormProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
-  categoryOptionsIsLoading: boolean,
-  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined,
+  categoryOptionsIsLoading: boolean;
+  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined;
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
+  onSaveDraft?: () => void;
+  draftSaved?: boolean;
+  draftError?: string | null;
 }
 
 export function BeaconForm({
@@ -33,6 +36,9 @@ export function BeaconForm({
   categtorOptionsError,
   submitting,
   setFieldValue,
+  onSaveDraft,
+  draftSaved,
+  draftError,
 }: BeaconFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -96,16 +102,30 @@ export function BeaconForm({
             maxImages={6}
           />
           {touched.Images && errors.Images && (
-            <p className="text-sm text-destructive mt-1">{errors.Images.toString()}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.Images.toString()}
+            </p>
           )}
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        {onSaveDraft && (
+          <Button
+            type="button"
+            onClick={onSaveDraft}
+            variant="outline"
+            className="border-primary/50 text-primary hover:text-primary/90"
+            disabled={submitting}
+          >
+            {draftSaved ? "Draft Saved!" : "Save Draft"}
+          </Button>
+        )}
+
         <Button
           type="submit"
           disabled={submitting}
-          className="bg-primary hover:bg-primary/90 text-white"
+          className="bg-primary hover:bg-primary/90 text-white ml-auto"
         >
           {submitting ? (
             <>
@@ -117,6 +137,14 @@ export function BeaconForm({
           )}
         </Button>
       </div>
+
+      {draftError && (
+        <p className="text-sm text-destructive mt-2">{draftError}</p>
+      )}
+
+      {draftSaved && (
+        <p className="text-sm text-primary mt-2">Draft saved successfully!</p>
+      )}
     </form>
   );
 }

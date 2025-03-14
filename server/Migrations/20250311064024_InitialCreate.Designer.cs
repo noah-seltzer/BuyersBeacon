@@ -12,8 +12,8 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250203203913_two")]
-    partial class two
+    [Migration("20250311064024_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,10 +29,57 @@ namespace server.Migrations
                 {
                     b.Property<Guid>("BeaconId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "BeaconId");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "CategoryId");
+
+                    b.Property<DateTime>("DateCreate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDraft")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "IsDraft");
+
+                    b.Property<string>("ItemDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasAnnotation("Relational:JsonPropertyName", "ItemDescription");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasAnnotation("Relational:JsonPropertyName", "ItemName");
+
+                    b.Property<decimal>("ItemPrice")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<DateTime?>("LastDraftSave")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "LastDraftSave");
+
+                    b.Property<string>("LocCity")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LocCountry")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LocPostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("LocRegion")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -43,18 +90,27 @@ namespace server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Beacon");
+                    b.ToTable("Beacons");
                 });
 
             modelBuilder.Entity("server.Models.Category", b =>
                 {
                     b.Property<Guid>("CategoryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "CategoryId");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasAnnotation("Relational:JsonPropertyName", "CategoryName");
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "Category");
                 });
 
             modelBuilder.Entity("server.Models.Image", b =>
@@ -63,6 +119,10 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("ImageSetId")
                         .HasColumnType("uniqueidentifier");
 
@@ -70,7 +130,7 @@ namespace server.Migrations
 
                     b.HasIndex("ImageSetId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("server.Models.ImageSet", b =>
@@ -82,12 +142,15 @@ namespace server.Migrations
                     b.Property<Guid>("BeaconId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("NumImages")
+                        .HasColumnType("int");
+
                     b.HasKey("ImageSetId");
 
                     b.HasIndex("BeaconId")
                         .IsUnique();
 
-                    b.ToTable("ImageSet");
+                    b.ToTable("ImageSets");
                 });
 
             modelBuilder.Entity("server.Models.User", b =>
@@ -95,6 +158,10 @@ namespace server.Migrations
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClerkId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
 
@@ -105,9 +172,7 @@ namespace server.Migrations
                 {
                     b.HasOne("server.Models.Category", "Category")
                         .WithMany("Beacons")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("server.Models.User", "User")
                         .WithMany("Beacons")
