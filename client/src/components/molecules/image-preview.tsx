@@ -1,8 +1,9 @@
+'use client'
 import { cn } from "@/lib/utils";
 import { BeaconImage } from "@/types/beacon"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../atoms/button";
 import BeatLoader from "react-spinners/BeatLoader";
 import EmptyState from "./empty-state";
@@ -18,7 +19,6 @@ interface ImagePreviewProps {
 const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-
     const nextImage = () => {
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
     };
@@ -27,17 +27,16 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps)
         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
     };
 
+    const currentImage = images[currentImageIndex]
+
 
     return <div className="relative aspect-video w-full overflow-hidden rounded-t-xl group">
         {
             images.length > 0 ?
                 <>
-                    <Image
-                        src={
-                            typeof images[currentImageIndex].file === "string"
-                                ? images[currentImageIndex].file
-                                : URL.createObjectURL(images[currentImageIndex].file)
-                        }
+                    <Image 
+                        suppressHydrationWarning
+                        src={currentImage.imageUrl}
                         alt={alt ?? "Beacon Image"}
                         fill
                         className="object-cover"
@@ -47,7 +46,7 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps)
                         {currentImageIndex + 1} / {images.length}
                     </div>
 
-                    {images[currentImageIndex].isCover && (
+                    {currentImageIndex === 0 && (
                         <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded-md text-sm flex items-center">
                             <Star className="h-4 w-4 mr-1" />
                             Cover Photo

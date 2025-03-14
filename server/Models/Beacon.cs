@@ -58,6 +58,12 @@ namespace server.Models
 
         public ImageSet? ImageSet { get; set; }
 
+        [NotMapped]
+        public IFormFile? Image { get; set; }
+
+        [NotMapped]
+        public IFormFile[]? Images { get; set; }
+
         [JsonPropertyName("IsDraft")]
         public bool IsDraft { get; set; } = false;
 

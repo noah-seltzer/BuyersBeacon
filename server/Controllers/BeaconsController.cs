@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Services;
+using server.Util;
 
 namespace server.Controllers
 {
@@ -14,10 +16,20 @@ namespace server.Controllers
     public class BeaconsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
-        public BeaconsController(ApplicationDbContext context)
+        private BlobServiceManager _blobServiceManager;
+        private ICategoryService _categoryService;
+        private IBeaconService _beaconService;
+        private IImageService _imageService;
+        public BeaconsController(ApplicationDbContext context, 
+            ICategoryService categoryService, 
+            IBeaconService beaconService, 
+            IImageService imageService)
         {
             _context = context;
+            _blobServiceManager = new BlobServiceManager();
+            _categoryService = categoryService;
+            _beaconService = beaconService;
+            _imageService = imageService;
         }
 
         /// <summary>
@@ -29,25 +41,9 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
         {
-            var beacons = await _context.Beacons
-                .Select(b => new Beacon
-                {
-                    BeaconId = b.BeaconId,
-                    UserId = b.UserId,
-                    CategoryId = b.CategoryId,
-                    DateCreate = b.DateCreate,
-                    DateUpdate = b.DateUpdate,
-                    ItemName = b.ItemName,
-                    ItemDescription = b.ItemDescription,
-                    ItemPrice = b.ItemPrice,
-                    LocCity = b.LocCity,
-                    LocRegion = b.LocRegion,
-                    LocCountry = b.LocCountry,
-                    LocPostalCode = b.LocPostalCode
-                })
-                .ToListAsync();
+            var beacons = await _beaconService.GetList();
 
-            return beacons;
+            return Ok(beacons);
         }
 
         /// <summary>
@@ -62,9 +58,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Beacon>> GetBeacon(Guid id)
         {
-            var beacon = await _context.Beacons
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(b => b.BeaconId == id);
+            var beacon = await _beaconService.GetById(id);
 
             if (beacon == null)
             {
@@ -73,6 +67,7 @@ namespace server.Controllers
 
             return Ok(beacon);
         }
+
 
         /// <summary>
         /// Gets all drafts for a user
@@ -103,19 +98,16 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Beacon>> CreateBeacon(Beacon beacon)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Beacon>> CreateBeacon([FromForm] Beacon beacon)
         {
-            beacon.UserId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8");
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Validate that Category exists
-            Category? category = await _context.Categories.Select(c => new Category {
-                CategoryId = c.CategoryId,
-                CategoryName = c.CategoryName
-            }).FirstOrDefaultAsync((Category c) => c.CategoryId == beacon.CategoryId);
+            var category = await _categoryService.GetById(beacon.CategoryId);
+
             if (category == null)
             {
                 ModelState.AddModelError("CategoryId", "Specified category does not exist");
@@ -124,11 +116,14 @@ namespace server.Controllers
 
             // Validate that User exists
             var userExists = await _context.Users.AnyAsync(u => u.UserId == beacon.UserId);
+
             if (!userExists)
             {
                 ModelState.AddModelError("UserId", "Specified user does not exist");
                 return BadRequest(ModelState);
             }
+
+
 
             var newBeacon = new Beacon
             {
@@ -148,10 +143,17 @@ namespace server.Controllers
                 LastDraftSave = beacon.IsDraft ? DateTime.UtcNow : null
             };
 
+
+
+
             var resB = _context.Beacons.Add(newBeacon);
+            resB.Entity.Category = category;
+
+
+            await _imageService.CreateImagesetForNewBeacon(newBeacon, beacon);
+
             await _context.SaveChangesAsync();
 
-            resB.Entity.Category = category; 
 
             return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, resB.Entity);
         }
