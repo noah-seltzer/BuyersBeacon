@@ -17,8 +17,6 @@ export default function DraftsPage() {
             console.log('Successfully deleted draft');
         } catch (error) {
             console.error('Failed to delete draft:', error);
-            // You might want to add some user feedback here
-            // For example, using a toast notification
         }
     }
 
