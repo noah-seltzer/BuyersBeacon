@@ -133,7 +133,7 @@ export function BeaconForm({
               Creating Beacon...
             </>
           ) : (
-            "Create Beacon"
+            "Post Beacon"
           )}
         </Button>
       </div>
