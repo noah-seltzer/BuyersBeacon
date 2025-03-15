@@ -1,10 +1,12 @@
 import { User } from "@/types/user";
 
 export interface BeaconImage {
-  imageId: string,
-  fileName: string,
-  imageUrl: string,
-  externalImageId: string
+  imageId?: string;
+  fileName?: string;
+  imageUrl?: string;
+  externalImageId?: string;
+  file?: File | string;
+  isCover?: boolean;
 }
 
 export interface Beacon {
@@ -17,10 +19,10 @@ export interface Beacon {
   ItemPrice?: number;
   IsDraft?: boolean;
   LastDraftSave?: string;
-  ItemPrice?: number
+  ItemPrice?: number;
   imageSet: {
-    images: BeaconImage[]
-  } 
+    images: BeaconImage[];
+  };
 }
 
 export interface Category {

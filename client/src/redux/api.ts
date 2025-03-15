@@ -20,31 +20,30 @@ export const beaconApi = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5037/api",
   }),
 
-    endpoints: (builder) => ({
-        getBeacons: builder.query<Beacon[], void>({
-            query: () => ENDPOINTS.BEACONS,
-            providesTags: () => [{ type: CACHES.BEACONS, id: 'LIST' }]
-        }),
-        createBeacon: builder.mutation<Beacon, Beacon>({
-            query: (payload) => {
-                var formData = new FormData();
-                formData.append('ItemName', payload.ItemName);
-                formData.append('ItemDescription', payload.ItemDescription);
-                formData.append('CategoryId', payload.CategoryId);
-                formData.append('UserId', 'D11FAABB-2B72-4E25-88B5-1B9AD7B8A530')
-                if (payload.Images.length > 0) {
-                    payload.Images.forEach(image => {
-                            formData.append("Images", image.file);
-                    });
-                    formData.append('Image', payload.Images[0].file)
-                }
+  endpoints: (builder) => ({
+    getBeacons: builder.query<Beacon[], void>({
+      query: () => ENDPOINTS.BEACONS,
+      providesTags: () => [{ type: CACHES.BEACONS, id: "LIST" }],
+    }),
+    createBeacon: builder.mutation<Beacon, Beacon>({
+      query: (payload) => {
+        var formData = new FormData();
+        formData.append("ItemName", payload.ItemName);
+        formData.append("ItemDescription", payload.ItemDescription);
+        formData.append("CategoryId", payload.CategoryId);
+        formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530"); 
+
+        if (payload.Images?.length > 0) {
+          payload.Images.forEach((image) => {
+            if (image.file instanceof File) {
+              formData.append("Images", image.file);
+            }
+          });
+        }
 
         return {
           url: ENDPOINTS.BEACONS,
           method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data;",
-          },
           body: formData,
         };
       },
