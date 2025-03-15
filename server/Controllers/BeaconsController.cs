@@ -106,9 +106,10 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var category = await _categoryService.GetById(beacon.CategoryId);
+            var category = beacon.CategoryId.HasValue ? 
+                await _categoryService.GetById(beacon.CategoryId.Value) : null;
 
-            if (category == null)
+            if (beacon.CategoryId.HasValue && category == null)
             {
                 ModelState.AddModelError("CategoryId", "Specified category does not exist");
                 return BadRequest(ModelState);
