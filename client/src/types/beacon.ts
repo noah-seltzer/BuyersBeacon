@@ -19,7 +19,10 @@ export interface Beacon {
   ItemPrice?: number;
   IsDraft?: boolean;
   LastDraftSave?: string;
-  ItemPrice?: number;
+  LocCity?: string;
+  LocRegion?: string;
+  LocCountry?: string;
+  LocPostalCode?: string;
   imageSet: {
     images: BeaconImage[];
   };

@@ -31,7 +31,24 @@ export const beaconApi = createApi({
         formData.append("ItemName", payload.ItemName);
         formData.append("ItemDescription", payload.ItemDescription);
         formData.append("CategoryId", payload.CategoryId);
-        formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530"); 
+        formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530");
+
+        // Add price and location fields
+        if (payload.ItemPrice) {
+          formData.append("ItemPrice", payload.ItemPrice.toString());
+        }
+        if (payload.LocCity) {
+          formData.append("LocCity", payload.LocCity);
+        }
+        if (payload.LocRegion) {
+          formData.append("LocRegion", payload.LocRegion);
+        }
+        if (payload.LocCountry) {
+          formData.append("LocCountry", payload.LocCountry);
+        }
+        if (payload.LocPostalCode) {
+          formData.append("LocPostalCode", payload.LocPostalCode);
+        }
 
         if (payload.Images?.length > 0) {
           payload.Images.forEach((image) => {
