@@ -8,7 +8,6 @@ using server.Data;
 using server.Models;
 using server.Services;
 using server.Util;
-using server.Models.Dtos;
 namespace server.Controllers
 {
     [ApiController]
@@ -250,7 +249,7 @@ namespace server.Controllers
         /// </summary>
         [HttpPost("drafts")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<Beacon>> CreateDraft([FromForm] CreateDraftDto draftDto)
+        public async Task<ActionResult<Beacon>> CreateDraft([FromForm] Beacon beacon)
         {
             try 
             {
@@ -273,15 +272,16 @@ namespace server.Controllers
                 {
                     BeaconId = Guid.NewGuid(),
                     UserId = userId,
-                    CategoryId = !string.IsNullOrEmpty(draftDto.CategoryId) ? 
-                        Guid.Parse(draftDto.CategoryId) : null,
+                    CategoryId = null, // Drafts don't require a category
                     DateCreate = DateTime.UtcNow,
                     DateUpdate = DateTime.UtcNow,
-                    ItemName = string.IsNullOrEmpty(draftDto.ItemName) ? 
-                        "Untitled Draft" : draftDto.ItemName,
-                    ItemDescription = string.IsNullOrEmpty(draftDto.ItemDescription) ? 
-                        "Draft description" : draftDto.ItemDescription,
-                    ItemPrice = draftDto.ItemPrice ?? 0,
+                    ItemName = string.IsNullOrEmpty(beacon.ItemName) ? "Untitled Draft" : beacon.ItemName,
+                    ItemDescription = string.IsNullOrEmpty(beacon.ItemDescription) ? "Draft description" : beacon.ItemDescription,
+                    ItemPrice = beacon.ItemPrice,
+                    LocCity = beacon.LocCity,
+                    LocRegion = beacon.LocRegion,
+                    LocCountry = beacon.LocCountry,
+                    LocPostalCode = beacon.LocPostalCode,
                     IsDraft = true,
                     LastDraftSave = DateTime.UtcNow
                 };
@@ -302,6 +302,7 @@ namespace server.Controllers
                     DateUpdate = newBeacon.DateUpdate
                 };
 
+                // Fix the CreatedAtAction call to use newBeacon.BeaconId
                 return CreatedAtAction(nameof(GetBeacon), new { id = newBeacon.BeaconId }, response);
             }
             catch (Exception ex)
