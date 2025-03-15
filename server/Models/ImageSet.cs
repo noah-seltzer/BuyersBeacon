@@ -10,17 +10,16 @@ namespace server.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ImageSetId { get; set; }
 
-        
-        public Guid BeaconId { get; set; }
-
         [Required]
         [Range(0, int.MaxValue)]
         public int NumImages { get; set; } = 0;
 
-        [ForeignKey("BeaconId")]
-        public Beacon? Beacon {  get; set; }
 
-        public ICollection<Image>? Images { get; set; } = new List<Image>();
+        public ICollection<Image> Images { get; set; } = new List<Image>();
 
+        public Beacon? Beacon { get; set; }
+
+        [ForeignKey("Beacon")]
+        public Guid? BeaconId { get; set; }
     }
 }
