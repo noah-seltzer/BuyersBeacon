@@ -113,7 +113,7 @@ export function Navbar() {
                             variant='default'
                             className='bg-primary hover:bg-primary/90 text-white hidden md:flex'
                         >
-                            Post Beacon
+                            Create Beacon
                         </Button>
                     </Link>
                     <Button
