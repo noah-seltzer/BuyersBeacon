@@ -9,7 +9,8 @@ export default function DraftsPage() {
   const { data: drafts, isLoading } = useGetDraftsQuery();
   const [deleteDraft] = useDeleteDraftMutation();
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     try {
       await deleteDraft(id).unwrap();
     } catch (error) {
@@ -32,36 +33,37 @@ export default function DraftsPage() {
       <h1 className="text-3xl font-bold mb-6">My Drafts</h1>
       <div className="grid gap-4">
         {drafts?.map((draft) => (
-          <Card key={draft.BeaconId} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">
-                  {draft.ItemName || "Untitled Draft"}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Last saved:{" "}
-                  {draft.LastDraftSave
-                    ? new Date(draft.LastDraftSave).toLocaleDateString()
-                    : "Never"}
-                </p>
+          <Link 
+            key={draft.BeaconId} 
+            href={`/beacons/edit/${draft.BeaconId}`}
+            className="block"
+          >
+            <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {draft.ItemName || "Untitled Draft"}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Last saved:{" "}
+                    {draft.LastDraftSave
+                      ? new Date(draft.LastDraftSave).toLocaleDateString()
+                      : "Never"}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={(e) => draft.BeaconId && handleDelete(e, draft.BeaconId)}
+                    className="text-destructive hover:text-destructive/90"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href={`/beacons/edit/${draft.BeaconId}`}>
-                    <Edit2 className="h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive"
-                  onClick={() => draft.BeaconId && handleDelete(draft.BeaconId)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
         {(!drafts || drafts.length === 0) && (
           <div className="text-center py-8">
