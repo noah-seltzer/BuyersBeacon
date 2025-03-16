@@ -7,7 +7,7 @@ import { SignInButton, SignUpButton } from '@clerk/nextjs'
 const Home: FC = () => (
   <div className="flex flex-col">
     {/* Hero Section */}
-    <section className="container mx-auto px-4 min-h-[80vh] flex items-center">
+    <section className="container mx-auto px-4 min-h-[70vh] flex items-center">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
         <div className="space-y-8">
           <div className="space-y-6">
@@ -72,9 +72,9 @@ const Home: FC = () => (
     </section>
 
     {/* How It Works Section*/}
-    <section className="container mx-auto px-4 py-16">
+    <section className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-20">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
           How It Works
         </h2>
 
