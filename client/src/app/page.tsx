@@ -121,13 +121,6 @@ const Home: FC = () => (
                         Join thousands of buyers and sellers already connecting
                         on BuyersBeacon
                     </h2>
-                    <Button
-                        size='lg'
-                        className='bg-primary hover:bg-primary/90 text-white h-14 px-8 text-base'
-                    >
-                        Start Now
-                        <ArrowRight className='ml-2 h-5 w-5' />
-                    </Button>
                 </div>
             </div>
         </section>
