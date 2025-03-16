@@ -10,15 +10,13 @@ import EmptyState from "./empty-state";
 
 interface ImagePreviewProps {
   images: BeaconImage[];
-  alt?: string;
+  alt: string;
   emptyStatePrimaryText: string;
+  className?: string;
 }
 
-const ImagePreview = ({
-  images,
-  alt,
-  emptyStatePrimaryText,
-}: ImagePreviewProps) => {
+const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePreviewProps) => {
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = () => {
@@ -28,6 +26,8 @@ const ImagePreview = ({
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
+
+  const imageUrls = images?.map(img => img.imageUrl) || [];
 
   const getCurrentImageSrc = () => {
     if (!images || !images[currentImageIndex]) return null;

@@ -1,12 +1,20 @@
 import { User } from "@/types/user";
 
 export interface BeaconImage {
-  imageId?: string;
-  fileName?: string;
-  imageUrl?: string;
-  externalImageId?: string;
-  file?: File | string;
-  isCover?: boolean;
+  imageId: string;
+  imageSetId: string;
+  fileName: string;
+  imageUrl: string;
+  externalImageId: string;
+  mimeType: string;
+  file?: File;
+}
+
+export interface ImageSet {
+  imageSetId: string;
+  numImages: number;
+  images: BeaconImage[];
+  beaconId: string;
 }
 
 export interface Beacon {
@@ -23,9 +31,7 @@ export interface Beacon {
   LocRegion?: string;
   LocCountry?: string;
   LocPostalCode?: string;
-  imageSet: {
-    images: BeaconImage[];
-  };
+  imageSet: ImageSet;
 }
 
 export interface Category {

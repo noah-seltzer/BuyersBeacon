@@ -23,6 +23,16 @@ export const beaconApi = createApi({
   endpoints: (builder) => ({
     getBeacons: builder.query<Beacon[], void>({
       query: () => ENDPOINTS.BEACONS,
+      transformResponse: (response: any[]) =>
+        response.map((beacon) => ({
+          ...beacon,
+          imageSet: {
+            imageSetId: beacon.imageSet?.imageSetId,
+            numImages: beacon.imageSet?.numImages || 0,
+            images: beacon.imageSet?.images || [],
+            beaconId: beacon.imageSet?.beaconId,
+          },
+        })),
       providesTags: () => [{ type: CACHES.BEACONS, id: "LIST" }],
     }),
     createBeacon: builder.mutation<Beacon, Beacon>({
@@ -71,7 +81,16 @@ export const beaconApi = createApi({
       providesTags: () => [{ type: CACHES.CATEGORIES, id: "LIST" }],
     }),
     getBeacon: builder.query<Beacon, string>({
-      query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
+      query: (id) => `${ENDPOINTS.BEACONS}/${id}`,
+      transformResponse: (response: any) => ({
+        ...response,
+        imageSet: {
+          imageSetId: response.imageSet?.imageSetId,
+          numImages: response.imageSet?.numImages || 0,
+          images: response.imageSet?.images || [],
+          beaconId: response.imageSet?.beaconId,
+        },
+      }),
       providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }],
     }),
     getDrafts: builder.query<Beacon[], void>({
@@ -146,10 +165,6 @@ export const beaconApi = createApi({
       }),
       invalidatesTags: () => [{ type: CACHES.DRAFTS, id: "LIST" }],
     }),
-    getBeaconById: builder.query<Beacon, string>({
-      query: (id) => `/beacons/${id}`,
-      providesTags: (result, error, id) => [{ type: CACHES.BEACONS, id }],
-    }),
   }),
 });
 
@@ -163,5 +178,4 @@ export const {
   useSaveDraftMutation,
   useUpdateDraftMutation,
   useDeleteDraftMutation,
-  useGetBeaconByIdQuery,
 } = beaconApi;

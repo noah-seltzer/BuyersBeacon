@@ -2,27 +2,72 @@
 import { useGetBeaconsQuery } from "@/redux/api";
 import { FC } from "react";
 import { Beacon } from "@/types/beacon";
-import { Image, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
+import ImagePreview from "@/components/molecules/image-preview";
 
 const BeaconThumbnail: FC<{ beacon: Beacon }> = ({ beacon }) => {
+  const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
+    .filter(Boolean)
+    .join(", ");
+
+  const formatPrice = (price: number | undefined) => {
+    if (typeof price !== "number") return "$0.00";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+
   return (
-    <Link href={`/beacons/${beacon.BeaconId}`}>
-      <Card className="p-4 flex flex-col flex-nowrap ">
-        <Image className="w-32 h-32 mb-4" />
-        <p className="font-bold">{beacon.ItemName}</p>
-        <div className="text-xs">
-          <p>category</p>
-          <p>{beacon.ItemDescription}</p>
-          <div className="w-full flex flex-row items-center justify-between">
-            <p className="text-primary text-base">
-              ${beacon.ItemPrice ?? "DEMO"}
+    <Link href={`/beacons/${beacon.BeaconId}`} className="block group">
+      <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-200">
+        {/* Image Container */}
+        <div className="aspect-[4/3] relative overflow-hidden">
+          <ImagePreview
+            images={beacon.imageSet?.images || []}
+            alt={beacon.ItemName}
+            emptyStatePrimaryText="No image"
+            showThumbnailsGrid={false}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          />
+        </div>
+
+        {/* Content Container */}
+        <div className="p-4">
+          {/* Category Badge */}
+          <div className="mb-2">
+            <span className="text-xs font-medium text-primary/80 bg-primary/10 px-2 py-1 rounded-full">
+              {beacon.Category?.CategoryName || "Uncategorized"}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3 className="font-semibold text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+            {beacon.ItemName}
+          </h3>
+
+          {/* Description */}
+          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+            {beacon.ItemDescription}
+          </p>
+
+          <div className="flex flex-col gap-2">
+            {/* Price */}
+            <p className="text-xl font-bold text-primary">
+              {formatPrice(beacon.ItemPrice)}
             </p>
-            <div className="flex flex-row items-center gap-1">
-              <MapPin className="w-4" />
-              Location
-            </div>
+
+            {/* Location */}
+            {location && (
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span className="line-clamp-1">{location}</span>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -31,29 +76,35 @@ const BeaconThumbnail: FC<{ beacon: Beacon }> = ({ beacon }) => {
 };
 
 const BrowseBeaconsPage: FC = () => {
-  const { data: beacons } = useGetBeaconsQuery();
+  const { data: beacons, isLoading } = useGetBeaconsQuery();
+  const publishedBeacons = beacons?.filter((beacon) => !beacon.IsDraft) || [];
 
   return (
-    <div className="w-3/4 mx-auto">
-      <div className="container px-4 pt-6 text-center items-center justify-center bg-gray-600 h-auto">
-        <div>Search goes here</div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-primary mb-2">Browse Beacons</h1>
+        <p className="text-muted-foreground text-lg">
+          {publishedBeacons.length} Beacons available
+        </p>
       </div>
 
-      <h1 className="text-5xl mt-8 font-bold text-primary">
-        Vancouver Beacons
-      </h1>
-      {beacons && (
-        <p className="text-tertiary text-lg text-bold mt-2 mb-8">
-          {beacons.length} Beacons
-        </p>
-      )}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Search Placeholder */}
+        <Card className="p-4 mb-8 bg-card/50 border-dashed">
+          <p className="text-center text-muted-foreground">
+            SEARCH TO BE IMPLEMENTED HERE
+          </p>
+        </Card>
 
-      <Card className="flex p-6 mx-auto flex-row gap-8 justify-start">
-        {beacons &&
-          beacons.map((element) => (
-            <BeaconThumbnail key={element.BeaconId} beacon={element} />
+        {/* Beacons Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {publishedBeacons.map((beacon) => (
+            <BeaconThumbnail key={beacon.BeaconId} beacon={beacon} />
           ))}
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
