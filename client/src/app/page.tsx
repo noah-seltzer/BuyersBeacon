@@ -2,7 +2,7 @@ import { Button } from "@/components/atoms/button";
 import { ArrowRight, Search, MessageSquare, Bell } from "lucide-react";
 import { FC } from "react";
 import Link from "next/link";
-import { SignInButton, SignUpButton } from '@clerk/nextjs'
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 const Home: FC = () => (
   <div className="flex flex-col">
@@ -137,6 +137,75 @@ const Home: FC = () => (
         </div>
       </div>
     </section>
+
+    {/* Footer */}
+    <footer className="border-t border-surface/10 mt-16">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="space-y-4 text-center">
+            <h3 className="text-lg font-semibold">BuyersBeacon</h3>
+            <p className="text-sm text-foreground/60">
+              Connecting local buyers and sellers for better deals.
+            </p>
+          </div>
+
+          <div className="space-y-4 text-center">
+            <h3 className="text-lg font-semibold">Product</h3>
+            <div className="space-y-2">
+              <Link
+                href="/beacons/browse"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                Browse Beacons
+              </Link>
+              <Link
+                href="/beacons/create"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                Create a Beacon
+              </Link>
+              <Link
+                href="/about"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                About Us
+              </Link>
+            </div>
+          </div>
+
+          <div className="space-y-4 text-center">
+            <h3 className="text-lg font-semibold">Support</h3>
+            <div className="space-y-2">
+              <Link
+                href="/help"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                Help Center
+              </Link>
+              <Link
+                href="/terms"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                Terms of Service
+              </Link>
+              <Link
+                href="/privacy"
+                className="block text-sm text-foreground/60 hover:text-foreground"
+              >
+                Privacy Policy
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-surface/10">
+          <p className="text-center text-sm text-foreground/60">
+            © {new Date().getFullYear()} BuyersBeacon. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
   </div>
 );
+
 export default Home;
