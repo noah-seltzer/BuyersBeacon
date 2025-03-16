@@ -51,7 +51,6 @@ export function Navbar() {
                     </Link>
                     <div className='hidden md:flex items-center gap-6'>
                         <NavLink href='/beacons/browse'>Browse</NavLink>
-                        <NavLink href='/categories'>Categories</NavLink>
                         <NavLink href='/about'>About</NavLink>
                         <NavLink href='/beacons/drafts'>Drafts</NavLink>
                     </div>
@@ -144,12 +143,6 @@ export function Navbar() {
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Browse
-                    </NavLink>
-                    <NavLink
-                        href='/categories'
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Categories
                     </NavLink>
                     <NavLink href='/about' onClick={() => setIsMenuOpen(false)}>
                         About
