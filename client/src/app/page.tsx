@@ -1,6 +1,7 @@
 import { Button } from '@/components/atoms/button'
 import { ArrowRight, Search, MessageSquare, Bell } from 'lucide-react'
 import { FC } from 'react'
+import Link from 'next/link'
 
 const Home: FC = () => (
     <div className='flex flex-col'>
@@ -25,17 +26,23 @@ const Home: FC = () => (
                         <Button
                             size='lg'
                             className='bg-primary hover:bg-primary/90 h-14 px-8 text-base'
+                            asChild
                         >
-                            Post a Beacon
-                            <ArrowRight className='ml-2 h-5 w-5' />
+                            <Link href="/beacons/create">
+                                Create a Beacon
+                                <ArrowRight className='ml-2 h-5 w-5' />
+                            </Link>
                         </Button>
                         <Button
                             size='lg'
                             variant='outline'
                             className='h-14 px-8 text-base group hover:border-primary/50'
+                            asChild
                         >
-                            <Search className='mr-2 h-5 w-5 group-hover:text-primary' />
-                            Browse Beacons
+                            <Link href="/beacons/browse">
+                                <Search className='mr-2 h-5 w-5 group-hover:text-primary' />
+                                Browse Beacons
+                            </Link>
                         </Button>
                     </div>
 
