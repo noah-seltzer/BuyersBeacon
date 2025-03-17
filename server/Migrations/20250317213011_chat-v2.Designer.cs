@@ -12,8 +12,8 @@ using server.Data;
 namespace server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250311064024_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250317213011_chat-v2")]
+    partial class chatv2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ChatUser", b =>
+                {
+                    b.Property<Guid>("ChatsChatId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PartcipantsUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ChatsChatId", "PartcipantsUserId");
+
+                    b.HasIndex("PartcipantsUserId");
+
+                    b.ToTable("ChatUser");
+                });
 
             modelBuilder.Entity("server.Models.Beacon", b =>
                 {
@@ -91,6 +106,8 @@ namespace server.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Beacons");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "Beacon");
                 });
 
             modelBuilder.Entity("server.Models.Category", b =>
@@ -113,11 +130,66 @@ namespace server.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "Category");
                 });
 
+            modelBuilder.Entity("server.Models.Chat", b =>
+                {
+                    b.Property<Guid>("ChatId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "ChatId");
+
+                    b.Property<Guid>("BeaconId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "BeaconId");
+
+                    b.Property<Guid?>("BeacondId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ChatId");
+
+                    b.HasIndex("BeacondId");
+
+                    b.ToTable("Chats");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "Chat");
+                });
+
+            modelBuilder.Entity("server.Models.ChatMessage", b =>
+                {
+                    b.Property<Guid>("ChatMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "ChatMessageId");
+
+                    b.Property<Guid>("ChatId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "ChatId");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "Message");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasAnnotation("Relational:JsonPropertyName", "UserId");
+
+                    b.HasKey("ChatMessageId");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("server.Models.Image", b =>
                 {
                     b.Property<Guid>("ImageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ExternalImageId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -125,6 +197,12 @@ namespace server.Migrations
 
                     b.Property<Guid>("ImageSetId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MimeType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ImageId");
 
@@ -139,7 +217,7 @@ namespace server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BeaconId")
+                    b.Property<Guid?>("BeaconId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("NumImages")
@@ -148,7 +226,8 @@ namespace server.Migrations
                     b.HasKey("ImageSetId");
 
                     b.HasIndex("BeaconId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BeaconId] IS NOT NULL");
 
                     b.ToTable("ImageSets");
                 });
@@ -166,6 +245,23 @@ namespace server.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "User");
+                });
+
+            modelBuilder.Entity("ChatUser", b =>
+                {
+                    b.HasOne("server.Models.Chat", null)
+                        .WithMany()
+                        .HasForeignKey("ChatsChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("server.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("PartcipantsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("server.Models.Beacon", b =>
@@ -185,6 +281,34 @@ namespace server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("server.Models.Chat", b =>
+                {
+                    b.HasOne("server.Models.Beacon", "Beacon")
+                        .WithMany("Chats")
+                        .HasForeignKey("BeacondId");
+
+                    b.Navigation("Beacon");
+                });
+
+            modelBuilder.Entity("server.Models.ChatMessage", b =>
+                {
+                    b.HasOne("server.Models.Chat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("server.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("server.Models.Image", b =>
                 {
                     b.HasOne("server.Models.ImageSet", "ImageSet")
@@ -200,21 +324,26 @@ namespace server.Migrations
                 {
                     b.HasOne("server.Models.Beacon", "Beacon")
                         .WithOne("ImageSet")
-                        .HasForeignKey("server.Models.ImageSet", "BeaconId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("server.Models.ImageSet", "BeaconId");
 
                     b.Navigation("Beacon");
                 });
 
             modelBuilder.Entity("server.Models.Beacon", b =>
                 {
+                    b.Navigation("Chats");
+
                     b.Navigation("ImageSet");
                 });
 
             modelBuilder.Entity("server.Models.Category", b =>
                 {
                     b.Navigation("Beacons");
+                });
+
+            modelBuilder.Entity("server.Models.Chat", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("server.Models.ImageSet", b =>

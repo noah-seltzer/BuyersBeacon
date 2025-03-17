@@ -14,5 +14,7 @@ namespace server.Models
         public string ClerkId { get; set; }
 
         public ICollection<Beacon>? Beacons { get; set; } = new List<Beacon>();
+
+        public ICollection<Chat> Chats { get; set; }
     }
 }

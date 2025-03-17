@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace server.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class chatv1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,12 +71,30 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Chat",
+                columns: table => new
+                {
+                    ChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BeaconId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BeacondId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chat", x => x.ChatId);
+                    table.ForeignKey(
+                        name: "FK_Chat_Beacons_BeacondId",
+                        column: x => x.BeacondId,
+                        principalTable: "Beacons",
+                        principalColumn: "BeaconId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ImageSets",
                 columns: table => new
                 {
                     ImageSetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BeaconId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NumImages = table.Column<int>(type: "int", nullable: false)
+                    NumImages = table.Column<int>(type: "int", nullable: false),
+                    BeaconId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -85,7 +103,56 @@ namespace server.Migrations
                         name: "FK_ImageSets_Beacons_BeaconId",
                         column: x => x.BeaconId,
                         principalTable: "Beacons",
-                        principalColumn: "BeaconId",
+                        principalColumn: "BeaconId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatMessage",
+                columns: table => new
+                {
+                    ChatMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatMessage", x => x.ChatMessageId);
+                    table.ForeignKey(
+                        name: "FK_ChatMessage_Chat_ChatId",
+                        column: x => x.ChatId,
+                        principalTable: "Chat",
+                        principalColumn: "ChatId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChatMessage_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatUser",
+                columns: table => new
+                {
+                    ChatsChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PartcipantsUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatUser", x => new { x.ChatsChatId, x.PartcipantsUserId });
+                    table.ForeignKey(
+                        name: "FK_ChatUser_Chat_ChatsChatId",
+                        column: x => x.ChatsChatId,
+                        principalTable: "Chat",
+                        principalColumn: "ChatId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChatUser_Users_PartcipantsUserId",
+                        column: x => x.PartcipantsUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -95,7 +162,10 @@ namespace server.Migrations
                 {
                     ImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageSetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExternalImageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MimeType = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -119,6 +189,26 @@ namespace server.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Chat_BeacondId",
+                table: "Chat",
+                column: "BeacondId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatMessage_ChatId",
+                table: "ChatMessage",
+                column: "ChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatMessage_UserId",
+                table: "ChatMessage",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatUser_PartcipantsUserId",
+                table: "ChatUser",
+                column: "PartcipantsUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Images_ImageSetId",
                 table: "Images",
                 column: "ImageSetId");
@@ -127,14 +217,24 @@ namespace server.Migrations
                 name: "IX_ImageSets_BeaconId",
                 table: "ImageSets",
                 column: "BeaconId",
-                unique: true);
+                unique: true,
+                filter: "[BeaconId] IS NOT NULL");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ChatMessage");
+
+            migrationBuilder.DropTable(
+                name: "ChatUser");
+
+            migrationBuilder.DropTable(
                 name: "Images");
+
+            migrationBuilder.DropTable(
+                name: "Chat");
 
             migrationBuilder.DropTable(
                 name: "ImageSets");

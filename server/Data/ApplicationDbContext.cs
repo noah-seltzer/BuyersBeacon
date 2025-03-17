@@ -14,5 +14,7 @@ namespace server.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<ImageSet> ImageSets { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }

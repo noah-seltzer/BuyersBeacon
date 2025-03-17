@@ -69,5 +69,7 @@ namespace server.Models
 
         [JsonPropertyName("LastDraftSave")]
         public DateTime? LastDraftSave { get; set; }
+           
+        public ICollection<Chat>? Chats { get; set; }
     }
 }

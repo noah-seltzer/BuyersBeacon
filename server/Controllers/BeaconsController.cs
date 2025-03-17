@@ -106,7 +106,13 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var category = await _categoryService.GetById(beacon.CategoryId);
+            if (beacon.CategoryId == null) {
+                ModelState.AddModelError(nameof(beacon.CategoryId), "Please select valid category id.");
+                return BadRequest(ModelState);
+            }
+
+            // Im only extracting the value becuase of the null check above.
+            var category = await _categoryService.GetById(beacon.CategoryId.Value);
 
             if (category == null)
             {
