@@ -1,4 +1,3 @@
-import { User } from "@/types/user";
 
 export interface BeaconImage {
   imageId: string,
@@ -17,10 +16,9 @@ export interface Beacon {
   ItemPrice?: number;
   IsDraft?: boolean;
   LastDraftSave?: string;
-  ItemPrice?: number
   imageSet: {
     images: BeaconImage[]
-  } 
+  }
 }
 
 export interface Category {

@@ -4,11 +4,12 @@ using server.Models;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using server.Services;
+using server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-
+builder.Services.AddSignalR(); 
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -75,6 +76,9 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ChatHub>("/chatHub");
+
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

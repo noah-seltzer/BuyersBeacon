@@ -89,7 +89,7 @@ const CreateBeaconPage: FC = () => {
       CategoryId: "",
       ItemDescription: "",
       Images: [],
-    } as Beacon,
+    } as unknown as Beacon,
     onSubmit: processSubmit,
   });
 
