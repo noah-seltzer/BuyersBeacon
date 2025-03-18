@@ -1,22 +1,35 @@
-import { User } from "@/types/user";
-
 export interface BeaconImage {
-  imageId: string,
-  fileName: string,
-  imageUrl: string,
-  externalImageId: string
+  imageId: string;
+  imageSetId: string;
+  fileName: string;
+  imageUrl: string;
+  externalImageId: string;
+  mimeType: string;
+  file?: File;
+}
+
+export interface ImageSet {
+  imageSetId?: string;
+  images?: BeaconImage[];
+  beaconId?: string;
 }
 
 export interface Beacon {
   Category?: Category;
   BeaconId?: string;
+  UserId?: string;
   ItemName: string;
-  CategoryId: string;
+  CategoryId?: string;
   ItemDescription: string;
-  ItemPrice?: number
-  imageSet: {
-    images: BeaconImage[]
-  } 
+  ItemPrice: number;
+  Images: BeaconImage[];
+  IsDraft?: boolean;
+  LastDraftSave?: string;
+  LocCity?: string;
+  LocRegion?: string;
+  LocCountry?: string;
+  LocPostalCode?: string;
+  imageSet: ImageSet;
 }
 
 export interface Category {

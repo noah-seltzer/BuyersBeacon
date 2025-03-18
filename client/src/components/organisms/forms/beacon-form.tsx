@@ -16,10 +16,13 @@ interface BeaconFormProps {
   errors: FormikErrors<Beacon>;
   touched: FormikTouched<Beacon>;
   categoryOptions: { label: string; value: string }[];
-  categoryOptionsIsLoading: boolean,
-  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined,
+  categoryOptionsIsLoading: boolean;
+  categtorOptionsError?: FetchBaseQueryError | SerializedError | undefined;
   submitting: boolean;
   setFieldValue: (field: string, value: any) => void;
+  onSaveDraft?: () => void;
+  draftSaved?: boolean;
+  draftError?: string | null;
 }
 
 export function BeaconForm({
@@ -33,6 +36,9 @@ export function BeaconForm({
   categtorOptionsError,
   submitting,
   setFieldValue,
+  onSaveDraft,
+  draftSaved,
+  draftError,
 }: BeaconFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -84,6 +90,77 @@ export function BeaconForm({
 
         <div>
           <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Price
+          </label>
+          <Input
+            type="number"
+            name="ItemPrice"
+            placeholder="Enter price"
+            onChange={handleChange}
+            value={values.ItemPrice || ""}
+            className="mt-2"
+          />
+          {touched.ItemPrice && errors.ItemPrice && (
+            <p className="text-sm text-destructive mt-1">{errors.ItemPrice}</p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              City
+            </label>
+            <Input
+              name="LocCity"
+              placeholder="Enter city"
+              onChange={handleChange}
+              value={values.LocCity || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Region/Province
+            </label>
+            <Input
+              name="LocRegion"
+              placeholder="Enter region/province"
+              onChange={handleChange}
+              value={values.LocRegion || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Country
+            </label>
+            <Input
+              name="LocCountry"
+              placeholder="Enter country"
+              onChange={handleChange}
+              value={values.LocCountry || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Postal Code
+            </label>
+            <Input
+              name="LocPostalCode"
+              placeholder="Enter postal code"
+              onChange={handleChange}
+              value={values.LocPostalCode || ""}
+              className="mt-2"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Images
           </label>
           <p className="text-sm text-muted-foreground mt-1">
@@ -96,16 +173,30 @@ export function BeaconForm({
             maxImages={6}
           />
           {touched.Images && errors.Images && (
-            <p className="text-sm text-destructive mt-1">{errors.Images.toString()}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.Images.toString()}
+            </p>
           )}
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        {onSaveDraft && (
+          <Button
+            type="button"
+            onClick={onSaveDraft}
+            variant="outline"
+            className="border-primary/50 text-primary hover:text-primary/90"
+            disabled={submitting}
+          >
+            {draftSaved ? "Draft Saved!" : "Save Draft"}
+          </Button>
+        )}
+
         <Button
           type="submit"
           disabled={submitting}
-          className="bg-primary hover:bg-primary/90 text-white"
+          className="bg-primary hover:bg-primary/90 text-white ml-auto"
         >
           {submitting ? (
             <>
@@ -113,10 +204,18 @@ export function BeaconForm({
               Creating Beacon...
             </>
           ) : (
-            "Create Beacon"
+            "Post Beacon"
           )}
         </Button>
       </div>
+
+      {draftError && (
+        <p className="text-sm text-destructive mt-2">{draftError}</p>
+      )}
+
+      {draftSaved && (
+        <p className="text-sm text-primary mt-2">Draft saved successfully!</p>
+      )}
     </form>
   );
 }

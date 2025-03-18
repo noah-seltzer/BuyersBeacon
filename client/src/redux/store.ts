@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { beaconApi } from "./api";
+import { beaconApi } from "@/redux/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import { authSlice } from "@/redux/auth-slice";
 
 export const store = configureStore({
     reducer: {
-        [beaconApi.reducerPath]: beaconApi.reducer
+        [beaconApi.reducerPath]: beaconApi.reducer,
+        auth: authSlice.reducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware()

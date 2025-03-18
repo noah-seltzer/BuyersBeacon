@@ -4,12 +4,16 @@ using server.Models;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using server.Services;
+using server.Util;
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotEnv.Load();
+
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connString =  builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connString));
@@ -30,14 +34,14 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
-                      {
-                          policy.WithOrigins(
+        policy =>
+        {
+           policy.WithOrigins(
                             "http://localhost:3000",
                             "http://localhost:3000", 
                             "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
@@ -48,9 +52,16 @@ builder.Services.AddCors(options =>
                       });
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
 builder.Services.AddScoped<ICategoryService, CategoryService>()
     .AddScoped<IBeaconService, BeaconService>()
-    .AddScoped<IImageService, ImageService>();
+    .AddScoped<IImageService, ImageService>()
+    .AddScoped<IClerkService, ClerkService>();
 
 var app = builder.Build();
 
@@ -76,5 +87,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuyersBeacon API V1");
     c.RoutePrefix = string.Empty; // This makes Swagger UI the default page
 });
+
 
 app.Run();

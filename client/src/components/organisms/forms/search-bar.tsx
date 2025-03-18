@@ -1,35 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { GetAllBeaconsQuery, useGetAllCategoriesQuery, useGetSearchResultsQuery} from "@/redux/api";
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { GetAllBeaconsQuery, useGetAllCategoriesQuery } from "@/redux/api";
+import { FormikErrors, FormikTouched } from 'formik';
+import { Category } from '@/types/beacon';
+import SelectInput from '@/components/molecules/inputs/select-input';
 
-const SearchBar = ({ onSearchResults }) => {
-  const { data: categories, error, isLoading, } = useGetAllCategoriesQuery();
+
+export interface SearchBarInputs {
+  CategoryId: string,
+  QueryString: string,
+}
+
+
+interface SearchBarProps {
+  values: SearchBarInputs,
+  errors: FormikErrors<SearchBarInputs>
+  touched: FormikTouched<SearchBarInputs>
+  handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void
+  handleChange: {
+    (e: React.ChangeEvent<any>): void;
+    <T_1 = string | ChangeEvent<any>>(field: T_1): T_1 extends React.ChangeEvent<any> ? void : (e: string | React.ChangeEvent<any>) => void;
+  },
+  isSubmitting: boolean,
+  categories: { label: string; value: string }[],
+}
+
+
+const SearchBar = ({
+  values,
+  errors,
+  touched,
+  handleSubmit,
+  handleChange,
+  categories
+}: SearchBarProps) => {
   const [query, setQuery] = useState<GetAllBeaconsQuery | null>(null);
-  const useGetAllBeaconsQUery = useGetSearchResultsQuery(query ?? {} as GetAllBeaconsQuery);
-  const [categoryOptions, setCategoryOptions] = useState<{ label: string; value: string }[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('Category');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch categories from server
-  useEffect(() => {
-    if (!categories) return;
-    const res: { label: string; value: string }[] = [];
-
-    for (let i = 0; i < categories.length; i++) {
-      const name = categories[i].CategoryName.charAt(0).toUpperCase() + categories[i].CategoryName.substring(1);
-      res.push({
-        label: name,
-        value: categories[i].CategoryId
-      })
-    }
-    setCategoryOptions(res);
-    
-  }, [categories])
-
-
   // Close the dropdown if clicked outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: any) => {
       if (!event.target.closest('#dropdownButton') && !event.target.closest('#dropdownMenu')) {
         setIsOpen(false);
       }
@@ -39,42 +50,7 @@ const SearchBar = ({ onSearchResults }) => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const handleDropdownToggle = () => {
-    setIsOpen((prev) => !prev);
-  };
-
-  const handleOptionSelect = (value) => {
-    setSelectedOption(value);
-    setIsOpen(false);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      searchQuery: searchQuery,
-      selectedOption: selectedOption,
-    };
-
-    try {
-      // Make the API request with the data
-      const response = await fetch("http://localhost:5037/api/Beacons/search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // Tell the server it's JSON
-        },
-        body: JSON.stringify(payload), // Send the data as a JSON string
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        onSearchResults(result);
-      } else {
-        console.log("Failed to fetch data.");
-      }
-    } catch (error) {
-      console.error("Error sending request:", error);
-    }
-  }
+  const handleDropdownToggle = () => setIsOpen((prev) => !prev);
 
   return (
     <div className="w-full max-w-sm min-w-[200px]">
@@ -104,18 +80,18 @@ const SearchBar = ({ onSearchResults }) => {
               className="min-w-[150px] overflow-hidden absolute left-0 w-full mt-10 bg-white border border-slate-200 rounded-md shadow-lg z-10"
             >
               <ul id="dropdownOptions">
-                {categoryOptions.length === 0 ? (
+                {categories.length === 0 ? (
                   <li className="px-4 py-2 text-slate-600 text-xs">Loading...</li>
                 ) : (
-                  categoryOptions.map((categoryOptions) => (
-                  <li
-                    key={categoryOptions.label}
-                    className="px-4 py-2 text-slate-600 hover:bg-slate-50 text-xs cursor-pointer"
-                    onClick={() => handleOptionSelect(categoryOptions.label)}
-                  >
-                    {categoryOptions.label}
-                  </li>
-                  ))
+                  <SelectInput
+                    name={"CategoryId"}
+                    value={values.categoryId}
+                    onChange={function (e: React.ChangeEvent<HTMLSelectElement>): void {
+                      throw new Error('Function not implemented.');
+                    }}
+                    options={[]}
+                    categoryOptionsIsLoading={false} />
+
                 )}
               </ul>
             </div>

@@ -18,7 +18,7 @@ namespace server.Models
         public User? User { get; set; }
 
         [JsonPropertyName("CategoryId")]
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
         [JsonPropertyName("Category")]
@@ -42,26 +42,38 @@ namespace server.Models
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]
+        [JsonPropertyName("ItemPrice")]
         public decimal ItemPrice { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocCity")]
         public string? LocCity { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocRegion")]
         public string? LocRegion { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocCountry")]
         public string? LocCountry { get; set; }
 
         [MaxLength(20)]
+        [JsonPropertyName("LocPostalCode")]
         public string? LocPostalCode { get; set; }
 
+      
         public ImageSet? ImageSet { get; set; }
 
         [NotMapped]
         public IFormFile? Image { get; set; }
 
         [NotMapped]
-        public IFormFile[]? Images {get;set;}
-}
+        public IFormFile[]? Images { get; set; }
+
+        [JsonPropertyName("IsDraft")]
+        public bool IsDraft { get; set; } = false;
+
+        [JsonPropertyName("LastDraftSave")]
+        public DateTime? LastDraftSave { get; set; }
+    }
 }

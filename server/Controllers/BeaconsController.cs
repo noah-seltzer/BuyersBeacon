@@ -8,7 +8,6 @@ using server.Data;
 using server.Models;
 using server.Services;
 using server.Util;
-
 namespace server.Controllers
 {
     [ApiController]
@@ -20,6 +19,7 @@ namespace server.Controllers
         private ICategoryService _categoryService;
         private IBeaconService _beaconService;
         private IImageService _imageService;
+
         public BeaconsController(ApplicationDbContext context, 
             ICategoryService categoryService, 
             IBeaconService beaconService, 
@@ -31,7 +31,7 @@ namespace server.Controllers
             _beaconService = beaconService;
             _imageService = imageService;
         }
-
+        
         /// <summary>
         /// Gets all beacons
         /// </summary>
@@ -39,28 +39,12 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] Guid? userId = null, [FromQuery] bool drafts = false)
         {
-            var beacons = await _beaconService.GetList();
+
+            var beacons = await _beaconService.GetList(userId, drafts);
 
             return Ok(beacons);
-        }
-
-        /// <summary>
-        /// Gets all beacons matching search criteria
-        /// </summary>
-        /// <returns>A list of all beacons matching search criteria</returns>
-        /// <response code="200">Returns the list of filtered beacons</response>
-        [HttpGet("search")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> SearchBeacons([FromBody] Dictionary<string, string> request)
-        {
-             if (request.TryGetValue("searchQuery", out var searchQuery) && 
-            request.TryGetValue("selectedOption", out var selectedOption)) {
-                var beacons = await _beaconService.SearchList(searchQuery, selectedOption);
-                return Ok(beacons);
-            }
-            return RedirectToAction("GetBeacons");
         }
 
         /// <summary>
@@ -82,9 +66,23 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            return beacon;
+            return Ok(beacon);
         }
 
+
+        /// <summary>
+        /// Gets all drafts for a user
+        /// </summary>
+        /// <returns>A list of all drafts for the user</returns>
+        /// <response code="200">Returns the list of drafts</response>
+        [HttpGet("drafts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
+        {
+            var drafts = await _beaconService.GetList(new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"), true);
+
+            return Ok(drafts);
+        }
 
         /// <summary>
         /// Creates a new beacon
@@ -104,9 +102,9 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var category = await _categoryService.GetById(beacon.CategoryId);
+            var category = await _categoryService.GetById((System.Guid) beacon.CategoryId);
 
-            if (category == null)
+            if (beacon.CategoryId.HasValue && category == null)
             {
                 ModelState.AddModelError("CategoryId", "Specified category does not exist");
                 return BadRequest(ModelState);
@@ -121,37 +119,17 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var newBeacon = await _beaconService.Create(beacon);
+            newBeacon.Category = category;
 
-
-            var newBeacon = new Beacon
-            {
-                BeaconId = Guid.NewGuid(),
-                UserId = beacon.UserId,
-                CategoryId = beacon.CategoryId,
-                DateCreate = DateTime.UtcNow,
-                DateUpdate = DateTime.UtcNow,
-                ItemName = beacon.ItemName,
-                ItemDescription = beacon.ItemDescription,
-                ItemPrice = beacon.ItemPrice,
-                LocCity = beacon.LocCity,
-                LocRegion = beacon.LocRegion,
-                LocCountry = beacon.LocCountry,
-                LocPostalCode = beacon.LocPostalCode
-            };
-
-
-
-
-            var resB = _context.Beacons.Add(newBeacon);
-            resB.Entity.Category = category;
-
+            _context.Beacons.Add(newBeacon);
 
             await _imageService.CreateImagesetForNewBeacon(newBeacon, beacon);
 
             await _context.SaveChangesAsync();
 
 
-            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, resB.Entity);
+            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, newBeacon);
         }
 
         /// <summary>
@@ -180,16 +158,7 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            beacon.UserId = beaconDto.UserId;
-            beacon.CategoryId = beaconDto.CategoryId;
-            beacon.DateUpdate = DateTime.UtcNow;
-            beacon.ItemName = beaconDto.ItemName;
-            beacon.ItemDescription = beaconDto.ItemDescription;
-            beacon.ItemPrice = beaconDto.ItemPrice;
-            beacon.LocCity = beaconDto.LocCity;
-            beacon.LocRegion = beaconDto.LocRegion;
-            beacon.LocCountry = beaconDto.LocCountry;
-            beacon.LocPostalCode = beaconDto.LocPostalCode;
+            _beaconService.Update(beacon, beaconDto);
 
             try
             {
@@ -219,16 +188,25 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBeacon(Guid id)
         {
-            var beacon = await _context.Beacons.FindAsync(id);
-            if (beacon == null)
+            try
             {
-                return NotFound();
+                var beacon = await _context.Beacons
+                    .FirstOrDefaultAsync(b => b.BeaconId == id);
+
+                if (beacon == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Beacons.Remove(beacon);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.Beacons.Remove(beacon);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to delete beacon", message = ex.Message });
+            }
         }
 
         private bool BeaconExists(Guid id)
