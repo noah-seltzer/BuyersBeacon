@@ -6,7 +6,6 @@ import { Beacon } from "@/types/beacon";
 import {
   useCreateBeaconMutation,
   useGetAllCategoriesQuery,
-  useSaveDraftMutation,
 } from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
@@ -76,6 +75,9 @@ const CreateBeaconPage: FC = () => {
         IsDraft: true,
         // Don't set a default CategoryId
       };
+      if (user) {
+        draftData.UserId = user.id
+      }
 
       await createBeacon(draftData).unwrap();
       setDraftSaved(true);

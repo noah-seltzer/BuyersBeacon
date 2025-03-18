@@ -31,19 +31,6 @@ namespace server.Services
                 .Where(b => b.IsDraft == drafts)
                 .Where(b => user_id == null ? true : b.UserId == user_id);
 
-            //if (user_id != null)
-            //{
-            //    beacons.Where(b => b.UserId == user_id);
-            //}
-
-            //if (drafts == true)
-            //{
-            //    beacons.Where(b => b.IsDraft == true);
-            //} else
-            //{
-            //    beacons.Where(b => b.IsDraft == false);
-            //}
-
             return await beacons.ToListAsync();
         }
 
