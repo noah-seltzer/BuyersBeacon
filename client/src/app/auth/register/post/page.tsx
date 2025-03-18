@@ -26,7 +26,7 @@ const PostRegisterPage: FC = async ()  => {
     return (
         <>
             <Suspense>
-                <SignInClientStateManager user={user} />
+                <SignInClientStateManager user={user} redirectUrl="/" />
             </Suspense>
         </>
     )

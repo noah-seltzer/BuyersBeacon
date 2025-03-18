@@ -15,12 +15,10 @@ const PostLoginPage: FC = async () => {
         }
     )
     const data = await beaconUser.json()
-    console.log('data', data)
     const user: User = {
         id: data.userId,
         clerk_user_id: data.clerkId
     }
-    console.log('data', data)
     return (
         <>
             <SignInClientStateManager user={user} redirectUrl="/" />
