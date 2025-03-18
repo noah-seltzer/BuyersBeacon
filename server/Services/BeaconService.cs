@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
 
@@ -9,12 +7,10 @@ namespace server.Services
     public class BeaconService: IBeaconService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICategoryService _categoryService;
 
-        public BeaconService(ApplicationDbContext context, ICategoryService categoryService)
+        public BeaconService(ApplicationDbContext context)
         {
             _context = context;
-            _categoryService = categoryService;
         }
         public async Task<Beacon?> GetById(Guid id)
         {
@@ -31,17 +27,22 @@ namespace server.Services
             var beacons = _context.Beacons
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
-                .ThenInclude(i => i.Images);
-            
-            if (user_id != null)
-            {
-                beacons.Where(b => b.UserId == user_id);
-            }
+                .ThenInclude(i => i.Images)
+                .Where(b => b.IsDraft == drafts)
+                .Where(b => user_id == null ? true : b.UserId == user_id);
 
-            if (drafts == true)
-            {
-                beacons.Where(b => b.IsDraft);
-            }
+            //if (user_id != null)
+            //{
+            //    beacons.Where(b => b.UserId == user_id);
+            //}
+
+            //if (drafts == true)
+            //{
+            //    beacons.Where(b => b.IsDraft == true);
+            //} else
+            //{
+            //    beacons.Where(b => b.IsDraft == false);
+            //}
 
             return await beacons.ToListAsync();
         }

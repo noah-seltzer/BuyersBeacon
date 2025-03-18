@@ -6,7 +6,6 @@ import { createBeaconFormdata } from '../lib/beacon-utils'
 export enum ENDPOINTS {
     CATEGORIES = 'Categories',
     BEACONS = 'Beacons',
-    DRAFTS = 'Beacons/drafts'
 }
 enum CACHES {
     BEACONS = 'Beacon',
@@ -31,12 +30,16 @@ export const beaconApi = createApi({
     }),
 
     endpoints: (builder) => ({
-        getBeacons: builder.query<Beacon[], { drafts: boolean }>({
-            query: ({ drafts = false }) => {
+        getBeacons: builder.query<Beacon[], { drafts?: boolean, userId?: string }>({
+            query: (arg) => {
+                const drafts = arg && arg.drafts ? true : false
+                const id = arg && arg.userId ? arg.userId : undefined
+
               return {
                 url: ENDPOINTS.BEACONS,
                 params: {
-                  drafts
+                  drafts,
+                  userId: id
                 }
               }
             },
@@ -49,12 +52,16 @@ export const beaconApi = createApi({
                         images: beacon.imageSet?.images || [],
                         beaconId: beacon.imageSet?.beaconId
                     }
-                })),
-            providesTags: (result, error, { drafts }) => {
-              const type = drafts ? CACHES.DRAFTS : CACHES.BEACONS
-              return [{ type, id: LIST_ID }]
+                }))
+            //     ,
+            // providesTags: (result, error, arg) => {
+            //     var type = CACHES.BEACONS
+            //     if (arg && arg.drafts) {
+            //         type = CACHES.DRAFTS
+            //     }
+            //     return [{ type, id: LIST_ID }]
 
-            }
+            // }
               
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({

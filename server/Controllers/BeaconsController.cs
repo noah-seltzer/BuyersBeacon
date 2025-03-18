@@ -31,7 +31,7 @@ namespace server.Controllers
             _beaconService = beaconService;
             _imageService = imageService;
         }
-
+        
         /// <summary>
         /// Gets all beacons
         /// </summary>
@@ -39,9 +39,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] Guid? userId = null, [FromQuery] bool drafts = false)
         {
-            var beacons = await _beaconService.GetList(null);
+
+            var beacons = await _beaconService.GetList(userId, drafts);
 
             return Ok(beacons);
         }

@@ -4,12 +4,16 @@ using server.Models;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using server.Services;
+using server.Util;
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
 
+DotEnv.Load();
+
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connString =  builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connString));
@@ -83,5 +87,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuyersBeacon API V1");
     c.RoutePrefix = string.Empty; // This makes Swagger UI the default page
 });
+
 
 app.Run();

@@ -14,17 +14,19 @@ namespace server.Services
     public class CategoryService : ICategoryService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ICategoryService _categoryService;
 
-        public CategoryService(ApplicationDbContext context, ICategoryService categoryService)
+        public CategoryService(ApplicationDbContext context)
         {
             _context = context;
-            _categoryService = categoryService;
         }
 
         public async Task<Category?> GetById(Guid CategoryId)
         {
-            return await _categoryService.GetById(CategoryId);
+            return await _context.Categories.Select(c => new Category
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName
+            }).FirstOrDefaultAsync((c) => c.CategoryId == CategoryId);
         }
     }
 }
