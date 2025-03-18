@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Beacon, Category } from '@/types/beacon'
 import Cookies from 'js-cookie'
+import { createBeaconFormdata } from '../lib/beacon-utils'
 
 export enum ENDPOINTS {
     CATEGORIES = 'Categories',
@@ -13,6 +14,8 @@ enum CACHES {
     DRAFTS = 'Drafts'
 }
 
+export const LIST_ID = 'LIST'
+
 export const beaconApi = createApi({
     tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS],
     reducerPath: 'beaconApi',
@@ -22,169 +25,98 @@ export const beaconApi = createApi({
         prepareHeaders: (headers) => {
             const sessionToken = Cookies.get('__session')
             if (sessionToken) {
-                headers.set("Authorization", `Bearer ${sessionToken}`)
+                headers.set('Authorization', `Bearer ${sessionToken}`)
             }
         }
-    }),                                        
+    }),
 
-  endpoints: (builder) => ({
-    getBeacons: builder.query<Beacon[], void>({
-      query: () => ENDPOINTS.BEACONS,
-      transformResponse: (response: any[]) =>
-        response.map((beacon) => ({
-          ...beacon,
-          imageSet: {
-            imageSetId: beacon.imageSet?.imageSetId,
-            numImages: beacon.imageSet?.numImages || 0,
-            images: beacon.imageSet?.images || [],
-            beaconId: beacon.imageSet?.beaconId,
-          },
-        })),
-      providesTags: () => [{ type: CACHES.BEACONS, id: "LIST" }],
-    }),
-    createBeacon: builder.mutation<Beacon, Beacon>({
-      query: (payload) => {
-        var formData = new FormData();
-        formData.append("ItemName", payload.ItemName);
-        formData.append("ItemDescription", payload.ItemDescription);
-        if (payload.CategoryId) {
-          formData.append("CategoryId", payload.CategoryId);
-        }
-        formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530");
-
-        // Add price and location fields
-        if (payload.ItemPrice) {
-          formData.append("ItemPrice", payload.ItemPrice.toString());
-        }
-        if (payload.LocCity) {
-          formData.append("LocCity", payload.LocCity);
-        }
-        if (payload.LocRegion) {
-          formData.append("LocRegion", payload.LocRegion);
-        }
-        if (payload.LocCountry) {
-          formData.append("LocCountry", payload.LocCountry);
-        }
-        if (payload.LocPostalCode) {
-          formData.append("LocPostalCode", payload.LocPostalCode);
-        }
-
-        if (payload.Images?.length > 0) {
-          payload.Images.forEach((image) => {
-            if (image.file instanceof File) {
-              formData.append("Images", image.file);
-            }
-          });
-        }
-
-        return {
-          url: ENDPOINTS.BEACONS,
-          method: "POST",
-          body: formData,
-        };
-      },
-      invalidatesTags: () => [{ type: CACHES.BEACONS, id: "LIST" }],
-    }),
-    getAllCategories: builder.query<Category[], void>({
-      query: () => ENDPOINTS.CATEGORIES,
-      providesTags: () => [{ type: CACHES.CATEGORIES, id: "LIST" }],
-    }),
-    getBeacon: builder.query<Beacon, string>({
-      query: (id) => `${ENDPOINTS.BEACONS}/${id}`,
-      transformResponse: (response: any) => ({
-        ...response,
-        imageSet: {
-          imageSetId: response.imageSet?.imageSetId,
-          numImages: response.imageSet?.numImages || 0,
-          images: response.imageSet?.images || [],
-          beaconId: response.imageSet?.beaconId,
-        },
-      }),
-      providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }],
-    }),
-    getDrafts: builder.query<Beacon[], void>({
-      query: () => ENDPOINTS.DRAFTS,
-      providesTags: () => [{ type: CACHES.DRAFTS, id: "LIST" }],
-    }),
-    getDraft: builder.query<Beacon, string>({
-      query: (id) => `${ENDPOINTS.DRAFTS}/${id}`,
-      providesTags: (_result, _error, id) => [{ type: CACHES.DRAFTS, id }],
-    }),
-    saveDraft: builder.mutation<Beacon, Beacon>({
-      query: (payload) => {
-        var formData = new FormData();
-        formData.append("ItemName", payload.ItemName || "Untitled Draft");
-        formData.append(
-          "ItemDescription",
-          payload.ItemDescription || "Draft description"
-        );
-        formData.append("ItemPrice", payload.ItemPrice?.toString() || "0");
-
-                // Only append CategoryId if it exists and isn't empty
-                if (payload.CategoryId && payload.CategoryId.trim() !== '') {
-                    formData.append('CategoryId', payload.CategoryId)
+    endpoints: (builder) => ({
+        getBeacons: builder.query<Beacon[], { drafts: boolean }>({
+            query: ({ drafts = false }) => {
+              return {
+                url: ENDPOINTS.BEACONS,
+                params: {
+                  drafts
                 }
-
-                formData.append('IsDraft', 'true')
-
-                if (payload.Images && payload.Images.length > 0) {
-                    for (let i = 0; i < payload.Images.length; i++) {
-                        formData.append('Images', payload.Images[i].file as File)
+              }
+            },
+            transformResponse: (response: any[]) =>
+                response.map((beacon) => ({
+                    ...beacon,
+                    imageSet: {
+                        imageSetId: beacon.imageSet?.imageSetId,
+                        numImages: beacon.imageSet?.numImages || 0,
+                        images: beacon.imageSet?.images || [],
+                        beaconId: beacon.imageSet?.beaconId
                     }
-                }
+                })),
+            providesTags: (result, error, { drafts }) => {
+              const type = drafts ? CACHES.DRAFTS : CACHES.BEACONS
+              return [{ type, id: LIST_ID }]
 
+            }
+              
+        }),
+        createBeacon: builder.mutation<Beacon, Beacon>({
+            query: (payload) => {
+                var formData = createBeaconFormdata(payload)
                 return {
-                    url: ENDPOINTS.DRAFTS,
+                    url: ENDPOINTS.BEACONS,
                     method: 'POST',
                     body: formData
                 }
             },
-            invalidatesTags: () => [{ type: CACHES.DRAFTS, id: 'LIST' }]
+            invalidatesTags: () => [{ type: CACHES.BEACONS, id: LIST_ID }]
         }),
-        updateDraft: builder.mutation<void, { id: string; draft: Beacon }>({
-            query: ({ id, draft }) => {
-                var formData = new FormData()
-                formData.append('ItemName', draft.ItemName || '')
-                formData.append('ItemDescription', draft.ItemDescription || '')
-                if (draft.CategoryId) {
-                    formData.append('CategoryId', draft.CategoryId)
+        getAllCategories: builder.query<Category[], void>({
+            query: () => ENDPOINTS.CATEGORIES,
+            providesTags: () => [{ type: CACHES.CATEGORIES, id: LIST_ID }]
+        }),
+        getBeacon: builder.query<Beacon, string>({
+            query: (id) => `${ENDPOINTS.BEACONS}/${id}`,
+            transformResponse: (response: any) => ({
+                ...response,
+                imageSet: {
+                    imageSetId: response.imageSet?.imageSetId,
+                    numImages: response.imageSet?.numImages || 0,
+                    images: response.imageSet?.images || [],
+                    beaconId: response.imageSet?.beaconId
                 }
-                formData.append('IsDraft', 'true')
-
-                if (draft.Images && draft.Images.length > 0) {
-                    for (let i = 0; i < draft.Images.length; i++) {
-                        formData.append('Images', draft.Images[i].file as File)
-                    }
+            }),
+            providesTags: (_result, _error, id) => [
+                { type: CACHES.BEACONS, id }
+            ]
+        }),
+        updateBeacon: builder.mutation<void, { id: string; beacon: Beacon }>({
+            query: ({ id, beacon }) => {
+                var formData = createBeaconFormdata(beacon)
+                return {
+                    url: `${ENDPOINTS.BEACONS}/${id}`,
+                    method: 'PUT',
+                    body: formData
                 }
-
-        return {
-          url: `${ENDPOINTS.DRAFTS}/${id}`,
-          method: "PUT",
-          body: formData,
-        };
-      },
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: CACHES.DRAFTS, id },
-      ],
-    }),
-    deleteDraft: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `${ENDPOINTS.DRAFTS}/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: () => [{ type: CACHES.DRAFTS, id: "LIST" }],
-    }),
-  }),
-});
+            },
+            invalidatesTags: (_result, _error, { id }) => [
+                { type: CACHES.BEACONS, id }
+            ]
+        }),
+        deleteBeacon: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `${ENDPOINTS.BEACONS}/${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: () => [
+              { type: CACHES.BEACONS, id: LIST_ID },
+              { type: CACHES.DRAFTS, id: LIST_ID }
+            ]
+        })
+    })
+})
 
 export const {
-  useGetBeaconsQuery,
-  useCreateBeaconMutation,
-  useGetAllCategoriesQuery,
-  useGetBeaconQuery,
-  useGetDraftsQuery,
-  useGetDraftQuery,
-  useSaveDraftMutation,
-  useUpdateDraftMutation,
-  useDeleteDraftMutation,
-} = beaconApi;
+    useGetBeaconsQuery,
+    useCreateBeaconMutation,
+    useGetAllCategoriesQuery,
+    useGetBeaconQuery,
+    useDeleteBeaconMutation
+} = beaconApi
