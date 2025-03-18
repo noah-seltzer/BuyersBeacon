@@ -79,7 +79,6 @@ namespace server.Services
                 var res = await _blobServiceManager.uploadFile(image.FileName, beacon.Image.OpenReadStream(), beacon.Image.ContentType);
             }
 
-            await _context.SaveChangesAsync();
 
             return beacon;
 

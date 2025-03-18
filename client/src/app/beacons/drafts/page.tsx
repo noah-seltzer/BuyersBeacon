@@ -1,33 +1,24 @@
 import DraftsPage from '@/components/organisms/beacons/drafts-page'
 import { getUserSS } from '@/lib/user'
-import { User } from '../../../types/user'
-import { auth } from '@clerk/nextjs/server'
 import { Suspense } from 'react'
+import { Button } from '@/components/atoms/button'
+import Link from 'next/link'
 export default async function drafts() {
     try {
-            const { userId: clerkUserId, getToken } = await auth()
-            const token = await getToken()
-            if (!clerkUserId || !token) {
-                throw new Error('Not Signed In')
-            }
-            const headers = new Headers()
-            headers.set('Authorization', `Bearer ${token}`)
-            const beaconUser = await fetch(
-                process.env.API_URL + 'users/clerk/' + clerkUserId,
-                {
-                    headers
-                }
-            )
-            const data = await beaconUser.json()
-            const user: User = {
-                id: data.userId,
-                clerk_user_id: data.clerkId
-            }
-        return <Suspense>
-            <DraftsPage user={user} />
-        </Suspense>
-
+        const user = await getUserSS()
+        return (
+            <Suspense>
+                <DraftsPage user={user} />
+            </Suspense>
+        )
     } catch {
-        return <></>
+        return (
+            <div className='text-center py-8'>
+                <p className='text-muted-foreground'>No drafts found</p>
+                <Button className='mt-4' asChild>
+                    <Link href='/beacons/create'>Create a Beacon</Link>
+                </Button>
+            </div>
+        )
     }
 }

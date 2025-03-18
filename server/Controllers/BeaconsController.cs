@@ -120,10 +120,13 @@ namespace server.Controllers
             }
 
             var newBeacon = await _beaconService.Create(beacon);
-            newBeacon.Category = category;
 
             _context.Beacons.Add(newBeacon);
+            await _context.SaveChangesAsync();
+            newBeacon.Category = category;
+            newBeacon.CategoryId = category.CategoryId;
 
+            await _context.SaveChangesAsync();
             await _imageService.CreateImagesetForNewBeacon(newBeacon, beacon);
 
             await _context.SaveChangesAsync();
