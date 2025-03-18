@@ -41,7 +41,7 @@ namespace server.Services
             {
                 BeaconId = Guid.NewGuid(),
                 UserId = beacon.UserId,
-                CategoryId = null, // Drafts don't require a category
+                CategoryId = beacon.CategoryId, // Drafts don't require a category
                 DateCreate = DateTime.UtcNow,
                 DateUpdate = DateTime.UtcNow,
                 ItemName = string.IsNullOrEmpty(beacon.ItemName) ? "Untitled Draft" : beacon.ItemName,
