@@ -9,7 +9,7 @@ const BeaconDetailsPage = async (props: BeaconDetailsPageProps) => {
     const { id } = await props.params;
 
 
-    return <Suspense fallback={<div>Fallback</div>}>
+    return <Suspense fallback={<div>Loading</div>}>
         <BeaconDetailsPageTemplate
             beaconId={id}
         />;

@@ -10,9 +10,11 @@ import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { skipToken } from '@reduxjs/toolkit/query'
+import { useAuth } from '@clerk/nextjs'
+import { currentUser } from '@clerk/nextjs/server'
 export default function DraftsPage() {
 
-    const user = useSelector((state: RootState) => state.auth.user)
+    // const user = useSelector((state: RootState) => state.auth.user)
     const auth = useSelector((state: RootState) => state.auth)
 
     console.log('user', user)

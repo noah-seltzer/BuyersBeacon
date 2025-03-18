@@ -7,6 +7,7 @@ using server.Data;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using server.Models;
+using dotenv.net;
 
 class Identity
 {
@@ -37,8 +38,10 @@ namespace server.Services
         }
         public async Task<string?> VerifyUserSessionToken(HttpRequest request)
         {
+            var secretKey = DotEnv.Read()["CLERK_SECRET_KEY"];
+
             var options = new AuthenticateRequestOptions(
-                secretKey: "sk_test_uIn1uiM7Wvc99k8PQYlcCOa1EDpRvF8TVSxeFXueRy",
+                secretKey,
                 authorizedParties: new string[] { "http://localhost:3000" }
 );
 

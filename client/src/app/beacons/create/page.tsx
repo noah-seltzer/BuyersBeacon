@@ -10,14 +10,12 @@ import {
 } from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
-import { useSignIn, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 
-
-import asdf from "@clerk/nextjs"
 
 const CreateBeaconPage: FC = () => {
   const [createBeacon] = useCreateBeaconMutation();
-  const [saveDraft] = useSaveDraftMutation();
+  
   const [categoryOptions, setCategoryOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -26,9 +24,6 @@ const CreateBeaconPage: FC = () => {
   const [draftSaved, setDraftSaved] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
   const { user } = useUser()
-
-  
-
 
   // Set category options
   useEffect(() => {
@@ -78,10 +73,11 @@ const CreateBeaconPage: FC = () => {
       const draftData = {
         ...values,
         ItemPrice: values.ItemPrice || 0,
+        IsDraft: true,
         // Don't set a default CategoryId
       };
 
-      await saveDraft(draftData).unwrap();
+      await createBeacon(draftData).unwrap();
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 3000);
     } catch (error) {
