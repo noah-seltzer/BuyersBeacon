@@ -7,6 +7,7 @@ import { Card } from '@/components/atoms/card'
 import { Button } from '@/components/atoms/button'
 import { Edit2, Loader2, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+<<<<<<< HEAD
 import {  useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { skipToken } from '@reduxjs/toolkit/query'
@@ -16,6 +17,20 @@ export default function DraftsPage() {
     // const auth = useSelector((state: RootState) => state.auth)
 
 
+=======
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
+import { skipToken } from '@reduxjs/toolkit/query'
+import { useAuth } from '@clerk/nextjs'
+import { currentUser } from '@clerk/nextjs/server'
+export default function DraftsPage() {
+
+    // const user = useSelector((state: RootState) => state.auth.user)
+    const auth = useSelector((state: RootState) => state.auth)
+
+    console.log('user', user)
+    console.log('auth', auth)
+>>>>>>> e1c31bd1765714fb6740621360b90d8487ff98d1
     const { data: drafts, isLoading } = useGetBeaconsQuery(!!user ? { drafts: true, userId: user.id } : skipToken)
     const [deleteDraft] = useDeleteBeaconMutation()
 

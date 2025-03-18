@@ -19,6 +19,7 @@ namespace server.Controllers
         private ICategoryService _categoryService;
         private IBeaconService _beaconService;
         private IImageService _imageService;
+
         public BeaconsController(ApplicationDbContext context, 
             ICategoryService categoryService, 
             IBeaconService beaconService, 
@@ -30,7 +31,7 @@ namespace server.Controllers
             _beaconService = beaconService;
             _imageService = imageService;
         }
-
+        
         /// <summary>
         /// Gets all beacons
         /// </summary>
@@ -38,9 +39,10 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons()
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] Guid? userId = null, [FromQuery] bool drafts = false)
         {
-            var beacons = await _beaconService.GetList();
+
+            var beacons = await _beaconService.GetList(userId, drafts);
 
             return Ok(beacons);
         }
@@ -77,14 +79,9 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
         {
-            var userId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"); // Replace with actual user ID
-            var drafts = await _context.Beacons
-                .Where(b => b.UserId == userId && b.IsDraft)
-                .Include(b => b.Category)
-                .OrderByDescending(b => b.LastDraftSave)
-                .ToListAsync();
+            var drafts = await _beaconService.GetList(new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"), true);
 
-            return drafts;
+            return Ok(drafts);
         }
 
         /// <summary>
@@ -122,39 +119,17 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
+            var newBeacon = await _beaconService.Create(beacon);
+            newBeacon.Category = category;
 
-
-            var newBeacon = new Beacon
-            {
-                BeaconId = Guid.NewGuid(),
-                UserId = beacon.UserId,
-                CategoryId = beacon.CategoryId,
-                DateCreate = DateTime.UtcNow,
-                DateUpdate = DateTime.UtcNow,
-                ItemName = beacon.ItemName,
-                ItemDescription = beacon.ItemDescription,
-                ItemPrice = beacon.ItemPrice,
-                LocCity = beacon.LocCity,
-                LocRegion = beacon.LocRegion,
-                LocCountry = beacon.LocCountry,
-                LocPostalCode = beacon.LocPostalCode,
-                IsDraft = beacon.IsDraft,
-                LastDraftSave = beacon.IsDraft ? DateTime.UtcNow : null
-            };
-
-
-
-
-            var resB = _context.Beacons.Add(newBeacon);
-            resB.Entity.Category = category;
-
+            _context.Beacons.Add(newBeacon);
 
             await _imageService.CreateImagesetForNewBeacon(newBeacon, beacon);
 
             await _context.SaveChangesAsync();
 
 
-            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, resB.Entity);
+            return CreatedAtAction(nameof(GetBeacon), new { id = beacon.BeaconId }, newBeacon);
         }
 
         /// <summary>
@@ -183,16 +158,7 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            beacon.UserId = beaconDto.UserId;
-            beacon.CategoryId = beaconDto.CategoryId;
-            beacon.DateUpdate = DateTime.UtcNow;
-            beacon.ItemName = beaconDto.ItemName;
-            beacon.ItemDescription = beaconDto.ItemDescription;
-            beacon.ItemPrice = beaconDto.ItemPrice;
-            beacon.LocCity = beaconDto.LocCity;
-            beacon.LocRegion = beaconDto.LocRegion;
-            beacon.LocCountry = beaconDto.LocCountry;
-            beacon.LocPostalCode = beaconDto.LocPostalCode;
+            _beaconService.Update(beacon, beaconDto);
 
             try
             {
@@ -240,105 +206,6 @@ namespace server.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "Failed to delete beacon", message = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Creates a new draft beacon
-        /// </summary>
-        [HttpPost("drafts")]
-        [Consumes("multipart/form-data")]
-        public async Task<ActionResult<Beacon>> CreateDraft([FromForm] Beacon beacon)
-        {
-            try 
-            {
-                var userId = new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8");
-                
-                // Check if default user exists, create if not
-                var user = await _context.Users.FindAsync(userId);
-                if (user == null)
-                {
-                    user = new User
-                    {
-                        UserId = userId,
-                        ClerkId = "default_clerk_id"
-                    };
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-                }
-
-                var newBeacon = new Beacon
-                {
-                    BeaconId = Guid.NewGuid(),
-                    UserId = userId,
-                    CategoryId = null, // Drafts don't require a category
-                    DateCreate = DateTime.UtcNow,
-                    DateUpdate = DateTime.UtcNow,
-                    ItemName = string.IsNullOrEmpty(beacon.ItemName) ? "Untitled Draft" : beacon.ItemName,
-                    ItemDescription = string.IsNullOrEmpty(beacon.ItemDescription) ? "Draft description" : beacon.ItemDescription,
-                    ItemPrice = beacon.ItemPrice,
-                    LocCity = beacon.LocCity,
-                    LocRegion = beacon.LocRegion,
-                    LocCountry = beacon.LocCountry,
-                    LocPostalCode = beacon.LocPostalCode,
-                    IsDraft = true,
-                    LastDraftSave = DateTime.UtcNow
-                };
-
-                _context.Beacons.Add(newBeacon);
-                await _context.SaveChangesAsync();
-
-                var response = new
-                {
-                    BeaconId = newBeacon.BeaconId,
-                    UserId = newBeacon.UserId,
-                    ItemName = newBeacon.ItemName,
-                    ItemDescription = newBeacon.ItemDescription,
-                    ItemPrice = newBeacon.ItemPrice,
-                    IsDraft = newBeacon.IsDraft,
-                    LastDraftSave = newBeacon.LastDraftSave,
-                    DateCreate = newBeacon.DateCreate,
-                    DateUpdate = newBeacon.DateUpdate
-                };
-
-                // Fix the CreatedAtAction call to use newBeacon.BeaconId
-                return CreatedAtAction(nameof(GetBeacon), new { id = newBeacon.BeaconId }, response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Failed to save draft", message = ex.Message });
-            }
-        }
-
-        [HttpDelete("drafts/{id}")]
-        public async Task<IActionResult> DeleteDraft(Guid id)
-        {
-            try
-            {
-                var draft = await _context.Beacons
-                    .FirstOrDefaultAsync(b => b.BeaconId == id && b.IsDraft);
-
-                if (draft == null)
-                {
-                    var nonDraftBeacon = await _context.Beacons
-                        .FirstOrDefaultAsync(b => b.BeaconId == id);
-                        
-                    if (nonDraftBeacon != null)
-                    {
-                        return BadRequest("Beacon exists but is not a draft");
-                    }
-                    
-                    return NotFound($"No draft found with ID: {id}");
-                }
-
-                _context.Beacons.Remove(draft);
-                await _context.SaveChangesAsync();
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Failed to delete draft", message = ex.Message });
             }
         }
 
