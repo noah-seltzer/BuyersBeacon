@@ -44,10 +44,14 @@ const CreateBeaconPage: FC = () => {
     async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
       try {
         helpers.setSubmitting(true);
+        console.log("Submitting beacon:", beacon);
         const res = await createBeacon(beacon).unwrap();
         navigateToBeaconDetailsPage(router, res);
       } catch (error) {
         console.error("Failed to create beacon:", error);
+        if (error.data?.errors) {
+          console.error("Validation errors:", error.data.errors);
+        }
       } finally {
         helpers.setSubmitting(false);
       }

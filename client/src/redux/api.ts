@@ -20,31 +20,57 @@ export const beaconApi = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5037/api",
   }),
 
-    endpoints: (builder) => ({
-        getBeacons: builder.query<Beacon[], void>({
-            query: () => ENDPOINTS.BEACONS,
-            providesTags: () => [{ type: CACHES.BEACONS, id: 'LIST' }]
-        }),
-        createBeacon: builder.mutation<Beacon, Beacon>({
-            query: (payload) => {
-                var formData = new FormData();
-                formData.append('ItemName', payload.ItemName);
-                formData.append('ItemDescription', payload.ItemDescription);
-                formData.append('CategoryId', payload.CategoryId);
-                formData.append('UserId', 'D11FAABB-2B72-4E25-88B5-1B9AD7B8A530')
-                if (payload.Images.length > 0) {
-                    payload.Images.forEach(image => {
-                            formData.append("Images", image.file);
-                    });
-                    formData.append('Image', payload.Images[0].file)
-                }
+  endpoints: (builder) => ({
+    getBeacons: builder.query<Beacon[], void>({
+      query: () => ENDPOINTS.BEACONS,
+      transformResponse: (response: any[]) =>
+        response.map((beacon) => ({
+          ...beacon,
+          imageSet: {
+            imageSetId: beacon.imageSet?.imageSetId,
+            numImages: beacon.imageSet?.numImages || 0,
+            images: beacon.imageSet?.images || [],
+            beaconId: beacon.imageSet?.beaconId,
+          },
+        })),
+      providesTags: () => [{ type: CACHES.BEACONS, id: "LIST" }],
+    }),
+    createBeacon: builder.mutation<Beacon, Beacon>({
+      query: (payload) => {
+        var formData = new FormData();
+        formData.append("ItemName", payload.ItemName);
+        formData.append("ItemDescription", payload.ItemDescription);
+        formData.append("CategoryId", payload.CategoryId);
+        formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530");
+
+        // Add price and location fields
+        if (payload.ItemPrice) {
+          formData.append("ItemPrice", payload.ItemPrice.toString());
+        }
+        if (payload.LocCity) {
+          formData.append("LocCity", payload.LocCity);
+        }
+        if (payload.LocRegion) {
+          formData.append("LocRegion", payload.LocRegion);
+        }
+        if (payload.LocCountry) {
+          formData.append("LocCountry", payload.LocCountry);
+        }
+        if (payload.LocPostalCode) {
+          formData.append("LocPostalCode", payload.LocPostalCode);
+        }
+
+        if (payload.Images?.length > 0) {
+          payload.Images.forEach((image) => {
+            if (image.file instanceof File) {
+              formData.append("Images", image.file);
+            }
+          });
+        }
 
         return {
           url: ENDPOINTS.BEACONS,
           method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data;",
-          },
           body: formData,
         };
       },
@@ -55,7 +81,16 @@ export const beaconApi = createApi({
       providesTags: () => [{ type: CACHES.CATEGORIES, id: "LIST" }],
     }),
     getBeacon: builder.query<Beacon, string>({
-      query: (id?: string) => `${ENDPOINTS.BEACONS}/${id}`,
+      query: (id) => `${ENDPOINTS.BEACONS}/${id}`,
+      transformResponse: (response: any) => ({
+        ...response,
+        imageSet: {
+          imageSetId: response.imageSet?.imageSetId,
+          numImages: response.imageSet?.numImages || 0,
+          images: response.imageSet?.images || [],
+          beaconId: response.imageSet?.beaconId,
+        },
+      }),
       providesTags: (_result, _error, id) => [{ type: CACHES.BEACONS, id }],
     }),
     getDrafts: builder.query<Beacon[], void>({
@@ -130,10 +165,6 @@ export const beaconApi = createApi({
       }),
       invalidatesTags: () => [{ type: CACHES.DRAFTS, id: "LIST" }],
     }),
-    getBeaconById: builder.query<Beacon, string>({
-      query: (id) => `/beacons/${id}`,
-      providesTags: (result, error, id) => [{ type: CACHES.BEACONS, id }],
-    }),
   }),
 });
 
@@ -147,5 +178,4 @@ export const {
   useSaveDraftMutation,
   useUpdateDraftMutation,
   useDeleteDraftMutation,
-  useGetBeaconByIdQuery,
 } = beaconApi;
