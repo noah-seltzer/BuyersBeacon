@@ -1,24 +1,31 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Beacon, Category } from "@/types/beacon";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { Beacon, Category } from '@/types/beacon'
+import Cookies from 'js-cookie'
 
 export enum ENDPOINTS {
-  CATEGORIES = "Categories",
-  BEACONS = "Beacons",
-  DRAFTS = "Beacons/drafts",
+    CATEGORIES = 'Categories',
+    BEACONS = 'Beacons',
+    DRAFTS = 'Beacons/drafts'
 }
 enum CACHES {
-  BEACONS = "Beacon",
-  CATEGORIES = "Categories",
-  DRAFTS = "Drafts",
+    BEACONS = 'Beacon',
+    CATEGORIES = 'Categories',
+    DRAFTS = 'Drafts'
 }
 
 export const beaconApi = createApi({
-  tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS],
-  reducerPath: "beaconApi",
-  baseQuery: fetchBaseQuery({
-    mode: "cors",
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5037/api",
-  }),
+    tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS],
+    reducerPath: 'beaconApi',
+    baseQuery: fetchBaseQuery({
+        mode: 'cors',
+        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api',
+        prepareHeaders: (headers) => {
+            const sessionToken = Cookies.get('__session')
+            if (sessionToken) {
+                headers.set("Authorization", `Bearer ${sessionToken}`)
+            }
+        }
+    }),                                        
 
   endpoints: (builder) => ({
     getBeacons: builder.query<Beacon[], void>({
@@ -40,7 +47,9 @@ export const beaconApi = createApi({
         var formData = new FormData();
         formData.append("ItemName", payload.ItemName);
         formData.append("ItemDescription", payload.ItemDescription);
-        formData.append("CategoryId", payload.CategoryId);
+        if (payload.CategoryId) {
+          formData.append("CategoryId", payload.CategoryId);
+        }
         formData.append("UserId", "D11FAABB-2B72-4E25-88B5-1B9AD7B8A530");
 
         // Add price and location fields
@@ -111,42 +120,42 @@ export const beaconApi = createApi({
         );
         formData.append("ItemPrice", payload.ItemPrice?.toString() || "0");
 
-        // Only append CategoryId if it exists and isn't empty
-        if (payload.CategoryId && payload.CategoryId.trim() !== "") {
-          formData.append("CategoryId", payload.CategoryId);
-        }
+                // Only append CategoryId if it exists and isn't empty
+                if (payload.CategoryId && payload.CategoryId.trim() !== '') {
+                    formData.append('CategoryId', payload.CategoryId)
+                }
 
-        formData.append("IsDraft", "true");
+                formData.append('IsDraft', 'true')
 
-        if (payload.Images && payload.Images.length > 0) {
-          for (let i = 0; i < payload.Images.length; i++) {
-            formData.append("Images", payload.Images[i].file);
-          }
-        }
+                if (payload.Images && payload.Images.length > 0) {
+                    for (let i = 0; i < payload.Images.length; i++) {
+                        formData.append('Images', payload.Images[i].file as File)
+                    }
+                }
 
-        return {
-          url: ENDPOINTS.DRAFTS,
-          method: "POST",
-          body: formData,
-        };
-      },
-      invalidatesTags: () => [{ type: CACHES.DRAFTS, id: "LIST" }],
-    }),
-    updateDraft: builder.mutation<void, { id: string; draft: Beacon }>({
-      query: ({ id, draft }) => {
-        var formData = new FormData();
-        formData.append("ItemName", draft.ItemName || "");
-        formData.append("ItemDescription", draft.ItemDescription || "");
-        if (draft.CategoryId) {
-          formData.append("CategoryId", draft.CategoryId);
-        }
-        formData.append("IsDraft", "true");
+                return {
+                    url: ENDPOINTS.DRAFTS,
+                    method: 'POST',
+                    body: formData
+                }
+            },
+            invalidatesTags: () => [{ type: CACHES.DRAFTS, id: 'LIST' }]
+        }),
+        updateDraft: builder.mutation<void, { id: string; draft: Beacon }>({
+            query: ({ id, draft }) => {
+                var formData = new FormData()
+                formData.append('ItemName', draft.ItemName || '')
+                formData.append('ItemDescription', draft.ItemDescription || '')
+                if (draft.CategoryId) {
+                    formData.append('CategoryId', draft.CategoryId)
+                }
+                formData.append('IsDraft', 'true')
 
-        if (draft.Images && draft.Images.length > 0) {
-          for (let i = 0; i < draft.Images.length; i++) {
-            formData.append("Images", draft.Images[i].file);
-          }
-        }
+                if (draft.Images && draft.Images.length > 0) {
+                    for (let i = 0; i < draft.Images.length; i++) {
+                        formData.append('Images', draft.Images[i].file as File)
+                    }
+                }
 
         return {
           url: `${ENDPOINTS.DRAFTS}/${id}`,

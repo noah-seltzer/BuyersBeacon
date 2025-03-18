@@ -7,13 +7,14 @@ import { Moon, Sun, Search, Menu, X, Bell } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
-import { SignedOut, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
+import { SignedOut, SignedIn, UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs'
 
 export function Navbar() {
     const { theme, setTheme } = useTheme()
     const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+    
+    
     const NavLink = ({
         href,
         children,
@@ -86,7 +87,10 @@ export function Navbar() {
                         )}
                     </Button>
                     <SignedOut>
-                        <SignInButton>
+                        <SignInButton
+                            fallbackRedirectUrl='/auth'
+                            signUpFallbackRedirectUrl='/auth'
+                        >
                         <Button
                             variant='default'
                             className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
@@ -94,7 +98,10 @@ export function Navbar() {
                             Sign In
                         </Button>
                         </SignInButton>
-                        <SignUpButton>
+                        <SignUpButton
+                            fallbackRedirectUrl='/auth'
+                            signInFallbackRedirectUrl='/auth'
+                        >
                         <Button
                             variant='default'
                             className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'

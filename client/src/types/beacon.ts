@@ -11,20 +11,20 @@ export interface BeaconImage {
 }
 
 export interface ImageSet {
-  imageSetId: string;
-  numImages: number;
-  images: BeaconImage[];
-  beaconId: string;
+  imageSetId?: string;
+  images?: BeaconImage[];
+  beaconId?: string;
 }
 
 export interface Beacon {
   Category?: Category;
   BeaconId?: string;
+  UserId?: string;
   ItemName: string;
   CategoryId?: string;
   ItemDescription: string;
+  ItemPrice: number;
   Images: BeaconImage[];
-  ItemPrice?: number;
   IsDraft?: boolean;
   LastDraftSave?: string;
   LocCity?: string;

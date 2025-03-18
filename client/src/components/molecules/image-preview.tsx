@@ -3,10 +3,9 @@ import { cn } from "@/lib/utils";
 import { BeaconImage } from "@/types/beacon";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Button } from "../atoms/button";
-import BeatLoader from "react-spinners/BeatLoader";
-import EmptyState from "./empty-state";
+import { useState } from "react";
+import { Button } from "@/components/atoms/button";
+import EmptyState from "@/components/molecules/empty-state";
 
 interface ImagePreviewProps {
   images: BeaconImage[];
@@ -33,16 +32,16 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePr
     if (!images || !images[currentImageIndex]) return null;
     const image = images[currentImageIndex];
 
-    if (image.file instanceof File) {
-      return URL.createObjectURL(image.file);
-    }
-
     if (image.imageUrl) {
       return image.imageUrl;
     }
 
     if (typeof image.file === "string") {
       return image.file;
+    }
+
+    if (image.file instanceof File) {
+      return URL.createObjectURL(image.file)
     }
 
     return null;

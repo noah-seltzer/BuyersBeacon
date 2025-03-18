@@ -105,8 +105,7 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var category = beacon.CategoryId.HasValue ? 
-                await _categoryService.GetById(beacon.CategoryId.Value) : null;
+            var category = await _categoryService.GetById((System.Guid) beacon.CategoryId);
 
             if (beacon.CategoryId.HasValue && category == null)
             {
