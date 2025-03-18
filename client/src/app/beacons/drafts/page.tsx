@@ -19,12 +19,10 @@ export default async function drafts() {
                 }
             )
             const data = await beaconUser.json()
-            console.log('data', data)
             const user: User = {
                 id: data.userId,
                 clerk_user_id: data.clerkId
             }
-            console.log('user', user)
         return <Suspense>
             <DraftsPage user={user} />
         </Suspense>
