@@ -36,7 +36,7 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps)
                 <>
                     <Image 
                         suppressHydrationWarning
-                        src={currentImage.imageUrl}
+                        src={currentImage.file ? URL.createObjectURL(currentImage.file as File) : currentImage.imageUrl}
                         alt={alt ?? "Beacon Image"}
                         fill
                         className="object-cover"

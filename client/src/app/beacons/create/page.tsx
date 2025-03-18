@@ -10,6 +10,10 @@ import {
 } from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
+import { useSignIn, useUser } from "@clerk/nextjs";
+
+
+import asdf from "@clerk/nextjs"
 
 const CreateBeaconPage: FC = () => {
   const [createBeacon] = useCreateBeaconMutation();
@@ -21,6 +25,10 @@ const CreateBeaconPage: FC = () => {
   const router = useRouter();
   const [draftSaved, setDraftSaved] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
+  const { user } = useUser()
+
+  
+
 
   // Set category options
   useEffect(() => {
@@ -44,7 +52,11 @@ const CreateBeaconPage: FC = () => {
     async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
       try {
         helpers.setSubmitting(true);
-        const res = await createBeacon(beacon).unwrap();
+        const payload = { ...beacon }
+        if (user) {
+          payload.UserId = user.id
+        }
+        const res = await createBeacon(payload).unwrap();
         navigateToBeaconDetailsPage(router, res);
       } catch (error) {
         console.error("Failed to create beacon:", error);
