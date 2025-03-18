@@ -42,20 +42,26 @@ namespace server.Models
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]
+        [JsonPropertyName("ItemPrice")]
         public decimal ItemPrice { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocCity")]
         public string? LocCity { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocRegion")]
         public string? LocRegion { get; set; }
 
         [MaxLength(100)]
+        [JsonPropertyName("LocCountry")]
         public string? LocCountry { get; set; }
 
         [MaxLength(20)]
+        [JsonPropertyName("LocPostalCode")]
         public string? LocPostalCode { get; set; }
 
+      
         public ImageSet? ImageSet { get; set; }
 
         [NotMapped]

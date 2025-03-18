@@ -8,7 +8,6 @@ using server.Data;
 using server.Models;
 using server.Services;
 using server.Util;
-
 namespace server.Controllers
 {
     [ApiController]
@@ -108,7 +107,7 @@ namespace server.Controllers
 
             var category = await _categoryService.GetById((System.Guid) beacon.CategoryId);
 
-            if (category == null)
+            if (beacon.CategoryId.HasValue && category == null)
             {
                 ModelState.AddModelError("CategoryId", "Specified category does not exist");
                 return BadRequest(ModelState);
@@ -289,7 +288,6 @@ namespace server.Controllers
                 _context.Beacons.Add(newBeacon);
                 await _context.SaveChangesAsync();
 
-                // Update the response to include BeaconId
                 var response = new
                 {
                     BeaconId = newBeacon.BeaconId,
@@ -312,30 +310,21 @@ namespace server.Controllers
             }
         }
 
-        // Add this endpoint to handle draft deletion
         [HttpDelete("drafts/{id}")]
         public async Task<IActionResult> DeleteDraft(Guid id)
         {
             try
             {
-                // Add logging to debug the incoming ID
-                Console.WriteLine($"Attempting to delete draft with ID: {id}");
-
                 var draft = await _context.Beacons
                     .FirstOrDefaultAsync(b => b.BeaconId == id && b.IsDraft);
 
                 if (draft == null)
                 {
-                    // Add more detailed logging for the 404 case
-                    Console.WriteLine($"Draft not found with ID: {id}");
-                    
-                    // Check if beacon exists but isn't a draft
                     var nonDraftBeacon = await _context.Beacons
                         .FirstOrDefaultAsync(b => b.BeaconId == id);
                         
                     if (nonDraftBeacon != null)
                     {
-                        Console.WriteLine("Beacon exists but is not marked as draft");
                         return BadRequest("Beacon exists but is not a draft");
                     }
                     
@@ -345,12 +334,10 @@ namespace server.Controllers
                 _context.Beacons.Remove(draft);
                 await _context.SaveChangesAsync();
 
-                Console.WriteLine($"Successfully deleted draft with ID: {id}");
                 return NoContent();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting draft: {ex.Message}");
                 return StatusCode(500, new { error = "Failed to delete draft", message = ex.Message });
             }
         }

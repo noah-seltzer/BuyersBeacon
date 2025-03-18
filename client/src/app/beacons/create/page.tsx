@@ -56,10 +56,13 @@ const CreateBeaconPage: FC = () => {
         if (user) {
           payload.UserId = user.id
         }
-        const res = await createBeacon(payload).unwrap();
+        const res = await createBeacon(beacon).unwrap();
         navigateToBeaconDetailsPage(router, res);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to create beacon:", error);
+        if (error.data?.errors) {
+          console.error("Validation errors:", error.data.errors);
+        }
       } finally {
         helpers.setSubmitting(false);
       }
@@ -101,6 +104,8 @@ const CreateBeaconPage: FC = () => {
       CategoryId: "",
       ItemDescription: "",
       Images: [],
+      ItemPrice: 0,
+      imageSet: {}
     } as Beacon,
     onSubmit: processSubmit,
   });

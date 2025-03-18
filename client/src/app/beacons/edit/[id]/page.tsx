@@ -2,7 +2,7 @@
 
 import { FC, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useGetBeaconByIdQuery, useGetAllCategoriesQuery } from "@/redux/api";
+import { useGetBeaconQuery, useGetAllCategoriesQuery } from "@/redux/api";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
 import { useFormik } from "formik";
 import { Beacon } from "@/types/beacon";
@@ -11,7 +11,7 @@ import { useUser } from "@clerk/nextjs";
 
 const EditBeaconPage: FC = () => {
   const { id } = useParams();
-  const { data: beacon, isLoading: beaconLoading, error: beaconError } = useGetBeaconByIdQuery(id as string);
+  const { data: beacon, isLoading: beaconLoading, error: beaconError } = useGetBeaconQuery(id as string);
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useGetAllCategoriesQuery();
 
 
