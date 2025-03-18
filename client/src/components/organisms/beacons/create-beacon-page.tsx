@@ -49,7 +49,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         if (user) {
           payload.UserId = user.id
         }
-        const res = await createBeacon(beacon).unwrap();
+        const res = await createBeacon(payload).unwrap();
         navigateToBeaconDetailsPage(router, res);
       } catch (error: any) {
         console.error("Failed to create beacon:", error);
