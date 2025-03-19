@@ -1,6 +1,5 @@
 import { Button } from "@/components/atoms/button";
 import BodyText from "@/components/atoms/text/body";
-import SecondaryTitle from "@/components/atoms/text/secondary-title";
 import SubTitle from "@/components/atoms/text/sub-title";
 import Title from "@/components/atoms/text/title";
 import ImagePreview from "@/components/molecules/image-preview";

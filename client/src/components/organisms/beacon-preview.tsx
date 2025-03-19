@@ -1,4 +1,4 @@
-import { Beacon, BeaconImage } from "@/types/beacon";
+import { Beacon } from "@/types/beacon";
 import { Card } from "@/components/atoms/card";
 import { Badge } from "@/components/atoms/badge";
 import { User2 } from "lucide-react";

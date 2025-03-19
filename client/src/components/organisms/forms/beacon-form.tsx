@@ -61,7 +61,7 @@ export function BeaconForm({
 
         <SelectInput
           name={"CategoryId"}
-          value={values.CategoryId}
+          value={values.CategoryId || ''}
           onChange={handleChange}
           options={categoryOptions}
           categoryOptionsIsLoading={categoryOptionsIsLoading}

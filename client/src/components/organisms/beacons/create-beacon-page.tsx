@@ -9,7 +9,6 @@ import {
 } from "@/redux/api";
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import { User } from "@/types/user";
 
 
@@ -60,7 +59,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         helpers.setSubmitting(false);
       }
     },
-    [createBeacon, router]
+    [createBeacon, router, user]
   );
 
   const handleSaveDraft = async () => {

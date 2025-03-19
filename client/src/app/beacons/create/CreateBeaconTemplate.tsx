@@ -1,10 +1,10 @@
-import { FC } from "react";
+import { ChangeEventHandler, FC } from "react";
 import { Category } from "@/types/beacon";
 import { FormikErrors, FormikTouched } from "formik";
 
 interface CreateBeaconTemplateProps {
   handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
-  handleChange: (e: React.ChangeEvent<any>) => void;
+  handleChange: ChangeEventHandler<HTMLElement>;
   values: {
     ItemName: string;
     ItemDescription: string;
@@ -28,9 +28,9 @@ interface CreateBeaconTemplateProps {
   }>;
   categoryOptions: Category[];
   categoryOptionsIsLoading: boolean;
-  categoryOptionsError: any;
+  categoryOptionsError: Error;
   submitting: boolean;
-  setFieldValue: (field: string, value: any) => void;
+  setFieldValue: (field: string, value: unknown) => void;
   onSaveDraft: () => void;
   draftSaved: boolean;
   draftError: string | null;
@@ -43,8 +43,6 @@ export const CreateBeaconTemplate: FC<CreateBeaconTemplateProps> = ({
   errors,
   touched,
   categoryOptions,
-  categoryOptionsIsLoading,
-  categoryOptionsError,
   submitting,
   setFieldValue,
   onSaveDraft,
