@@ -16,7 +16,7 @@ const HelpCenter: FC = () => (
             <h3 className="text-lg font-medium mb-2">What is a Beacon?</h3>
             <p className="text-foreground/60">
               A Beacon is a request you create to find specific items or
-              services. It helps sellers understand exactly what you're looking
+              services. It helps sellers understand exactly what you&#39;re looking
               for and allows them to contact you if they can help.
             </p>
           </div>
@@ -26,8 +26,8 @@ const HelpCenter: FC = () => (
               How do I create a Beacon?
             </h3>
             <p className="text-foreground/60">
-              Click the "Create Beacon" button in the navigation bar, fill in
-              the details about what you're looking for, including any specific
+              Click the &quot;Create Beacon&quot; button in the navigation bar, fill in
+              the details about what you&#39;re looking for, including any specific
               requirements or price range, and submit your Beacon.
             </p>
           </div>

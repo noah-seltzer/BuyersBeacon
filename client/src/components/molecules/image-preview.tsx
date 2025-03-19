@@ -14,7 +14,7 @@ interface ImagePreviewProps {
   className?: string;
 }
 
-const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePreviewProps) => {
+const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps) => {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -25,8 +25,6 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePr
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
-
-  const imageUrls = images?.map(img => img.imageUrl) || [];
 
   const getCurrentImageSrc = () => {
     if (!images || !images[currentImageIndex]) return null;

@@ -63,7 +63,7 @@ const CreateBeaconTemplate: FC<CreateBeaconTemplateProps> = ({
                 {isEditing ? "Edit Beacon" : "Create New Beacon"}
               </h1>
               <p className="text-foreground/60 mt-1">
-                Let sellers know what you're looking for
+                Let sellers know what you&#39;re looking for
               </p>
             </div>
           </div>

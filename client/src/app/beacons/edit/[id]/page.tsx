@@ -7,7 +7,6 @@ import CreateBeaconTemplate from "@/components/templates/create-beacon-template"
 import { useFormik } from "formik";
 import { Beacon } from "@/types/beacon";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
 
 const EditBeaconPage: FC = () => {
   const { id } = useParams();

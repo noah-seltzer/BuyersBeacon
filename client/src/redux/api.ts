@@ -15,6 +15,8 @@ enum CACHES {
 
 export const LIST_ID = 'LIST'
 
+export interface GetBeaconQueryInput { drafts?: boolean, userId?: string }
+
 export const beaconApi = createApi({
     tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS],
     reducerPath: 'beaconApi',
@@ -30,7 +32,7 @@ export const beaconApi = createApi({
     }),
 
     endpoints: (builder) => ({
-        getBeacons: builder.query<Beacon[], { drafts?: boolean, userId?: string }>({
+        getBeacons: builder.query<Beacon[], GetBeaconQueryInput | void>({
             query: (arg) => {
                 const drafts = arg && arg.drafts ? true : false
                 const id = arg && arg.userId ? arg.userId : undefined
@@ -43,30 +45,26 @@ export const beaconApi = createApi({
                 }
               }
             },
-            transformResponse: (response: any[]) =>
+            transformResponse: (response: Beacon[]) =>
                 response.map((beacon) => ({
                     ...beacon,
                     imageSet: {
                         imageSetId: beacon.imageSet?.imageSetId,
-                        numImages: beacon.imageSet?.numImages || 0,
                         images: beacon.imageSet?.images || [],
                         beaconId: beacon.imageSet?.beaconId
                     }
                 }))
-            //     ,
-            // providesTags: (result, error, arg) => {
-            //     var type = CACHES.BEACONS
-            //     if (arg && arg.drafts) {
-            //         type = CACHES.DRAFTS
-            //     }
-            //     return [{ type, id: LIST_ID }]
+                ,
+            providesTags: (result, error, arg) => {
+                const type = arg && arg.drafts ? CACHES.DRAFTS : CACHES.BEACONS
+                return [{ type, id: LIST_ID }]
 
-            // }
+            }
               
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
-                var formData = createBeaconFormdata(payload)
+                const formData = createBeaconFormdata(payload)
                 return {
                     url: ENDPOINTS.BEACONS,
                     method: 'POST',
@@ -81,11 +79,10 @@ export const beaconApi = createApi({
         }),
         getBeacon: builder.query<Beacon, string>({
             query: (id) => `${ENDPOINTS.BEACONS}/${id}`,
-            transformResponse: (response: any) => ({
+            transformResponse: (response: Beacon) => ({
                 ...response,
                 imageSet: {
                     imageSetId: response.imageSet?.imageSetId,
-                    numImages: response.imageSet?.numImages || 0,
                     images: response.imageSet?.images || [],
                     beaconId: response.imageSet?.beaconId
                 }
@@ -96,7 +93,7 @@ export const beaconApi = createApi({
         }),
         updateBeacon: builder.mutation<void, { id: string; beacon: Beacon }>({
             query: ({ id, beacon }) => {
-                var formData = createBeaconFormdata(beacon)
+                const formData = createBeaconFormdata(beacon)
                 return {
                     url: `${ENDPOINTS.BEACONS}/${id}`,
                     method: 'PUT',

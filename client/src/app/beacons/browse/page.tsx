@@ -31,7 +31,6 @@ const BeaconThumbnail: FC<{ beacon: Beacon }> = ({ beacon }) => {
             images={beacon.imageSet?.images || []}
             alt={beacon.ItemName}
             emptyStatePrimaryText="No image"
-            showThumbnailsGrid={false}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           />
         </div>
@@ -76,7 +75,7 @@ const BeaconThumbnail: FC<{ beacon: Beacon }> = ({ beacon }) => {
 };
 
 const BrowseBeaconsPage: FC = () => {
-  const { data: beacons, isLoading } = useGetBeaconsQuery();
+  const { data: beacons } = useGetBeaconsQuery();
   const publishedBeacons = beacons?.filter((beacon) => !beacon.IsDraft) || [];
 
   return (

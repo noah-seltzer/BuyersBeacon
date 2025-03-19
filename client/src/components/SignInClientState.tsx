@@ -9,7 +9,7 @@ import { redirect } from "next/navigation"
 
 export type SignInClientStateManagerProps = {user: User, redirectUrl?: string}
 
-const SignInClientStateManager: FC<SignInClientStateManagerProps> = async ({ user, redirectUrl }) => {
+const SignInClientStateManager: FC<SignInClientStateManagerProps> = ({ user, redirectUrl }) => {
     const dispatch = useDispatch()
     dispatch(setUserId(user.id))
     dispatch(setUser(user))

@@ -12,7 +12,6 @@ interface BeaconDetailsPageTemplate {
 const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
   const {
     data: beacon,
-    error,
     isLoading,
   } = useGetBeaconQuery(beaconId ?? skipToken);
 

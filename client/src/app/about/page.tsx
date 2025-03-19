@@ -20,7 +20,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
             <p className="text-muted-foreground mb-4">
               BuyersBeacon connects buyers with local sellers, making it easier
-              to find exactly what you're looking for. Instead of endless
+              to find exactly what you&#39;re looking for. Instead of endless
               scrolling through listings, simply create a beacon for what you
               want and let sellers come to you.
             </p>
@@ -43,7 +43,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="text-lg font-medium mb-2">1. Create a Beacon</h3>
                 <p className="text-muted-foreground">
-                  Describe what you're looking for, set your price range, and
+                  Describe what you&#39;re looking for, set your price range, and
                   add any specific requirements.
                 </p>
               </div>
@@ -53,7 +53,7 @@ export default function AboutPage() {
                 </h3>
                 <p className="text-muted-foreground">
                   Local sellers will see your beacon and can reach out if they
-                  have what you're looking for.
+                  have what you&#39;re looking for.
                 </p>
               </div>
               <div>

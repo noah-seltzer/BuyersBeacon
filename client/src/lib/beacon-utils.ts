@@ -1,7 +1,7 @@
 import { Beacon } from "@/types/beacon";
 
 export const createBeaconFormdata = (beacon: Beacon) => {
-    var formData = new FormData()
+    const formData = new FormData()
     formData.append('ItemName', beacon.ItemName || 'Draft')
     formData.append(
         'ItemDescription',
