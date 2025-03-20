@@ -14,8 +14,6 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
     <Provider store={store}>
       <ClerkProvider
-        signInFallbackRedirectUrl="/auth"
-        publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
         appearance={{
           baseTheme: theme === "dark" ? dark : undefined,
           variables: {
@@ -35,38 +33,13 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
             borderRadius: "0.5rem",
           },
           elements: {
-            formButtonPrimary:
-              "bg-primary hover:bg-primary/90 text-primary-foreground transition-colors",
-            card:
-              theme === "dark"
-                ? "bg-background border-surface/10"
-                : "bg-background border-surface/10",
-            socialButtonsIconButton:
-              "border border-surface/10 hover:bg-surface/5",
-            formFieldInput:
-              "bg-background border border-surface/10 focus:border-primary/50",
-            dividerLine: "bg-surface/10",
-            dividerText: "text-foreground/60",
-            footer:
-              theme === "dark" ? "text-foreground/60" : "text-foreground/60",
-            headerTitle: "text-foreground font-bold",
-            headerSubtitle: "text-foreground/60",
-            rootBox: "bg-background text-foreground",
-            navbar: "bg-background",
-            main: "bg-background",
-            formField: "text-foreground",
-            formFieldLabel: "text-foreground",
-            formFieldHintText: "text-foreground/60",
-            formFieldSuccessText: "text-primary",
-            formFieldErrorText: "text-destructive",
-            identityPreviewText: "text-foreground",
-            identityPreviewEditButtonIcon: "text-primary",
-          },
-          layout: {
-            socialButtonsIconButton: "w-full",
-            socialButtonsBlockButton: "w-full",
-          },
+            card: "bg-background",
+            rootBox: "bg-background",
+            formButtonPrimary: "bg-primary hover:bg-primary/90",
+          }
         }}
+        signInUrl="/auth/login"
+        signUpUrl="/auth/register"
       >
         <ToastContainer />
         <Navbar />

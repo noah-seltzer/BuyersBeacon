@@ -87,22 +87,24 @@ export function Navbar() {
                         )}
                     </Button>
                     <SignedOut>
-                        <SignInButton mode="modal" afterSignInUrl="/">
-                            <Button
-                                variant='default'
-                                className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
-                            >
-                                Sign In
-                            </Button>
-                        </SignInButton>
-                        <SignUpButton mode="modal" afterSignUpUrl="/auth/register/post">
-                            <Button
-                                variant='default'
-                                className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
-                            >
-                                Sign Up
-                            </Button>
-                        </SignUpButton>
+                        <div className="hidden md:flex gap-4">
+                            <SignInButton mode="modal">
+                                <Button
+                                    variant="default"
+                                    className="bg-tertiary hover:bg-primary/90 text-white"
+                                >
+                                    Sign In
+                                </Button>
+                            </SignInButton>
+                            <SignUpButton mode="modal">
+                                <Button
+                                    variant="default"
+                                    className="bg-secondary hover:bg-primary/90 text-white"
+                                >
+                                    Sign Up
+                                </Button>
+                            </SignUpButton>
+                        </div>
                     </SignedOut>
 
                     <SignedIn>

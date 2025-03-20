@@ -116,7 +116,7 @@ const Home: FC = () => (
             BuyersBeacon
           </h2>
           <div className="flex items-center justify-center gap-4">
-            <SignInButton>
+            <SignInButton mode="modal">
               <Button
                 size="lg"
                 variant="outline"
@@ -125,7 +125,7 @@ const Home: FC = () => (
                 Log In
               </Button>
             </SignInButton>
-            <SignUpButton>
+            <SignUpButton mode="modal">
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 h-14 px-8 text-base"
