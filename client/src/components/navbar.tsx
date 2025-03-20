@@ -87,27 +87,21 @@ export function Navbar() {
                         )}
                     </Button>
                     <SignedOut>
-                        <SignInButton
-                            fallbackRedirectUrl='/auth'
-                            signUpFallbackRedirectUrl='/auth'
-                        >
-                        <Button
-                            variant='default'
-                            className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
-                        >
-                            Sign In
-                        </Button>
+                        <SignInButton mode="modal" afterSignInUrl="/">
+                            <Button
+                                variant='default'
+                                className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
+                            >
+                                Sign In
+                            </Button>
                         </SignInButton>
-                        <SignUpButton
-                            fallbackRedirectUrl='/auth'
-                            signInFallbackRedirectUrl='/auth'
-                        >
-                        <Button
-                            variant='default'
-                            className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
-                        >
-                            Sign Up
-                        </Button>
+                        <SignUpButton mode="modal" afterSignUpUrl="/auth/register/post">
+                            <Button
+                                variant='default'
+                                className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
+                            >
+                                Sign Up
+                            </Button>
                         </SignUpButton>
                     </SignedOut>
 
