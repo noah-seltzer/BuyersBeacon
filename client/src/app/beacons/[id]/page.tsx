@@ -10,9 +10,11 @@ const BeaconDetailsPage = async (props: BeaconDetailsPageProps) => {
 
 
     return <Suspense fallback={<div>Loading</div>}>
-        <BeaconDetailsPageTemplate
-            beaconId={id}
-        />;
+        <div className="container mx-auto px-4 py-4">
+            <BeaconDetailsPageTemplate
+                beaconId={id}
+            />
+        </div>
     </Suspense>
 };
 

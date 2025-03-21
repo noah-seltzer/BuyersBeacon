@@ -67,17 +67,13 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
 
       {/* Cover Photo Section */}
       <div className="relative">
-        <div className="absolute top-4 left-4 z-10">
-          <span className="text-sm font-medium bg-black/50 text-white px-3 py-1.5 rounded-md backdrop-blur-sm">
-            Cover Photo
-          </span>
-        </div>
         <div className="aspect-[16/9] w-full overflow-hidden rounded-xl border bg-background">
           {beacon.Images ? (
             <ImagePreview
               images={beacon.Images}
               alt={beacon.ItemName}
               emptyStatePrimaryText="No images found"
+              showCoverPhotoLabel={true}
             />
           ) : (
             <div className="flex items-center justify-center h-full">

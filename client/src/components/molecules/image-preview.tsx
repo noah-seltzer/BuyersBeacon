@@ -12,9 +12,10 @@ interface ImagePreviewProps {
   alt: string;
   emptyStatePrimaryText: string;
   className?: string;
+  showCoverPhotoLabel?: boolean;
 }
 
-const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps) => {
+const ImagePreview = ({ images, alt, emptyStatePrimaryText, showCoverPhotoLabel = true }: ImagePreviewProps) => {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -63,7 +64,7 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText }: ImagePreviewProps)
             {currentImageIndex + 1} / {images.length}
           </div>
 
-          {currentImageIndex === 0 && (
+          {showCoverPhotoLabel && currentImageIndex === 0 && (
             <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded-md text-sm flex items-center">
               <Star className="h-4 w-4 mr-1" />
               Cover Photo

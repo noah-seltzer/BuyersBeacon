@@ -24,6 +24,7 @@ export const BeaconThumbnail: FC<BeaconThumbnailProps> = ({ beacon }) => {
             images={beacon.imageSet?.images || []}
             alt={beacon.ItemName}
             emptyStatePrimaryText="No image"
+            showCoverPhotoLabel={false}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           />
         </div>

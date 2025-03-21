@@ -56,7 +56,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pt-4">
       {/* Back Button and Title Row */}
       <div className="flex flex-col gap-4">
         <Button
@@ -88,6 +88,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
               images={beacon.imageSet?.images || []}
               alt={beacon.ItemName}
               emptyStatePrimaryText="No images available"
+              showCoverPhotoLabel={false}
             />
           </div>
 
