@@ -4,6 +4,7 @@ using server.Data;
 using server.Models;
 using server.Services;
 using System.Security.Authentication;
+using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -50,21 +51,25 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var user = await _context.Users
-                .Where(u => u.UserId == id)
-                .Select(u => new User
-                {
-                    UserId = u.UserId,
-                    ClerkId = u.ClerkId
-                })
-                .FirstOrDefaultAsync();
+            var user = await _context.Users.FindAsync(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            // Get Clerk user data if available
+            var clerkUser = await _clerkService.GetClerkUserFromToken(HttpContext.Request);
+            
+            return Ok(new {
+                userId = user.UserId,
+                clerkId = user.ClerkId,
+                displayName = user.DisplayName,
+                bio = user.Bio,
+                location = user.Location,
+                joinedDate = user.JoinedDate,
+                // The image URL will come from the client side using Clerk's SDK
+            });
         }
 
         /// <summary>
@@ -164,33 +169,21 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<User>> CreateUser(User userDto)
+        public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDto userDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Check if ClerkId already exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.ClerkId == userDto.ClerkId);
-            if (existingUser != null)
-            {
-                ModelState.AddModelError("ClerkId", "A user with this Clerk ID already exists");
-                return BadRequest(ModelState);
-            }
-
             var user = new User
             {
-                UserId = Guid.NewGuid(),
-                ClerkId = userDto.ClerkId
+                ClerkId = userDto.ClerkId,
+                DisplayName = "Anonymous User",
+                Bio = "No bio yet",
+                Location = "Location not set",
+                JoinedDate = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            userDto.UserId = user.UserId;
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, userDto);
+            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
 
         /// <summary>
@@ -269,7 +262,7 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            if (user.Beacons.Any())
+            if (user.Beacons?.Any() == true)
             {
                 ModelState.AddModelError("", "Cannot delete user with associated beacons");
                 return BadRequest(ModelState);
@@ -279,6 +272,58 @@ namespace server.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("profile/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<User>> GetUserProfile(Guid id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Beacons)
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                user.UserId,
+                user.DisplayName,
+                user.Bio,
+                user.Location,
+                user.JoinedDate,
+                BeaconCount = user.Beacons?.Count ?? 0
+            });
+        }
+
+        [HttpPut("profile/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProfile(Guid id, UpdateProfileDto profile)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Verify the authenticated user matches the profile being updated
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            if (authed == null || authed != user.ClerkId)
+            {
+                return Unauthorized();
+            }
+
+            user.DisplayName = profile.DisplayName;
+            user.Bio = profile.Bio;
+            user.Location = profile.Location;
+
+            await _context.SaveChangesAsync();
+            return Ok(user);
         }
 
         private bool UserExists(Guid id)
