@@ -1,29 +1,39 @@
-import { FC } from 'react';
-import { User } from '@/types/user';
-import { Card } from '@/components/atoms/card';
-import { Button } from '@/components/atoms/button';
-import { Pencil, MapPin, Calendar, User as UserIcon, Info } from 'lucide-react';
-import Link from 'next/link';
-import { BeaconThumbnail } from '@/components/molecules/beacon-thumbnail';
-import { useGetBeaconsQuery } from '@/redux/api';
-import { ClimbingBoxLoader } from 'react-spinners';
-import Title from '@/components/atoms/text/title';
+import { FC } from "react";
+import { User } from "@/types/user";
+import { Card } from "@/components/atoms/card";
+import { Button } from "@/components/atoms/button";
+import {
+  Pencil,
+  MapPin,
+  Calendar,
+  User as UserIcon,
+  Info,
+  User2,
+} from "lucide-react";
+import Link from "next/link";
+import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
+import { useGetBeaconsQuery } from "@/redux/api";
+import { ClimbingBoxLoader } from "react-spinners";
+import Title from "@/components/atoms/text/title";
 import { useUser } from "@clerk/nextjs";
-import Image from 'next/image';
+import Image from "next/image";
 
 interface ProfilePageProps {
   profile: User;
   isOwnProfile?: boolean;
 }
 
-export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => {
-  const { data: beacons, isLoading: beaconsLoading } = useGetBeaconsQuery({ 
+export const ProfilePage: FC<ProfilePageProps> = ({
+  profile,
+  isOwnProfile,
+}) => {
+  const { data: beacons, isLoading: beaconsLoading } = useGetBeaconsQuery({
     userId: profile.id,
-    drafts: false
+    drafts: false,
   });
 
   const { user: clerkUser } = useUser();
-  
+
   const avatarUrl = isOwnProfile && clerkUser?.imageUrl 
     ? clerkUser.imageUrl
     : profile.avatarUrl 
@@ -32,15 +42,16 @@ export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => 
     ? clerkUser.imageUrl 
     : "/default-avatar.png";
 
-  const formattedJoinDate = profile.joinedDate ? 
-    new Date(profile.joinedDate).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }) : 'Invalid Date';
+  const formattedJoinDate = profile.joinedDate
+    ? new Date(profile.joinedDate).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Invalid Date";
 
-  const possessiveName = profile.displayName.endsWith('s') 
-    ? `${profile.displayName}'` 
+  const possessiveName = profile.displayName.endsWith("s")
+    ? `${profile.displayName}'`
     : `${profile.displayName}'s`;
 
   return (
@@ -52,17 +63,21 @@ export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => 
             {/* User Info */}
             <div className="flex items-center gap-6">
               <div className="relative w-20 h-20">
-                <Image 
-                  src={avatarUrl}
-                  alt={profile.displayName}
-                  fill
-                  className="rounded-full object-cover border-4 border-background"
-                  sizes="80px"
-                  onError={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    img.src = "/default-avatar.png";
-                  }}
-                />
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={profile.displayName}
+                    fill
+                    className="rounded-full object-cover border-4 border-background"
+                    sizes="80px"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <User2 className="w-20 h-20 text-muted-foreground" />
+                )}
               </div>
               <div>
                 <h1 className="text-2xl font-bold mb-1">
@@ -95,9 +110,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => 
           {/* Bio Section */}
           {profile.bio && (
             <div className="mt-6 pt-6 border-t">
-              <p className="text-muted-foreground">
-                {profile.bio}
-              </p>
+              <p className="text-muted-foreground">{profile.bio}</p>
             </div>
           )}
         </div>
@@ -110,7 +123,8 @@ export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => 
             {isOwnProfile ? "Your Beacons" : `${possessiveName} Beacons`}
           </h2>
           <div className="text-sm text-muted-foreground">
-            {beacons?.length || 0} beacon{(beacons?.length || 0) !== 1 ? 's' : ''} posted
+            {beacons?.length || 0} beacon
+            {(beacons?.length || 0) !== 1 ? "s" : ""} posted
           </div>
         </div>
 
@@ -126,12 +140,10 @@ export const ProfilePage: FC<ProfilePageProps> = ({ profile, isOwnProfile }) => 
           </div>
         ) : (
           <Card className="p-12 text-center bg-background/50">
-            <p className="text-muted-foreground">
-              No beacons posted yet
-            </p>
+            <p className="text-muted-foreground">No beacons posted yet</p>
           </Card>
         )}
       </div>
     </div>
   );
-}; 
+};

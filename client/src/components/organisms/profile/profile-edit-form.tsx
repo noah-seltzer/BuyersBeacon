@@ -7,7 +7,7 @@ import { Textarea } from "@/components/atoms/textarea";
 import { useUpdateProfileMutation } from "@/redux/api";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { Loader2 } from "lucide-react";
+import { Loader2, User2 } from "lucide-react";
 import { useToast } from "@/components/atoms/use-toast";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
@@ -22,11 +22,7 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
   const { toast } = useToast();
   const { user: clerkUser } = useUser();
 
-  const avatarUrl = clerkUser?.imageUrl
-    ? clerkUser.imageUrl
-    : user.avatarUrl
-    ? user.avatarUrl
-    : "/default-avatar.png";
+  const avatarUrl = clerkUser?.imageUrl || user.avatarUrl || "/default-avatar.png";
 
   const { handleSubmit, handleChange, values, isSubmitting } = useFormik({
     initialValues: {
@@ -65,17 +61,21 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
       <div className="p-6">
         <div className="flex justify-center mb-6">
           <div className="relative w-20 h-20">
-            <Image
-              src={avatarUrl}
-              alt={user.displayName}
-              fill
-              className="rounded-full object-cover border-4 border-background"
-              sizes="80px"
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.src = "/default-avatar.png";
-              }}
-            />
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt={user.displayName}
+                fill
+                className="rounded-full object-cover border-4 border-background"
+                sizes="80px"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = "none";
+                }}
+              />
+            ) : (
+              <User2 className="w-20 h-20 text-muted-foreground" />
+            )}
           </div>
         </div>
 

@@ -29,7 +29,7 @@ export function UserMenu() {
     skip: !clerkUser?.id,
   });
 
-  const avatarUrl = clerkUser?.imageUrl || "/default-avatar.png";
+  const avatarUrl = clerkUser?.imageUrl;
 
   return (
     <DropdownMenu>

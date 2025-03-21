@@ -48,7 +48,7 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
   const displayName =
     beaconUser?.displayName || clerkUser?.fullName || "Anonymous User";
   const avatarUrl =
-    beaconUser?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
+    beaconUser?.avatarUrl || clerkUser?.imageUrl 
 
   return (
     <div>

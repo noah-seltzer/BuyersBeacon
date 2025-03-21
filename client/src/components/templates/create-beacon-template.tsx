@@ -54,7 +54,7 @@ const CreateBeaconTemplate: FC<CreateBeaconTemplateProps> = ({
               asChild
               className="text-foreground/80 hover:text-foreground"
             >
-              <Link href="/browse">
+              <Link href="/beacons/browse">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>

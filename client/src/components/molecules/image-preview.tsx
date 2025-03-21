@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { BeaconImage } from "@/types/beacon";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/button";
@@ -15,8 +15,12 @@ interface ImagePreviewProps {
   showCoverPhotoLabel?: boolean;
 }
 
-const ImagePreview = ({ images, alt, emptyStatePrimaryText, showCoverPhotoLabel = true }: ImagePreviewProps) => {
-
+const ImagePreview = ({
+  images,
+  alt,
+  emptyStatePrimaryText,
+  showCoverPhotoLabel = true,
+}: ImagePreviewProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = () => {
@@ -32,15 +36,15 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, showCoverPhotoLabel 
     const image = images[currentImageIndex];
 
     if (image.imageUrl) {
-      return image.imageUrl;
+      return image.imageUrl || null;
     }
 
     if (typeof image.file === "string") {
-      return image.file;
+      return image.file || null;
     }
 
     if (image.file instanceof File) {
-      return URL.createObjectURL(image.file)
+      return URL.createObjectURL(image.file);
     }
 
     return null;
@@ -58,6 +62,9 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, showCoverPhotoLabel 
             alt={alt ?? "Beacon Image"}
             fill
             className="object-cover"
+            onError={() => {
+              setCurrentImageIndex(0);
+            }}
           />
 
           <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded-md text-sm">
@@ -112,6 +119,7 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, showCoverPhotoLabel 
       ) : (
         <EmptyState
           primaryText={emptyStatePrimaryText}
+          icon={ImageIcon}
           iconH={100}
           className="h-full"
           iconW={100}

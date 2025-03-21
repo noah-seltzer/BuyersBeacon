@@ -40,11 +40,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
     }).format(price);
   };
 
-  const avatarUrl = userData?.avatarUrl
-    ? userData.avatarUrl
-    : clerkUser?.imageUrl
-    ? clerkUser.imageUrl
-    : "/default-avatar.png";
+  const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   if (isLoading) {
     return (
@@ -112,17 +108,21 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
                 className="flex items-center gap-4 hover:opacity-80"
               >
                 <div className="relative h-12 w-12">
-                  <Image
-                    src={avatarUrl}
-                    alt={userData?.displayName || "User"}
-                    fill
-                    className="rounded-full object-cover border-4 border-background"
-                    sizes="48px"
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      img.src = "/default-avatar.png";
-                    }}
-                  />
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={userData?.displayName || "User"}
+                      fill
+                      className="rounded-full object-cover border-4 border-background"
+                      sizes="48px"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = "none"; // Hide the image on error
+                      }}
+                    />
+                  ) : (
+                    <User2 className="h-12 w-12 text-muted-foreground" /> // Show a user icon instead
+                  )}
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Posted by</p>
