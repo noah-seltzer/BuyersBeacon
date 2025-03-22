@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'buyersbeaconstorage.blob.core.windows.net',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.clerk.dev',
+        pathname: '/**',
       }
     ]
   }

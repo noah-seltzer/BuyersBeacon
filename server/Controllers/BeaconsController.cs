@@ -8,6 +8,8 @@ using server.Data;
 using server.Models;
 using server.Services;
 using server.Util;
+using System.Security.Claims;
+
 namespace server.Controllers
 {
     [ApiController]
@@ -39,12 +41,17 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] Guid? userId = null, [FromQuery] bool drafts = false)
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] bool drafts = false, [FromQuery] string? userId = null)
         {
-
-            var beacons = await _beaconService.GetList(userId, drafts);
-
-            return Ok(beacons);
+            try 
+            {
+                var beacons = await _beaconService.GetList(userId != null ? new Guid(userId) : null, drafts);
+                return Ok(beacons);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Failed to get beacons", message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -79,8 +86,13 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
         {
-            var drafts = await _beaconService.GetList(new Guid("AA568EEF-C1A6-4EF0-99D3-53B5580414F8"), true);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
+            var drafts = await _beaconService.GetList(new Guid(userId), true);
             return Ok(drafts);
         }
 

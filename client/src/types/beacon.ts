@@ -1,3 +1,5 @@
+import { User } from "@/types/user";
+
 export interface BeaconImage {
   imageId?: string;
   imageSetId?: string;
@@ -30,6 +32,15 @@ export interface Beacon {
   LocCountry?: string;
   LocPostalCode?: string;
   imageSet?: ImageSet;
+  User?: {
+    UserId: string;
+    DisplayName: string;
+    Bio: string;
+    Location: string;
+    AvatarUrl?: string;
+    JoinedDate: string;
+    ClerkId: string;
+  };
 }
 
 export interface Category {
