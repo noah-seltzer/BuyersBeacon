@@ -16,7 +16,6 @@ namespace server.Services
 
         public async Task<Review> CreateReviewAsync(Guid userId, Guid reviewerId, CreateReviewDto reviewDto)
         {
-            // Create a new review
             var review = new Review
             {
                 UserId = userId,
@@ -27,21 +26,18 @@ namespace server.Services
 
             _context.Reviews.Add(review);
 
-            // Process tags
             if (reviewDto.TagNames != null && reviewDto.TagNames.Count > 0)
             {
                 foreach (var tagName in reviewDto.TagNames)
                 {
-                    // Find existing tag or create a new one
                     var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
                     if (tag == null)
                     {
                         tag = new Tag { Name = tagName };
                         _context.Tags.Add(tag);
-                        await _context.SaveChangesAsync(); // Save to get the TagId
+                        await _context.SaveChangesAsync(); 
                     }
 
-                    // Create ReviewTag relationship
                     var reviewTag = new ReviewTag
                     {
                         ReviewId = review.ReviewId,
@@ -53,7 +49,6 @@ namespace server.Services
 
             await _context.SaveChangesAsync();
 
-            // Update user's average rating
             await UpdateUserRatingAsync(userId);
 
             return review;
@@ -101,7 +96,6 @@ namespace server.Services
                 };
             }
 
-            // Get top tags with counts
             var tagCounts = await _context.ReviewTags
                 .Where(rt => rt.Review.UserId == userId)
                 .GroupBy(rt => rt.Tag.Name)
@@ -111,7 +105,7 @@ namespace server.Services
                     Count = g.Count()
                 })
                 .OrderByDescending(tc => tc.Count)
-                .Take(10) // Top 10 most used tags
+                .Take(10) 
                 .ToListAsync();
 
             return new UserRatingDto
@@ -130,7 +124,6 @@ namespace server.Services
             if (review == null)
                 return false;
 
-            // Remove associated ReviewTags
             var reviewTags = await _context.ReviewTags
                 .Where(rt => rt.ReviewId == reviewId)
                 .ToListAsync();
@@ -139,7 +132,6 @@ namespace server.Services
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
 
-            // Update user's average rating
             await UpdateUserRatingAsync(review.UserId);
 
             return true;
