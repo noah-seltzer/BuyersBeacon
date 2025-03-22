@@ -23,7 +23,8 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
     return null;
   }
 
-  const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
+  const avatarUrl =
+    userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
     <Link
@@ -49,9 +50,11 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
           <User2 className="h-6 w-6 text-muted-foreground" />
         )}
       </div>
-      
+
       <div className="flex flex-col">
-        <span className="text-xs font-medium truncate">{userData.displayName}</span>
+        <span className="text-xs font-medium truncate">
+          {userData.displayName}
+        </span>
         <div className="scale-75 origin-left -ml-1 -mt-1">
           <UserRatingSummary userId={userId} showTags={false} />
         </div>
