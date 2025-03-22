@@ -2,26 +2,29 @@ import { FC } from "react";
 import { Beacon } from "@/types/beacon";
 import { Card } from "@/components/atoms/card";
 import Link from "next/link";
-import { MapPin, User } from "lucide-react";
+import { MapPin, User, User2 } from "lucide-react";
 import ImagePreview from "@/components/molecules/image-preview";
 import { formatPrice } from "@/lib/format";
 import StarRating from "@/components/molecules/star-rating";
-import { useGetUserByIdQuery, useGetUserRatingQuery } from "@/redux/api";
+import { useGetUserByIdQuery } from "@/redux/api";
+import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import UserRatingSummary from "@/components/molecules/user-rating-summary";
 
 interface BeaconThumbnailProps {
   beacon: Beacon;
 }
 
 const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
-  const { data: user, isLoading } = useGetUserByIdQuery(userId);
-  const { data: userRating } = useGetUserRatingQuery(userId);
+  const { data: userData, isLoading } = useGetUserByIdQuery(userId);
+  const { user: clerkUser } = useUser();
 
-  if (isLoading || !user) {
+  if (isLoading || !userData) {
     return null;
   }
 
-  // Get the avatar URL or use default
-  const avatarUrl = user.avatarUrl || user.imageUrl || "/default-avatar.png";
+  // Get the avatar URL using the same approach as detailed-beacon.tsx
+  const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
     <Link
@@ -29,48 +32,31 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
       className="flex items-center gap-2 hover:text-primary transition-colors"
       onClick={(e) => e.stopPropagation()}
     >
-      {/* User avatar */}
-      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-primary/10">
+      {/* User avatar - Matching the approach in detailed-beacon.tsx */}
+      <div className="relative h-6 w-6">
         {avatarUrl ? (
-          <div className="w-full h-full relative">
-            <img 
-              src={avatarUrl} 
-              alt={user.displayName} 
-              className="object-cover w-full h-full"
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.style.display = 'none';
-                img.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-muted"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-foreground/70"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
-              }}
-            />
-          </div>
+          <Image
+            src={avatarUrl}
+            alt={userData?.displayName || "User"}
+            fill
+            className="rounded-full object-cover border border-background"
+            sizes="24px"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.style.display = "none"; // Hide the image on error
+            }}
+          />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-muted">
-            <User className="w-3.5 h-3.5 text-foreground/70" />
-          </div>
+          <User2 className="h-6 w-6 text-muted-foreground" />
         )}
       </div>
+      
       <div className="flex flex-col">
-        <span className="text-xs font-medium truncate">{user.displayName}</span>
-        {userRating?.averageRating ? (
-          <div className="flex items-center gap-1">
-            <StarRating value={userRating.averageRating} size="sm" />
-            <span className="text-[10px] text-muted-foreground">
-              ({userRating.totalReviews || 0})
-            </span>
-          </div>
-        ) : user.averageRating ? (
-          <div className="flex items-center gap-1">
-            <StarRating value={user.averageRating} size="sm" />
-            <span className="text-[10px] text-muted-foreground">
-              ({user.totalReviews || 0})
-            </span>
-          </div>
-        ) : (
-          <span className="text-[10px] text-muted-foreground">
-            No ratings yet
-          </span>
-        )}
+        <span className="text-xs font-medium truncate">{userData.displayName}</span>
+        {/* Use the UserRatingSummary component instead of manually building the rating display */}
+        <div className="scale-75 origin-left -ml-1 -mt-1">
+          <UserRatingSummary userId={userId} showTags={false} />
+        </div>
       </div>
     </Link>
   );
