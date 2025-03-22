@@ -16,6 +16,7 @@ import {
   FileEdit,
   PenSquare,
   Boxes,
+  User2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -88,10 +89,20 @@ export function UserMenu() {
             <>
               <DropdownMenuItem asChild>
                 <Link
+                  href={`/profile/${beaconUser.id}`}
+                  className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
+                >
+                  <User2 className="mr-3 h-4 w-4 text-primary/80" />
+                  <span className="font-medium">View Profile</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
                   href={`/profile/${beaconUser.id}/edit`}
                   className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
                 >
-                  <User className="mr-3 h-4 w-4 text-primary/80" />
+                  <FileEdit className="mr-3 h-4 w-4 text-primary/80" />
                   <span className="font-medium">Edit Public Profile</span>
                 </Link>
               </DropdownMenuItem>
