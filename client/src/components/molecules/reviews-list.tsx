@@ -34,32 +34,39 @@ export const ReviewsList: FC<ReviewsListProps> = ({ userId }) => {
   return (
     <div className="space-y-4">
       {reviews.map((review) => (
-        <Card key={review.reviewId} className="p-4">
+        <Card key={review.reviewId} className="p-4 border-border/30 hover:border-primary/30 hover:shadow-sm transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="bg-muted rounded-full p-1.5">
-                <User className="h-4 w-4 text-muted-foreground" />
+              <div className="bg-primary/10 rounded-full p-2">
+                <User className="h-3.5 w-3.5 text-primary/80" />
               </div>
-              <Link
-                href={`/profile/${review.reviewer.userId}`}
-                className="font-medium hover:underline"
+              <Link 
+                href={`/profile/${review.reviewer.userId}`} 
+                className="font-medium hover:text-primary hover:underline transition-colors"
               >
                 {review.reviewer.displayName}
               </Link>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
               {format(new Date(review.createdAt), 'MMM d, yyyy')}
             </div>
           </div>
-
-          <div className="mt-3">
+          
+          <div className="mt-4 flex items-center gap-2">
             <StarRating value={review.rating} size="sm" />
+            <span className="text-xs text-muted-foreground">
+              ({review.rating}/5)
+            </span>
           </div>
-
+          
           {review.tags && review.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {review.tags.map((tag, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
+                <Badge 
+                  key={index} 
+                  variant="outline" 
+                  className="text-xs bg-accent/50 text-accent-foreground border-primary/10 hover:bg-primary/10 transition-colors"
+                >
                   {tag}
                 </Badge>
               ))}

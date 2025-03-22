@@ -19,105 +19,129 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useGetUserByClerkIdQuery } from "@/redux/api";
+import { useGetUserByClerkIdQuery, useGetUserByIdQuery } from "@/redux/api";
 import { Button } from "../atoms/button";
 
 export function UserMenu() {
   const { signOut, openUserProfile } = useClerk();
   const { user: clerkUser } = useUser();
+
   const { data: beaconUser } = useGetUserByClerkIdQuery(clerkUser?.id || "", {
     skip: !clerkUser?.id,
   });
 
-  const avatarUrl = clerkUser?.imageUrl;
+  const { data: fullProfile } = useGetUserByIdQuery(beaconUser?.id || "", {
+    skip: !beaconUser?.id,
+  });
+
+  const displayName =
+    fullProfile?.displayName ||
+    beaconUser?.displayName ||
+    "Update your profile";
+  const avatarUrl = clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Image
-            src={avatarUrl}
-            alt="Profile"
-            fill
-            className="rounded-full object-cover"
-            sizes="32px"
-          />
+        <Button
+          variant="ghost"
+          className="relative h-9 w-9 rounded-full p-0 overflow-hidden border-2 border-primary/20 hover:border-primary/40 transition-all"
+        >
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt="Profile"
+              fill
+              className="rounded-full object-cover"
+              sizes="36px"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = "/default-avatar.png";
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-primary/10">
+              <User className="h-5 w-5 text-primary/80" />
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="w-56 bg-background border-border shadow-lg font-sans"
+      <DropdownMenuContent
+        className="w-72 bg-background border-border shadow-xl rounded-xl p-1 font-sans"
         align="end"
         side="bottom"
         sideOffset={8}
       >
         <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {clerkUser?.fullName || "Anonymous User"}
+          <div className="flex flex-col space-y-1 p-2">
+            <p className="text-base font-medium leading-none text-primary">
+              {displayName}
             </p>
-            <p className="text-xs leading-none text-muted-foreground">
+            <p className="text-xs leading-none text-muted-foreground pt-1">
               {clerkUser?.primaryEmailAddress?.emailAddress}
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1" />
         <DropdownMenuGroup>
           {beaconUser && (
-            <DropdownMenuItem asChild>
-              <Link 
-                href={`/profile/${beaconUser.id}`} 
-                className="flex items-center w-full cursor-pointer hover:bg-primary/10 focus:bg-primary/10"
-              >
-                <Boxes className="mr-2 h-4 w-4" />
-                <span>My Beacons</span>
-              </Link>
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/profile/${beaconUser.id}/edit`}
+                  className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
+                >
+                  <User className="mr-3 h-4 w-4 text-primary/80" />
+                  <span className="font-medium">Edit Public Profile</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
+                  href={`/profile/${beaconUser.id}`}
+                  className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
+                >
+                  <Boxes className="mr-3 h-4 w-4 text-primary/80" />
+                  <span className="font-medium">My Beacons</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/beacons/drafts"
+                  className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
+                >
+                  <FileEdit className="mr-3 h-4 w-4 text-primary/80" />
+                  <span className="font-medium">My Drafts</span>
+                </Link>
+              </DropdownMenuItem>
+            </>
           )}
-          {beaconUser && (
-            <DropdownMenuItem asChild>
-              <Link 
-                href={`/profile/${beaconUser.id}/edit`} 
-                className="flex items-center w-full cursor-pointer hover:bg-primary/10 focus:bg-primary/10"
-              >
-                <User className="mr-2 h-4 w-4" />
-                <span>Edit Public Profile</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem asChild>
-            <Link 
-              href="/beacons/drafts" 
-              className="flex items-center w-full cursor-pointer hover:bg-primary/10 focus:bg-primary/10"
-            >
-              <PenSquare className="mr-2 h-4 w-4" />
-              <span>My Drafts</span>
-            </Link>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1" />
         <DropdownMenuGroup>
-          <DropdownMenuItem 
-            onClick={() => openUserProfile()} 
-            className="flex items-center cursor-pointer hover:bg-primary/10 focus:bg-primary/10"
+          <DropdownMenuItem
+            onClick={() => openUserProfile()}
+            className="flex items-center cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
           >
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Account Settings</span>
+            <Settings className="mr-3 h-4 w-4 text-primary/80" />
+            <span className="font-medium">Account Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => openUserProfile({ tab: "security" })} 
-            className="flex items-center cursor-pointer hover:bg-primary/10 focus:bg-primary/10"
+          <DropdownMenuItem
+            onClick={() => openUserProfile({ tab: "security" })}
+            className="flex items-center cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
           >
-            <Shield className="mr-2 h-4 w-4" />
-            <span>Security</span>
+            <Shield className="mr-3 h-4 w-4 text-primary/80" />
+            <span className="font-medium">Security</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
+        <DropdownMenuSeparator className="my-1" />
+        <DropdownMenuItem
           onClick={() => signOut()}
-          className="text-red-600 focus:text-red-600 flex items-center cursor-pointer hover:bg-red-600/10 focus:bg-red-600/10"
+          className="text-red-500 focus:text-red-500 flex items-center cursor-pointer rounded-lg p-2.5 hover:bg-red-600/10 focus:bg-red-600/10 mt-1"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign Out</span>
+          <LogOut className="mr-3 h-4 w-4" />
+          <span className="font-medium">Sign Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

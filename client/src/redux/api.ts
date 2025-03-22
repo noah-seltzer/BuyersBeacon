@@ -188,15 +188,31 @@ export const beaconApi = createApi({
     }),
     getUserByClerkId: builder.query<User, string>({
       query: (clerkId) => `users/clerk/${clerkId}`,
-      transformResponse: (response: any) => ({
-        id: response.userId,
-        clerk_user_id: response.clerkId,
-        displayName: response.displayName || "Anonymous User",
-        bio: response.bio || "No bio yet",
-        location: response.location || "Location not set",
-        avatarUrl: response.avatarUrl,
-        joinedDate: response.joinedDate || new Date().toISOString(),
-      }),
+      transformResponse: (response: any) => {
+        const userId = response.userId;
+        
+        return {
+          id: response.userId,
+          clerk_user_id: response.clerkId,
+          displayName: "Anonymous User", 
+          bio: "No bio yet", 
+          location: "Location not set",
+          avatarUrl: "", 
+          joinedDate: new Date().toISOString(),
+        };
+      },
+      async onQueryStarted(clerkId, { dispatch, queryFulfilled }) {
+        try {
+          const { data: initialUser } = await queryFulfilled;
+          if (initialUser?.id) {
+            dispatch(
+              beaconApi.endpoints.getUserById.initiate(initialUser.id)
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      },
     }),
     uploadProfileImage: builder.mutation<{ url: string }, File>({
       query: (file) => {

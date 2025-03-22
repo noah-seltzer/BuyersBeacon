@@ -8,7 +8,8 @@ import Title from "@/components/atoms/text/title";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/atoms/button";
 import Link from "next/link";
-import { useGetUserByClerkIdQuery } from "@/redux/api";
+import { useGetUserByClerkIdQuery, useGetUserByIdQuery } from "@/redux/api";
+import { useState, useEffect } from "react";
 
 interface BeaconPreviewProps {
   beacon: {
@@ -26,10 +27,22 @@ interface BeaconPreviewProps {
 }
 
 export function BeaconPreview({ beacon }: BeaconPreviewProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const { user: clerkUser } = useUser();
-  const { data: beaconUser } = useGetUserByClerkIdQuery(clerkUser?.id || "", {
+  
+  const { data: beaconUser, isLoading: isBeaconUserLoading } = useGetUserByClerkIdQuery(clerkUser?.id || "", {
     skip: !clerkUser?.id,
   });
+  
+  const { data: fullProfile, isLoading: isProfileLoading } = useGetUserByIdQuery(beaconUser?.id || "", {
+    skip: !beaconUser?.id,
+  });
+
+  useEffect(() => {
+    if (!clerkUser || (beaconUser && !isProfileLoading)) {
+      setIsLoading(false);
+    }
+  }, [clerkUser, beaconUser, isProfileLoading]);
 
   const formatPrice = (price: number | undefined) => {
     if (typeof price !== "number") return "$0.00";
@@ -45,10 +58,8 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
     .filter(Boolean)
     .join(", ");
 
-  const displayName =
-    beaconUser?.displayName || clerkUser?.fullName || "Anonymous User";
-  const avatarUrl =
-    beaconUser?.avatarUrl || clerkUser?.imageUrl 
+  const displayName = fullProfile?.displayName || beaconUser?.displayName || clerkUser?.fullName || "Anonymous User";
+  const avatarUrl = fullProfile?.avatarUrl || beaconUser?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
     <div>
@@ -88,14 +99,33 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
         <div className="p-6">
           {/* Author Info */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-8 w-8 rounded-full overflow-hidden">
-              <img
-                src={avatarUrl}
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <span className="text-sm">Posted by {displayName}</span>
+            {isLoading ? (
+              <>
+                <div className="h-8 w-8 rounded-full bg-primary/20 animate-pulse"></div>
+                <div className="h-4 w-32 bg-muted animate-pulse rounded"></div>
+              </>
+            ) : (
+              <>
+                <div className="h-8 w-8 rounded-full overflow-hidden bg-primary/10">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "/default-avatar.png";
+                      }}
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <User2 className="h-4 w-4 text-primary/70" />
+                    </div>
+                  )}
+                </div>
+                <span className="text-sm">Posted by {displayName}</span>
+              </>
+            )}
           </div>
 
           {/* Description */}
@@ -112,7 +142,7 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
             <p className="text-sm text-muted-foreground mb-1">Price</p>
             <div className="flex items-center gap-2">
               <span className="text-4xl font-bold text-primary">
-                $ {formatPrice(beacon.ItemPrice)}
+                {formatPrice(beacon.ItemPrice)}
               </span>
             </div>
           </div>

@@ -29,7 +29,6 @@ namespace server.Controllers
         {
             try
             {
-                // Verify the authenticated user
                 var clerkUserId = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
                 if (string.IsNullOrEmpty(clerkUserId))
                 {
@@ -49,7 +48,6 @@ namespace server.Controllers
                     return BadRequest("Users cannot review themselves.");
                 }
 
-                // Create the review
                 var review = await _reviewService.CreateReviewAsync(userId, reviewer.UserId, reviewDto);
 
                 return CreatedAtAction(nameof(GetUserReviews), new { userId }, review);
@@ -86,21 +84,18 @@ namespace server.Controllers
         {
             try
             {
-                // Verify the authenticated user
                 var clerkUserId = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
                 if (string.IsNullOrEmpty(clerkUserId))
                 {
                     return Unauthorized("User is not authenticated.");
                 }
 
-                // Get the reviewer's application user ID
                 var reviewer = await _userService.GetUserByClerkIdAsync(clerkUserId);
                 if (reviewer == null)
                 {
                     return Unauthorized("Reviewer not found.");
                 }
 
-                // Delete the review
                 var result = await _reviewService.DeleteReviewAsync(reviewId, reviewer.UserId);
                 if (!result)
                 {
