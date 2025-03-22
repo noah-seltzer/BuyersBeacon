@@ -93,9 +93,8 @@ const Home: FC = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 inline-block relative">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 How BuyersBeacon Works
-                <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1.5 bg-primary rounded-full"></div>
               </h2>
               <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
                 Find what you need or connect with potential buyers in just a
