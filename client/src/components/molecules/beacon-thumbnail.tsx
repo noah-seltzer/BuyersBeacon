@@ -2,13 +2,38 @@ import { FC } from 'react';
 import { Beacon } from '@/types/beacon';
 import { Card } from '@/components/atoms/card';
 import Link from 'next/link';
-import { MapPin } from 'lucide-react';
+import { MapPin, User } from 'lucide-react';
 import ImagePreview from '@/components/molecules/image-preview';
 import { formatPrice } from '@/lib/format';
+import StarRating from '@/components/molecules/star-rating';
+import { useGetUserByIdQuery } from '@/redux/api';
 
 interface BeaconThumbnailProps {
   beacon: Beacon;
 }
+
+// Component to display user info with rating
+const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
+  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  
+  if (isLoading || !user) {
+    return null;
+  }
+  
+  return (
+    <Link 
+      href={`/profile/${userId}`} 
+      className="flex items-center gap-2 mt-2 pt-2 border-t border-border hover:text-primary"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <User className="w-3 h-3" />
+      <span className="text-xs truncate">{user.displayName}</span>
+      <div className="ml-auto">
+        <StarRating value={user.averageRating || 0} size="sm" />
+      </div>
+    </Link>
+  );
+};
 
 export const BeaconThumbnail: FC<BeaconThumbnailProps> = ({ beacon }) => {
   const location = beacon.LocCity && beacon.LocRegion 
@@ -60,6 +85,11 @@ export const BeaconThumbnail: FC<BeaconThumbnailProps> = ({ beacon }) => {
                 <MapPin className="w-4 h-4 flex-shrink-0" />
                 <span className="line-clamp-1">{location}</span>
               </div>
+            )}
+            
+            {/* User info with rating - show only if user ID exists */}
+            {beacon.userId && (
+              <UserInfoWithRating userId={beacon.userId} />
             )}
           </div>
         </div>

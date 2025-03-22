@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Beacon, Category } from "@/types/beacon";
 import Cookies from "js-cookie";
 import { createBeaconFormdata } from "../lib/beacon-utils";
-import { User } from "@/types/user";
+import { User, Review, UserRating } from "@/types/user";
 
 export enum ENDPOINTS {
   CATEGORIES = "Categories",
@@ -13,6 +13,8 @@ enum CACHES {
   CATEGORIES = "Categories",
   DRAFTS = "Drafts",
   USERS = "Users",
+  REVIEWS = "Reviews",
+  TAGS = "Tags",
 }
 
 export const LIST_ID = "LIST";
@@ -23,7 +25,7 @@ export interface GetBeaconQueryInput {
 }
 
 export const beaconApi = createApi({
-  tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS, CACHES.USERS],
+  tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS, CACHES.USERS, CACHES.REVIEWS, CACHES.TAGS],
   reducerPath: "beaconApi",
   baseQuery: fetchBaseQuery({
     mode: "cors",
@@ -37,6 +39,49 @@ export const beaconApi = createApi({
   }),
 
   endpoints: (builder) => ({
+    // Review endpoints
+    getUserReviews: builder.query<Review[], string>({
+      query: (userId) => `reviews/user/${userId}`,
+      providesTags: (_result, _error, userId) => [
+        { type: CACHES.REVIEWS, id: userId },
+        { type: CACHES.REVIEWS, id: LIST_ID },
+      ],
+    }),
+    
+    getUserRating: builder.query<UserRating, string>({
+      query: (userId) => `reviews/user/${userId}/rating`,
+      providesTags: (_result, _error, userId) => [
+        { type: CACHES.REVIEWS, id: userId },
+      ],
+    }),
+    
+    createReview: builder.mutation<Review, { userId: string; rating: number; tagNames: string[] }>({
+      query: ({ userId, ...reviewData }) => ({
+        url: `reviews/user/${userId}`,
+        method: 'POST',
+        body: reviewData,
+      }),
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: CACHES.REVIEWS, id: userId },
+        { type: CACHES.REVIEWS, id: LIST_ID },
+        { type: CACHES.USERS, id: userId },
+      ],
+    }),
+    
+    deleteReview: builder.mutation<void, string>({
+      query: (reviewId) => ({
+        url: `reviews/${reviewId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: () => [
+        { type: CACHES.REVIEWS, id: LIST_ID },
+      ],
+    }),
+    
+    getTags: builder.query<{ tagId: string; name: string }[], void>({
+      query: () => 'reviews/tags',
+      providesTags: () => [{ type: CACHES.TAGS, id: LIST_ID }],
+    }),
     getBeacons: builder.query<Beacon[], GetBeaconQueryInput>({
       query: (params) => {
         const queryParams = new URLSearchParams();
@@ -178,4 +223,10 @@ export const {
   useGetUserByIdQuery,
   useGetUserByClerkIdQuery,
   useUploadProfileImageMutation,
+  // Review hooks
+  useGetUserReviewsQuery,
+  useGetUserRatingQuery,
+  useCreateReviewMutation,
+  useDeleteReviewMutation,
+  useGetTagsQuery,
 } = beaconApi;

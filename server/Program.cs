@@ -61,7 +61,9 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<ICategoryService, CategoryService>()
     .AddScoped<IBeaconService, BeaconService>()
     .AddScoped<IImageService, ImageService>()
-    .AddScoped<IClerkService, ClerkService>();
+    .AddScoped<IClerkService, ClerkService>()
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<IReviewService, ReviewService>();
 
 var app = builder.Build();
 

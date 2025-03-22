@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { useGetUserByIdQuery } from "@/redux/api";
 import { ClimbingBoxLoader } from "react-spinners";
+import UserRatingSummary from "@/components/molecules/user-rating-summary";
 
 interface DetailedBeaconProps {
   beacon: Beacon;
@@ -129,6 +130,11 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
                   <p className="font-medium">
                     {userData?.displayName || "Anonymous User"}
                   </p>
+                  {userData?.id && (
+                    <div className="mt-1">
+                      <UserRatingSummary userId={userData.id} showTags={false} />
+                    </div>
+                  )}
                 </div>
               </Link>
 

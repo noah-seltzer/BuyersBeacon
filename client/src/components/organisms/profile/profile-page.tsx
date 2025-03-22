@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { User } from "@/types/user";
 import { Card } from "@/components/atoms/card";
 import { Button } from "@/components/atoms/button";
@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   Info,
   User2,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
@@ -17,6 +18,9 @@ import { ClimbingBoxLoader } from "react-spinners";
 import Title from "@/components/atoms/text/title";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
+import UserRatingSummary from "@/components/molecules/user-rating-summary";
+import ReviewForm from "@/components/molecules/review-form";
+import ReviewsList from "@/components/molecules/reviews-list";
 
 interface ProfilePageProps {
   profile: User;
@@ -93,6 +97,10 @@ export const ProfilePage: FC<ProfilePageProps> = ({
                     {profile.location}
                   </div>
                 </div>
+                {/* User Rating Summary */}
+                <div className="mt-2">
+                  <UserRatingSummary userId={profile.id} />
+                </div>
               </div>
             </div>
 
@@ -115,6 +123,32 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           )}
         </div>
       </Card>
+
+      {/* Reviews Section */}
+      <div className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5" />
+              {isOwnProfile ? "Your Reviews" : `${possessiveName} Reviews`}
+            </div>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Reviews List */}
+          <div className="lg:col-span-2">
+            <ReviewsList userId={profile.id} />
+          </div>
+
+          {/* Leave a Review (only show if not own profile) */}
+          {!isOwnProfile && (
+            <div className="lg:col-span-1">
+              <ReviewForm userId={profile.id} />
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Beacons Section */}
       <div>

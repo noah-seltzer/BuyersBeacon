@@ -7,4 +7,28 @@ export interface User {
   avatarUrl?: string;
   joinedDate: string;
   imageUrl?: string;
+  averageRating?: number;
+  totalReviews?: number;
+}
+
+export interface Review {
+  reviewId: string;
+  rating: number;
+  createdAt: string;
+  reviewer: {
+    userId: string;
+    displayName: string;
+  };
+  tags: string[];
+}
+
+export interface UserRating {
+  averageRating: number;
+  totalReviews: number;
+  topTags: TagCount[];
+}
+
+export interface TagCount {
+  tagName: string;
+  count: number;
 }
