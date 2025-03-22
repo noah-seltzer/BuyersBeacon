@@ -5,6 +5,7 @@ import { ProfileEditForm } from '@/components/organisms/profile/profile-edit-for
 import { useParams } from 'next/navigation';
 import { ClimbingBoxLoader } from "react-spinners";
 import Title from '@/components/atoms/text/title';
+import PageHeading from '@/components/atoms/text/page-heading';
 
 export default function EditProfilePage() {
   const params = useParams();
@@ -15,7 +16,7 @@ export default function EditProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <ClimbingBoxLoader size={35} color="#24dbb7" className="mb-10" />
-        <Title className="mt-10">Loading Profile...</Title>
+        <PageHeading title="Loading Profile..." className="mt-10 text-center" />
       </div>
     );
   }
@@ -23,14 +24,17 @@ export default function EditProfilePage() {
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <Title>Profile not found</Title>
+        <PageHeading title="Profile not found" subtitle="We couldn't find the profile you're looking for" className="text-center" />
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Title className="mb-6">Edit Profile</Title>
+      <PageHeading 
+        title="Edit Profile"
+        subtitle="Update your personal information and preferences"
+      />
       <ProfileEditForm user={profile} />
     </div>
   );

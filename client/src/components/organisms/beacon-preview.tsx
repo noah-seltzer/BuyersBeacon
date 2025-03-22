@@ -1,6 +1,6 @@
 import { Card } from "@/components/atoms/card";
 import { Badge } from "@/components/atoms/badge";
-import { User2, MapPin, DollarSign, ArrowLeft } from "lucide-react";
+import { User2, MapPin, DollarSign, ArrowLeft, FileText } from "lucide-react";
 import ImagePreview from "@/components/molecules/image-preview";
 import { BeaconImage } from "@/types/beacon";
 import { BeatLoader } from "react-spinners";
@@ -10,6 +10,7 @@ import { Button } from "@/components/atoms/button";
 import Link from "next/link";
 import { useGetUserByClerkIdQuery, useGetUserByIdQuery } from "@/redux/api";
 import { useState, useEffect } from "react";
+import SectionHeading from "@/components/atoms/text/section-heading";
 
 interface BeaconPreviewProps {
   beacon: {
@@ -130,7 +131,12 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
 
           {/* Description */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">About this Beacon</h3>
+            <SectionHeading 
+              title="About this Beacon"
+              icon={<FileText className="w-4 h-4 text-primary" />}
+              underline={false}
+              className="mb-2"
+            />
             <p className="text-muted-foreground">
               {beacon.ItemDescription ||
                 "Your beacon description will appear here..."}

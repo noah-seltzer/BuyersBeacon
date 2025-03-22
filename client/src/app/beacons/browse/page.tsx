@@ -10,6 +10,7 @@ import ImagePreview from "@/components/molecules/image-preview";
 import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
 import { Input } from "@/components/atoms/input";
 import { Button } from "@/components/atoms/button";
+import PageHeading from "@/components/atoms/text/page-heading";
 
 const BrowseBeaconsPage: FC = () => {
   const { data: beacons } = useGetBeaconsQuery();
@@ -56,10 +57,10 @@ const BrowseBeaconsPage: FC = () => {
     <div className="min-h-screen">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-primary mb-2">Browse Beacons</h1>
-        <p className="text-muted-foreground text-lg">
-          {filteredBeacons.length} Beacons {query ? 'found' : 'available'}
-        </p>
+        <PageHeading 
+          title="Browse Beacons"
+          subtitle={`${filteredBeacons.length} Beacons ${query ? 'found' : 'available'}`}
+        />
       </div>
 
       {/* Main Content */}

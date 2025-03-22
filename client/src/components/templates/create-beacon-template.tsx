@@ -8,6 +8,7 @@ import Link from "next/link";
 import { SerializedError } from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { FC } from "react";
+import PageHeading from "../atoms/text/page-heading";
 
 interface CreateBeaconTemplateProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement> | undefined) => void;
@@ -58,14 +59,11 @@ const CreateBeaconTemplate: FC<CreateBeaconTemplateProps> = ({
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {isEditing ? "Edit Beacon" : "Create New Beacon"}
-              </h1>
-              <p className="text-foreground/60 mt-1">
-                Let sellers know what you&#39;re looking for
-              </p>
-            </div>
+            <PageHeading
+              title={isEditing ? "Edit Beacon" : "Create New Beacon"}
+              subtitle="Let sellers know what you're looking for"
+              className="mb-0"
+            />
           </div>
 
           {/* Form and Preview Grid */}

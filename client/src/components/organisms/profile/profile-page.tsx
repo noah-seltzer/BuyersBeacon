@@ -22,6 +22,8 @@ import Image from "next/image";
 import UserRatingSummary from "@/components/molecules/user-rating-summary";
 import ReviewForm from "@/components/molecules/review-form";
 import ReviewsList from "@/components/molecules/reviews-list";
+import SectionHeading from "@/components/atoms/text/section-heading";
+import PageHeading from "@/components/atoms/text/page-heading";
 
 interface ProfilePageProps {
   profile: User;
@@ -136,18 +138,15 @@ export const ProfilePage: FC<ProfilePageProps> = ({
             <Card className="overflow-hidden border-border/50 bg-background/50 backdrop-blur-sm shadow-sm">
               <div className="p-8">
                 {/* User Info Header */}
-                <div className="flex flex-row justify-between items-center mb-6">
-                  <h1 className="text-2xl md:text-3xl font-bold">
-                    {profile.displayName}
-                  </h1>
-
-                  {/* Action Buttons for non-owners */}
-                  {!isOwnProfile && (
+                <PageHeading 
+                  title={profile.displayName}
+                  rightContent={!isOwnProfile && (
                     <Button className="bg-primary hover:bg-primary/90 rounded-full text-white">
                       Contact {profile.displayName.split(" ")[0]}
                     </Button>
                   )}
-                </div>
+                  className="mb-6"
+                />
 
                 {/* Bio Section */}
                 {profile.bio && (
@@ -175,17 +174,10 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           <div className="absolute top-12 -left-32 w-64 h-64 rounded-full bg-primary/5 blur-3xl opacity-60"></div>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold relative">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-full">
-                <Star className="w-4 h-4 text-primary" />
-              </div>
-              {isOwnProfile ? "Your Reviews" : `${possessiveName} Reviews`}
-            </div>
-            <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/30 rounded-full"></div>
-          </h2>
-        </div>
+        <SectionHeading 
+          title={isOwnProfile ? "Your Reviews" : `${possessiveName} Reviews`}
+          icon={<Star className="w-4 h-4 text-primary" />}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Reviews List */}
@@ -208,21 +200,17 @@ export const ProfilePage: FC<ProfilePageProps> = ({
 
       {/* Beacons Section */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-semibold relative">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-full">
-                <ArrowRight className="w-4 h-4 text-primary" />
-              </div>
-              {isOwnProfile ? "Your Beacons" : `${possessiveName} Beacons`}
+        <SectionHeading 
+          title={isOwnProfile ? "Your Beacons" : `${possessiveName} Beacons`}
+          icon={<ArrowRight className="w-4 h-4 text-primary" />}
+          rightContent={
+            <div className="text-sm bg-primary/10 px-3 py-1 rounded-full text-primary font-medium">
+              {beacons?.length || 0} beacon
+              {(beacons?.length || 0) !== 1 ? "s" : ""} posted
             </div>
-            <div className="absolute -bottom-2 left-0 w-full h-1 bg-primary/30 rounded-full"></div>
-          </h2>
-          <div className="text-sm bg-primary/10 px-3 py-1 rounded-full text-primary font-medium">
-            {beacons?.length || 0} beacon
-            {(beacons?.length || 0) !== 1 ? "s" : ""} posted
-          </div>
-        </div>
+          }
+          className="mb-8"
+        />
 
         {beaconsLoading ? (
           <div className="flex justify-center py-12">
