@@ -23,7 +23,6 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
     return null;
   }
 
-  // Get the avatar URL using the same approach as detailed-beacon.tsx
   const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
@@ -32,7 +31,7 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
       className="flex items-center gap-2 hover:text-primary transition-colors"
       onClick={(e) => e.stopPropagation()}
     >
-      {/* User avatar - Matching the approach in detailed-beacon.tsx */}
+      {/* User avatar*/}
       <div className="relative h-6 w-6">
         {avatarUrl ? (
           <Image
@@ -53,7 +52,6 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
       
       <div className="flex flex-col">
         <span className="text-xs font-medium truncate">{userData.displayName}</span>
-        {/* Use the UserRatingSummary component instead of manually building the rating display */}
         <div className="scale-75 origin-left -ml-1 -mt-1">
           <UserRatingSummary userId={userId} showTags={false} />
         </div>

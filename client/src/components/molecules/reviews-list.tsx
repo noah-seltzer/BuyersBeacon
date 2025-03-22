@@ -2,11 +2,46 @@ import { FC } from "react";
 import { Card } from "@/components/atoms/card";
 import { StarRating } from "./star-rating";
 import { Badge } from "@/components/atoms/badge";
-import { useGetUserReviewsQuery } from "@/redux/api";
+import { useGetUserReviewsQuery, useGetUserByIdQuery } from "@/redux/api";
 import { ClimbingBoxLoader } from "react-spinners";
 import { format } from "date-fns";
-import { User } from "lucide-react";
+import { User2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+
+interface ReviewerAvatarProps {
+  userId: string;
+}
+
+const ReviewerAvatar: FC<ReviewerAvatarProps> = ({ userId }) => {
+  const { data: userData } = useGetUserByIdQuery(userId);
+  const { user: clerkUser } = useUser();
+  
+  const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
+  
+  return (
+    <div className="relative h-8 w-8">
+      {avatarUrl ? (
+        <Image
+          src={avatarUrl}
+          alt={userData?.displayName || "User"}
+          fill
+          className="rounded-full object-cover border-2 border-primary/10"
+          sizes="32px"
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.style.display = "none"; // Hide the image on error
+          }}
+        />
+      ) : (
+        <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+          <User2 className="h-4 w-4 text-primary/80" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface ReviewsListProps {
   userId: string;
@@ -37,9 +72,7 @@ export const ReviewsList: FC<ReviewsListProps> = ({ userId }) => {
         <Card key={review.reviewId} className="p-4 border-border/30 hover:border-primary/30 hover:shadow-sm transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="bg-primary/10 rounded-full p-2">
-                <User className="h-3.5 w-3.5 text-primary/80" />
-              </div>
+              <ReviewerAvatar userId={review.reviewer.userId} />
               <Link 
                 href={`/profile/${review.reviewer.userId}`} 
                 className="font-medium hover:text-primary hover:underline transition-colors"
