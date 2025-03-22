@@ -6,7 +6,7 @@ import { MapPin, User } from "lucide-react";
 import ImagePreview from "@/components/molecules/image-preview";
 import { formatPrice } from "@/lib/format";
 import StarRating from "@/components/molecules/star-rating";
-import { useGetUserByIdQuery } from "@/redux/api";
+import { useGetUserByIdQuery, useGetUserRatingQuery } from "@/redux/api";
 
 interface BeaconThumbnailProps {
   beacon: Beacon;
@@ -14,10 +14,14 @@ interface BeaconThumbnailProps {
 
 const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
   const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const { data: userRating } = useGetUserRatingQuery(userId);
 
   if (isLoading || !user) {
     return null;
   }
+
+  // Get the avatar URL or use default
+  const avatarUrl = user.avatarUrl || user.imageUrl || "/default-avatar.png";
 
   return (
     <Link
@@ -25,12 +29,37 @@ const UserInfoWithRating: FC<{ userId: string }> = ({ userId }) => {
       className="flex items-center gap-2 hover:text-primary transition-colors"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted">
-        <User className="w-3.5 h-3.5 text-foreground/70" />
+      {/* User avatar */}
+      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-primary/10">
+        {avatarUrl ? (
+          <div className="w-full h-full relative">
+            <img 
+              src={avatarUrl} 
+              alt={user.displayName} 
+              className="object-cover w-full h-full"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.style.display = 'none';
+                img.parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-muted"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-foreground/70"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>';
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-muted">
+            <User className="w-3.5 h-3.5 text-foreground/70" />
+          </div>
+        )}
       </div>
       <div className="flex flex-col">
         <span className="text-xs font-medium truncate">{user.displayName}</span>
-        {user.averageRating ? (
+        {userRating?.averageRating ? (
+          <div className="flex items-center gap-1">
+            <StarRating value={userRating.averageRating} size="sm" />
+            <span className="text-[10px] text-muted-foreground">
+              ({userRating.totalReviews || 0})
+            </span>
+          </div>
+        ) : user.averageRating ? (
           <div className="flex items-center gap-1">
             <StarRating value={user.averageRating} size="sm" />
             <span className="text-[10px] text-muted-foreground">
