@@ -1,25 +1,14 @@
 import { FC } from "react";
-
 import { Beacon } from "@/types/beacon";
-
 import { Card } from "@/components/atoms/card";
-
 import Link from "next/link";
-
 import { MapPin, User, User2 } from "lucide-react";
-
 import ImagePreview from "@/components/molecules/image-preview";
-
 import { formatPrice } from "@/lib/format";
-
 import StarRating from "@/components/molecules/star-rating";
-
 import { useGetUserByIdQuery } from "@/redux/api";
-
 import Image from "next/image";
-
 import { useUser } from "@clerk/nextjs";
-
 import UserRatingSummary from "@/components/molecules/user-rating-summary";
 
 interface BeaconThumbnailProps {
