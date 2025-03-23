@@ -1,13 +1,13 @@
-import { FC } from "react";
+import { FC, useState, useRef } from "react";
 import { User } from "@/types/user";
 import { Card } from "@/components/atoms/card";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Textarea } from "@/components/atoms/textarea";
-import { useUpdateProfileMutation } from "@/redux/api";
+import { useUpdateProfileMutation, useUploadProfileImageMutation } from "@/redux/api";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { Loader2, User2 } from "lucide-react";
+import { Camera, Loader2, User2 } from "lucide-react";
 import { useToast } from "@/components/atoms/use-toast";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
@@ -18,17 +18,22 @@ interface ProfileEditFormProps {
 
 export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
   const [updateProfile] = useUpdateProfileMutation();
+  const [uploadProfileImage] = useUploadProfileImageMutation();
   const router = useRouter();
   const { toast } = useToast();
   const { user: clerkUser } = useUser();
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const avatarUrl = clerkUser?.imageUrl || user.avatarUrl || "/default-avatar.png";
+  // Prioritize the local avatarUrl over Clerk's imageUrl
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png");
 
-  const { handleSubmit, handleChange, values, isSubmitting } = useFormik({
+  const { handleSubmit, handleChange, values, isSubmitting, setFieldValue } = useFormik({
     initialValues: {
       displayName: user.displayName || clerkUser?.firstName || "Anonymous User",
       bio: user.bio,
       location: user.location,
+      avatarUrl: user.avatarUrl || "",
     },
     onSubmit: async (values) => {
       try {
@@ -56,28 +61,94 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
     },
   });
 
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Preview the image locally first
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setIsUploading(true);
+    try {
+      // Upload the image to the server
+      const response = await uploadProfileImage(file).unwrap();
+      // Set the avatar URL field in the form
+      setFieldValue("avatarUrl", response.url);
+      setIsUploading(false);
+      
+      toast({
+        title: "Image Uploaded",
+        description: "Your profile picture has been updated!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Failed to upload profile image:", error);
+      setIsUploading(false);
+      
+      toast({
+        title: "Upload Failed",
+        description: "There was a problem uploading your profile picture. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <Card className="max-w-2xl mx-auto">
       <div className="p-6">
         <div className="flex justify-center mb-6">
-          <div className="relative w-20 h-20">
+          <div 
+            className="relative w-24 h-24 cursor-pointer group" 
+            onClick={handleImageClick}
+          >
             {avatarUrl ? (
-              <Image
-                src={avatarUrl}
-                alt={user.displayName}
-                fill
-                className="rounded-full object-cover border-4 border-background"
-                sizes="80px"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.style.display = "none";
-                }}
-              />
+              <>
+                <Image
+                  src={avatarUrl}
+                  alt={user.displayName}
+                  fill
+                  className="rounded-full object-cover border-4 border-background"
+                  sizes="96px"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = "/default-avatar.png";
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+              </>
             ) : (
-              <User2 className="w-20 h-20 text-muted-foreground" />
+              <User2 className="w-24 h-24 text-muted-foreground" />
+            )}
+            
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              </div>
             )}
           </div>
+          
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            className="hidden" 
+            accept="image/*"
+            onChange={handleImageChange}
+          />
         </div>
+        
+        <p className="text-center text-sm text-muted-foreground mb-6">
+          Click on the image to change your profile picture
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
@@ -127,7 +198,7 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            <Button type="submit" className="flex-1" disabled={isSubmitting || isUploading}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />

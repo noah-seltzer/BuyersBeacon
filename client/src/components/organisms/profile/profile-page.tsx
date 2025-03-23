@@ -61,14 +61,8 @@ export const ProfilePage: FC<ProfilePageProps> = ({
 
   const { user: clerkUser } = useUser();
 
-  const avatarUrl =
-    isOwnProfile && clerkUser?.imageUrl
-      ? clerkUser.imageUrl
-      : profile.avatarUrl
-      ? profile.avatarUrl
-      : clerkUser?.imageUrl
-      ? clerkUser.imageUrl
-      : "/default-avatar.png";
+  // Prioritize the user's stored avatarUrl over Clerk's imageUrl
+  const avatarUrl = profile.avatarUrl || (isOwnProfile && clerkUser?.imageUrl) || "/default-avatar.png";
 
   const formattedJoinDate = profile.joinedDate
     ? new Date(profile.joinedDate).toLocaleDateString(undefined, {

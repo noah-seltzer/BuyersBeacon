@@ -39,7 +39,9 @@ export function UserMenu() {
     fullProfile?.displayName ||
     beaconUser?.displayName ||
     "Update your profile";
-  const avatarUrl = clerkUser?.imageUrl || "/default-avatar.png";
+  
+  // Prioritize the user's stored avatarUrl over Clerk's imageUrl
+  const avatarUrl = fullProfile?.avatarUrl || beaconUser?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
   return (
     <DropdownMenu>

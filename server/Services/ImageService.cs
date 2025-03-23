@@ -81,7 +81,18 @@ namespace server.Services
 
 
             return beacon;
-
+        }
+        
+        public async Task<string> UploadImageAsync(IFormFile imageFile)
+        {
+            // Generate a unique identifier for the file
+            var fileId = Guid.NewGuid().ToString();
+            
+            // Upload the file to blob storage
+            await _blobServiceManager.uploadFile(fileId, imageFile.OpenReadStream(), imageFile.ContentType);
+            
+            // Return the URL where the image can be accessed
+            return $"{BlobStorageURLBase}/{fileId}";
         }
     }
 }

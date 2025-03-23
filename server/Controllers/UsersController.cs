@@ -68,7 +68,8 @@ namespace server.Controllers
                 bio = user.Bio,
                 location = user.Location,
                 joinedDate = user.JoinedDate,
-                // The image URL will come from the client side using Clerk's SDK
+                avatarUrl = user.AvatarUrl,
+                // Fall back to Clerk's image URL if needed
             });
         }
 
@@ -295,6 +296,7 @@ namespace server.Controllers
                 user.Bio,
                 user.Location,
                 user.JoinedDate,
+                user.AvatarUrl,
                 BeaconCount = user.Beacons?.Count ?? 0
             });
         }
@@ -321,9 +323,66 @@ namespace server.Controllers
             user.DisplayName = profile.DisplayName;
             user.Bio = profile.Bio;
             user.Location = profile.Location;
+            
+            // Update avatar URL if provided
+            if (!string.IsNullOrEmpty(profile.AvatarUrl))
+            {
+                user.AvatarUrl = profile.AvatarUrl;
+            }
 
             await _context.SaveChangesAsync();
             return Ok(user);
+        }
+
+        [HttpPost("profile-image")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UploadProfileImage([FromServices] IImageService imageService)
+        {
+            // Verify the authenticated user
+            var clerkId = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            if (clerkId == null)
+            {
+                return Unauthorized();
+            }
+            
+            // Find the user
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+                
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            
+            // Check if there's an image in the request
+            if (Request.Form.Files.Count == 0)
+            {
+                return BadRequest("No image file provided");
+            }
+            
+            var imageFile = Request.Form.Files[0];
+            if (imageFile.Length == 0)
+            {
+                return BadRequest("Empty image file");
+            }
+            
+            try
+            {
+                // Upload image to blob storage
+                var imageUrl = await imageService.UploadImageAsync(imageFile);
+                
+                // Update user's avatar URL
+                user.AvatarUrl = imageUrl;
+                await _context.SaveChangesAsync();
+                
+                return Ok(new { url = imageUrl });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to upload image: {ex.Message}");
+            }
         }
 
         private bool UserExists(Guid id)

@@ -22,6 +22,9 @@ namespace server.Models
         [MaxLength(100)]
         public string? Location { get; set; } = "Location not set";
 
+        [MaxLength(1000)]
+        public string? AvatarUrl { get; set; }
+
         public DateTime JoinedDate { get; set; } = DateTime.UtcNow;
 
         // Rating information
