@@ -4,16 +4,14 @@ import Title from "@/components/atoms/text/title";
 import DetailedBeacon from "@/components/organisms/beacons/detailed-beacon";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetBeaconQuery } from "@/redux/api";
+import { Beacon } from "@/types/beacon";
 
 interface BeaconDetailsPageTemplate {
-  beaconId?: string;
+  beacon: Beacon | undefined,
+  isLoading: boolean,
 }
 
-const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
-  const {
-    data: beacon,
-    isLoading,
-  } = useGetBeaconQuery(beaconId ?? skipToken);
+const BeaconDetailsPageTemplate = ({ beacon, isLoading }: BeaconDetailsPageTemplate) => {
 
 
   return (
