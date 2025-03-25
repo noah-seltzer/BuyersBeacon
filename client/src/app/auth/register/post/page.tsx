@@ -27,8 +27,8 @@ const PostRegisterPage: FC = async () => {
 
     const data = await beaconUser.json()
     const user: User = {
-        id: data.userId,
-        clerk_user_id: data.clerkId
+        UserId: data.userId,
+        ClerkId: data.clerkId
     }
     return (
         <>

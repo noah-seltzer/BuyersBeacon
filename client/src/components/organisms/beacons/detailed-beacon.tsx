@@ -10,10 +10,11 @@ import Link from "next/link";
 interface DetailedBeaconProps {
   beacon: Beacon;
   category: Category;
-  handleOnChat: () => any
+  handleOnChat: () => any;
+  isOwner: boolean;
 }
 
-const DetailedBeacon = ({ beacon, category, handleOnChat }: DetailedBeaconProps) => {
+const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner }: DetailedBeaconProps) => {
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
@@ -88,11 +89,14 @@ const DetailedBeacon = ({ beacon, category, handleOnChat }: DetailedBeaconProps)
       </div>
 
       {/* Contact Section */}
-      <div className="flex justify-end mt-4">
-        <Button variant="default" size="lg" className="px-8" onClick={handleOnChat}>
-          Get in Touch
-        </Button>
-      </div>
+      {
+        !isOwner && handleOnChat &&
+        <div className="flex justify-end mt-4">
+          <Button variant="default" size="lg" className="px-8" onClick={handleOnChat}>
+            Get in Touch
+          </Button>
+        </div>
+      }
     </div>
   );
 };

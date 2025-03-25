@@ -12,6 +12,8 @@ namespace server.Services
         {
             _context = context;
         }
+        
+
         public async Task<Beacon?> GetById(Guid id)
         {
             return await _context.Beacons
@@ -19,6 +21,28 @@ namespace server.Services
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                 .ThenInclude(i => i.Images)
+                .Include(b => b.User)
+                .Select(b =>  new Beacon
+                {
+                    BeaconId = Guid.NewGuid(), // Assign a new unique ID
+                    UserId = b.UserId, // Copy UserId
+                    CategoryId = b.CategoryId,
+                    DateCreate = b.DateCreate,
+                    DateUpdate = b.DateUpdate, // Set updated timestamp for cloning
+                    ItemName = b.ItemName,
+                    ItemDescription = b.ItemDescription,
+                    ItemPrice = b.ItemPrice,
+                    LocCity = b.LocCity,
+                    LocRegion = b.LocRegion,
+                    LocCountry = b.LocCountry,
+                    LocPostalCode = b.LocPostalCode,
+                    IsDraft = b.IsDraft,
+                    LastDraftSave = b.LastDraftSave,
+                    Category = b.Category,
+                    ImageSet = b.ImageSet,
+                    Chats = b.Chats,
+                    User = b.User != null ? new User { ClerkId = b.User.ClerkId } : null
+                })
                 .FirstOrDefaultAsync();
         }
 

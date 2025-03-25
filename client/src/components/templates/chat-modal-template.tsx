@@ -15,8 +15,8 @@ const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ messages, setClos
 
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-96 h-[500px] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-background rounded-lg shadow-xl w-96 h-[500px] flex flex-col border-2 border-primary">
                 <div className="flex justify-between items-center p-4 border-b">
                     <h2 className="text-xl font-semibold">Chat</h2>
                     <button

@@ -7,11 +7,11 @@ import { setUser, setUserId } from "@/redux/auth-slice"
 import { redirect } from "next/navigation"
 
 
-export type SignInClientStateManagerProps = {user: User, redirectUrl?: string}
+export type SignInClientStateManagerProps = { user: User, redirectUrl?: string }
 
 const SignInClientStateManager: FC<SignInClientStateManagerProps> = ({ user, redirectUrl }) => {
     const dispatch = useDispatch()
-    dispatch(setUserId(user.id))
+    dispatch(setUserId(user.UserId))
     dispatch(setUser(user))
     if (redirectUrl) {
         redirect(redirectUrl)

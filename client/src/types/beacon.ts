@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface BeaconImage {
   imageId?: string;
   imageSetId?: string;
@@ -18,6 +20,7 @@ export interface Beacon {
   Category?: Category;
   BeaconId?: string;
   UserId?: string;
+  User?: User;
   ItemName: string;
   CategoryId?: string;
   ItemDescription: string;

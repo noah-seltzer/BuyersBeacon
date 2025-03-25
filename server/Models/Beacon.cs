@@ -12,9 +12,11 @@ namespace server.Models
         [JsonPropertyName("BeaconId")]
         public Guid BeaconId { get; set; }
 
+        [JsonPropertyName("UserId")]
         public Guid UserId { get; set; }
 
         [ForeignKey("UserId")]
+        [JsonPropertyName("User")]
         public User? User { get; set; }
 
         [JsonPropertyName("CategoryId")]

@@ -2,17 +2,16 @@
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import Title from "@/components/atoms/text/title";
 import DetailedBeacon from "@/components/organisms/beacons/detailed-beacon";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetBeaconQuery } from "@/redux/api";
 import { Beacon } from "@/types/beacon";
 
 interface BeaconDetailsPageTemplate {
   beacon: Beacon | undefined,
   isLoading: boolean,
-  handleOnChat: () => any
+  handleOnChat: () => any,
+  isOwner: boolean
 }
 
-const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat }: BeaconDetailsPageTemplate) => {
+const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat, isOwner }: BeaconDetailsPageTemplate) => {
 
 
   return (
@@ -25,7 +24,7 @@ const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat }: BeaconDe
               <Title className="mt-10">Loading Beacon....</Title>
             </div>
           ) : (
-            <DetailedBeacon handleOnChat={handleOnChat} beacon={beacon} category={beacon.Category} />
+            <DetailedBeacon handleOnChat={handleOnChat} beacon={beacon} category={beacon.Category} isOwner={isOwner} />
           )}
         </div>
       </div>
