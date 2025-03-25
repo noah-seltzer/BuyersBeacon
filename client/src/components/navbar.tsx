@@ -13,7 +13,8 @@ export function Navbar() {
     const { theme, setTheme } = useTheme()
     const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-
+    
+    
     const NavLink = ({
         href,
         children,
@@ -51,7 +52,6 @@ export function Navbar() {
                     </Link>
                     <div className='hidden md:flex items-center gap-6'>
                         <NavLink href='/beacons/browse'>Browse</NavLink>
-                        <NavLink href='/categories'>Categories</NavLink>
                         <NavLink href='/about'>About</NavLink>
                         <NavLink href='/beacons/drafts'>Drafts</NavLink>
                     </div>
@@ -87,7 +87,10 @@ export function Navbar() {
                         )}
                     </Button>
                     <SignedOut>
-                        <SignInButton>
+                        <SignInButton
+                            fallbackRedirectUrl='/auth'
+                            signUpFallbackRedirectUrl='/auth'
+                        >
                         <Button
                             variant='default'
                             className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
@@ -95,7 +98,10 @@ export function Navbar() {
                             Sign In
                         </Button>
                         </SignInButton>
-                        <SignUpButton>
+                        <SignUpButton
+                            fallbackRedirectUrl='/auth'
+                            signInFallbackRedirectUrl='/auth'
+                        >
                         <Button
                             variant='default'
                             className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
@@ -113,7 +119,7 @@ export function Navbar() {
                             variant='default'
                             className='bg-primary hover:bg-primary/90 text-white hidden md:flex'
                         >
-                            Post Beacon
+                            Create Beacon
                         </Button>
                     </Link>
                     <Button
@@ -145,12 +151,6 @@ export function Navbar() {
                     >
                         Browse
                     </NavLink>
-                    <NavLink
-                        href='/categories'
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Categories
-                    </NavLink>
                     <NavLink href='/about' onClick={() => setIsMenuOpen(false)}>
                         About
                     </NavLink>
@@ -165,7 +165,7 @@ export function Navbar() {
                             variant='default'
                             className='bg-primary hover:bg-primary/90 text-white w-full mt-2'
                         >
-                            Post Beacon
+                            Create Beacon
                         </Button>
                     </Link>
                 </div>

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using server.Services;
+using System.Security.Authentication;
 
 namespace server.Controllers
 {
@@ -10,10 +12,12 @@ namespace server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClerkService _clerkService;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, IClerkService clerkService)
         {
             _context = context;
+            _clerkService = clerkService;
         }
 
         /// <summary>
@@ -75,6 +79,18 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetUserByClerkId(string clerkId)
         {
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+
+            //if (authed == null)
+            //{
+            //    return Unauthorized("Not Authorized");
+            //}
+
+            //if (authed != clerkId)
+            //{
+            //    return Unauthorized("Wrong User");
+            //}
+
             var user = await _context.Users
                 .Where(u => u.ClerkId == clerkId)
                 .Select(u => new User
@@ -84,10 +100,56 @@ namespace server.Controllers
                 })
                 .FirstOrDefaultAsync();
 
+
+
+
             if (user == null)
             {
                 return NotFound();
             }
+
+            return user;
+        }
+
+        [HttpPost("clerk/{clerkId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<User>> CreateUserByClerkId(string clerkId)
+        {
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+
+            if (authed == null)
+            {
+                return Unauthorized("Not Authorized");
+            }
+
+            if (authed != clerkId)
+            {
+                return Unauthorized("Wrong User");
+            }
+            var existingUser = await _context.Users
+                .Where(u => u.ClerkId == clerkId)
+                .Select(u => new User
+                {
+                    UserId = u.UserId,
+                    ClerkId = u.ClerkId
+                })
+                .FirstOrDefaultAsync();
+
+            if (existingUser != null)
+            {
+                return existingUser;
+            }
+
+            var user = new User();
+
+            user.UserId = Guid.NewGuid();
+            user.ClerkId = clerkId;
+
+            _context.Users.Add(user);
+
+            await _context.SaveChangesAsync();
+
 
             return user;
         }

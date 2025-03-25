@@ -1,5 +1,4 @@
 import { ChangeEvent, useState, DragEvent } from "react";
-import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { ImagePlus, X, Upload } from "lucide-react";
 import Image from "next/image";
@@ -28,7 +27,6 @@ export function ImageUpload({
 
     const newImages: BeaconImage[] = files.map((file) => ({
       file,
-      isCover: value.length === 0, // First image is cover by default
     }));
 
     onChange([...value, ...newImages]);
@@ -62,10 +60,6 @@ export function ImageUpload({
 
   const handleRemove = (index: number) => {
     const newImages = value.filter((_, i) => i !== index);
-    // If we removed the cover photo, make the first image the cover
-    if (value[index].isCover && newImages.length > 0) {
-      newImages[0].isCover = true;
-    }
     onChange(newImages);
   };
 
@@ -77,16 +71,16 @@ export function ImageUpload({
             <div className="relative w-full h-full rounded-lg border overflow-hidden">
               <Image
                 src={
-                  typeof image.file === "string"
+                  !!image.file && typeof image.file === "string"
                     ? image.file
-                    : URL.createObjectURL(image.file)
+                    : URL.createObjectURL(image.file as Blob)
                 }
                 alt={`Image ${index + 1}`}
                 fill
                 className="object-cover"
               />
               <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                {image.isCover ? "Cover Photo" : `Photo ${index + 1}`}
+                {index === 0 ? "Cover Photo" : `Photo ${index + 1}`}
               </div>
               <button
                 onClick={() => handleRemove(index)}

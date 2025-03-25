@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { PropsWithChildren, FC } from 'react'
 import Providers from '@/components/providers'
+import { ThemeProvider } from 'next-themes'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -25,7 +26,14 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => {
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <Providers>{children}</Providers>
+                <ThemeProvider
+                    attribute='class'
+                    defaultTheme='dark'
+                    enableSystem={false}
+                    disableTransitionOnChange
+                >
+                    <Providers>{children}</Providers>
+                </ThemeProvider>
             </body>
         </html>
     )

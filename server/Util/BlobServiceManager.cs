@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using dotenv.net;
 
 namespace server.Util
 {
@@ -8,11 +9,8 @@ namespace server.Util
     {
         public BlobServiceManager()
         {
-            var str = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+            var str = DotEnv.Read()["AZURE_STORAGE_CONNECTION_STRING"];
             this.Client = new BlobServiceClient(str);
-                //new Uri("https://buyersbeaconstorage.blob.core.windows.net"),
-                //new DefaultAzureCredential());
-            //this.config = config;
             this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
         }
 

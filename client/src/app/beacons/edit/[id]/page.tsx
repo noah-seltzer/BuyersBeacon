@@ -2,7 +2,7 @@
 
 import { FC, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useGetBeaconByIdQuery, useGetAllCategoriesQuery } from "@/redux/api";
+import { useGetBeaconQuery, useGetAllCategoriesQuery } from "@/redux/api";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
 import { useFormik } from "formik";
 import { Beacon } from "@/types/beacon";
@@ -10,8 +10,9 @@ import { Loader2 } from "lucide-react";
 
 const EditBeaconPage: FC = () => {
   const { id } = useParams();
-  const { data: beacon, isLoading: beaconLoading, error: beaconError } = useGetBeaconByIdQuery(id as string);
+  const { data: beacon, isLoading: beaconLoading, error: beaconError } = useGetBeaconQuery(id as string);
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useGetAllCategoriesQuery();
+
 
   const categoryOptions = categories?.map(cat => ({
     label: cat.CategoryName.charAt(0).toUpperCase() + cat.CategoryName.slice(1),

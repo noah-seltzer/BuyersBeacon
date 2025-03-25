@@ -61,7 +61,7 @@ export function BeaconForm({
 
         <SelectInput
           name={"CategoryId"}
-          value={values.CategoryId}
+          value={values.CategoryId || ''}
           onChange={handleChange}
           options={categoryOptions}
           categoryOptionsIsLoading={categoryOptionsIsLoading}
@@ -86,6 +86,77 @@ export function BeaconForm({
               {errors.ItemDescription}
             </p>
           )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Price
+          </label>
+          <Input
+            type="number"
+            name="ItemPrice"
+            placeholder="Enter price"
+            onChange={handleChange}
+            value={values.ItemPrice || ""}
+            className="mt-2"
+          />
+          {touched.ItemPrice && errors.ItemPrice && (
+            <p className="text-sm text-destructive mt-1">{errors.ItemPrice}</p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              City
+            </label>
+            <Input
+              name="LocCity"
+              placeholder="Enter city"
+              onChange={handleChange}
+              value={values.LocCity || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Region/Province
+            </label>
+            <Input
+              name="LocRegion"
+              placeholder="Enter region/province"
+              onChange={handleChange}
+              value={values.LocRegion || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Country
+            </label>
+            <Input
+              name="LocCountry"
+              placeholder="Enter country"
+              onChange={handleChange}
+              value={values.LocCountry || ""}
+              className="mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Postal Code
+            </label>
+            <Input
+              name="LocPostalCode"
+              placeholder="Enter postal code"
+              onChange={handleChange}
+              value={values.LocPostalCode || ""}
+              className="mt-2"
+            />
+          </div>
         </div>
 
         <div>
@@ -133,7 +204,7 @@ export function BeaconForm({
               Creating Beacon...
             </>
           ) : (
-            "Create Beacon"
+            "Post Beacon"
           )}
         </Button>
       </div>
