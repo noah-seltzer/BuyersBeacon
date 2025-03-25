@@ -9,9 +9,10 @@ import { Beacon } from "@/types/beacon";
 interface BeaconDetailsPageTemplate {
   beacon: Beacon | undefined,
   isLoading: boolean,
+  handleOnChat: () => any
 }
 
-const BeaconDetailsPageTemplate = ({ beacon, isLoading }: BeaconDetailsPageTemplate) => {
+const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat }: BeaconDetailsPageTemplate) => {
 
 
   return (
@@ -24,7 +25,7 @@ const BeaconDetailsPageTemplate = ({ beacon, isLoading }: BeaconDetailsPageTempl
               <Title className="mt-10">Loading Beacon....</Title>
             </div>
           ) : (
-            <DetailedBeacon beacon={beacon} category={beacon.Category} />
+            <DetailedBeacon handleOnChat={handleOnChat} beacon={beacon} category={beacon.Category} />
           )}
         </div>
       </div>

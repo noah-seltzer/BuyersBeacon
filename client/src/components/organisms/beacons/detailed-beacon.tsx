@@ -10,9 +10,10 @@ import Link from "next/link";
 interface DetailedBeaconProps {
   beacon: Beacon;
   category: Category;
+  handleOnChat: () => any
 }
 
-const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
+const DetailedBeacon = ({ beacon, category, handleOnChat }: DetailedBeaconProps) => {
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
@@ -88,7 +89,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
 
       {/* Contact Section */}
       <div className="flex justify-end mt-4">
-        <Button variant="default" size="lg" className="px-8">
+        <Button variant="default" size="lg" className="px-8" onClick={handleOnChat}>
           Get in Touch
         </Button>
       </div>
