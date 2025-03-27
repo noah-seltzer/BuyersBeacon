@@ -2,10 +2,12 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Beacon, Category } from '@/types/beacon'
 import Cookies from 'js-cookie'
 import { createBeaconFormdata } from '../lib/beacon-utils'
+import { Chat } from '@/types/chat'
 
 export enum ENDPOINTS {
     CATEGORIES = 'Categories',
     BEACONS = 'Beacons',
+    CHAT = 'Chat'
 }
 enum CACHES {
     BEACONS = 'Beacon',
@@ -22,7 +24,7 @@ export const beaconApi = createApi({
     reducerPath: 'beaconApi',
     baseQuery: fetchBaseQuery({
         mode: 'cors',
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api',
+        baseUrl: (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/') + 'api/',
         prepareHeaders: (headers) => {
             const sessionToken = Cookies.get('__session')
             if (sessionToken) {
@@ -37,13 +39,13 @@ export const beaconApi = createApi({
                 const drafts = arg && arg.drafts ? true : false
                 const id = arg && arg.userId ? arg.userId : undefined
 
-              return {
-                url: ENDPOINTS.BEACONS,
-                params: {
-                  drafts,
-                  userId: id
+                return {
+                    url: ENDPOINTS.BEACONS,
+                    params: {
+                        drafts,
+                        userId: id
+                    }
                 }
-              }
             },
             transformResponse: (response: Beacon[]) =>
                 response.map((beacon) => ({
@@ -54,13 +56,13 @@ export const beaconApi = createApi({
                         beaconId: beacon.imageSet?.beaconId
                     }
                 }))
-                ,
+            ,
             providesTags: (result, error, arg) => {
                 const type = arg && arg.drafts ? CACHES.DRAFTS : CACHES.BEACONS
                 return [{ type, id: LIST_ID }]
 
             }
-              
+
         }),
         createBeacon: builder.mutation<Beacon, Beacon>({
             query: (payload) => {
@@ -110,9 +112,24 @@ export const beaconApi = createApi({
                 method: 'DELETE'
             }),
             invalidatesTags: () => [
-              { type: CACHES.BEACONS, id: LIST_ID },
-              { type: CACHES.DRAFTS, id: LIST_ID }
+                { type: CACHES.BEACONS, id: LIST_ID },
+                { type: CACHES.DRAFTS, id: LIST_ID }
             ]
+        }),
+        getChat: builder.query<Chat, string>({
+            query: (id) => `${ENDPOINTS.CHAT}/${id}`
+        }),
+        getChats: builder.query<Chat[], string>({
+            query: (clerkId) => {
+                return {
+                    url: `${ENDPOINTS.CHAT}`,
+                    params: {
+                        clerkId
+                    }
+
+                }
+
+            }
         })
     })
 })
@@ -122,5 +139,7 @@ export const {
     useCreateBeaconMutation,
     useGetAllCategoriesQuery,
     useGetBeaconQuery,
-    useDeleteBeaconMutation
+    useDeleteBeaconMutation,
+    useGetChatsQuery,
+    useLazyGetChatsQuery
 } = beaconApi

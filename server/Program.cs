@@ -49,7 +49,8 @@ builder.Services.AddCors(options =>
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "https://buyers-beacon-client.vercel.app")
                              .AllowAnyHeader()
-                             .AllowAnyMethod();
+                             .AllowAnyMethod()
+                             .AllowCredentials();
         });
 });
 
@@ -82,7 +83,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ChatHub>("/chathub");
 
 
 app.UseSwagger();

@@ -4,7 +4,6 @@ import BeaconDetailsPageTemplate from "@/components/templates/beacon-deatails.te
 import { useGetBeaconQuery } from "@/redux/api";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useParams } from "next/navigation";
-import useChat from "@/services/chat";
 import { useChatModal } from "@/components/providers/chat-provider";
 import { useUser } from "@clerk/nextjs";
 
@@ -20,11 +19,9 @@ const BeaconDetailsPage = () => {
 
 
     const handleOnChat = useCallback((beaconId: string) => {
-        console.log('HANDLE ON CHAT')
-        openChat();
+        openChat(beaconId);
     }, [])
 
-    console.log(user?.id, beacon?.User?.ClerkId)
 
     return <Suspense fallback={<div>Loading</div>}>
         <BeaconDetailsPageTemplate

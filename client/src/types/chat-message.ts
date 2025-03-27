@@ -2,11 +2,11 @@ import { User } from "@/types/user";
 import { Chat } from "@/types/chat";
 
 export interface ChatMessage {
-    ChatMessageId: string,
+    ChatMessageId?: string,
     ChatId: string,
     Chat?: Chat,
     UserId: string,
-    User: User,
+    User?: User,
     Message: string,
-    SendDateTime: Date,
+    SendDateTime?: Date,
 }

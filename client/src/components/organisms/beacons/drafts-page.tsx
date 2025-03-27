@@ -10,10 +10,10 @@ import Link from 'next/link'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { User } from '@/types/user'
 import { FC } from 'react'
-const DraftsPage: FC<{user: User}> = ({ user }) => {
+const DraftsPage: FC<{ user: User }> = ({ user }) => {
 
 
-    const { data: drafts, isLoading } = useGetBeaconsQuery(!!user ? { drafts: true, userId: user.id } : skipToken)
+    const { data: drafts, isLoading } = useGetBeaconsQuery(!!user ? { drafts: true, userId: user.UserId } : skipToken)
     const [deleteDraft] = useDeleteBeaconMutation()
 
     const handleDelete = async (e: React.MouseEvent, id: string) => {
@@ -55,8 +55,8 @@ const DraftsPage: FC<{user: User}> = ({ user }) => {
                                         Last saved:{' '}
                                         {draft.LastDraftSave
                                             ? new Date(
-                                                  draft.LastDraftSave
-                                              ).toLocaleDateString()
+                                                draft.LastDraftSave
+                                            ).toLocaleDateString()
                                             : 'Never'}
                                     </p>
                                 </div>

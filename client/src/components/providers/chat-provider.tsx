@@ -3,9 +3,16 @@ import React, {
     useState,
     useContext,
     ReactNode,
-    useCallback
+    useCallback,
+    useEffect
 } from 'react';
 import ChatModalTemplate from '../templates/chat-modal-template';
+import { Chat } from '@/types/chat';
+import { useLazyGetChatsQuery } from '@/redux/api';
+import { useAuth } from '@clerk/nextjs';
+import { toast } from 'react-toastify';
+import { skipToken } from '@reduxjs/toolkit/query';
+import useChat from '@/services/chat';
 
 // Define the shape of the chat context
 interface ChatModalContextType {
@@ -31,7 +38,6 @@ export const ChatModalProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [currentBeaconId, setCurrentBeaconId] = useState<string | null>(null);
 
     const openChat = useCallback((beaconId?: string) => {
-        console.log("OPEN CHAT", beaconId)
         setCurrentBeaconId(beaconId ?? null);
         setIsOpen(true);
     }, []);
@@ -74,9 +80,69 @@ export const useChatModal = () => {
 
 export const ChatModalEngine = () => {
     const { isOpen, currentBeaconId, openChat, closeChat } = useChatModal();
+    const { sendMessage, isConnected } = useChat({})
+    const [focusedChat, setFocusedChat] = useState<Chat | null>(null);
+    const { isSignedIn, userId } = useAuth()
+    const [getChats, { data: chats, isLoading, isError }] = useLazyGetChatsQuery()
 
+    const handleBeaconIdChange = useCallback(async (currentBeaconId: null | string) => {
+        // If chats is null return to home of chat modal 
+        if (!chats) {
+            return;
+        }
 
+        if (!currentBeaconId) {
+            setFocusedChat(null);
+            return;
+        }
 
+        // If Chat is not found locally attempt to get it
+        const chat = chats.findIndex(c => c.BeacondId === currentBeaconId);
+
+        if (chat === -1) {
+            const toastId = toast.loading("Chat not found. Initializing new chat....");
+
+            // Create new chat
+            setTimeout(() => {
+                toast.dismiss(toastId)
+                toast.success("New chat created.");
+            }, 2000)
+        } else {
+            setFocusedChat(chats[chat]);
+        }
+
+        // If beacon is not found in api create a new chat with beacon owner. 
+    }, [chats])
+
+    useEffect(() => {
+        handleBeaconIdChange(currentBeaconId)
+    }, [currentBeaconId])
+
+    const initializeChat = async (userId: string) => {
+        await getChats(userId);
+    }
+
+    useEffect(() => {
+        if (isSignedIn && userId) {
+            console.log("INITIALIZE CHATS")
+            initializeChat(userId);
+        }
+    }, [isSignedIn, userId])
+
+    const testSendMessage = async () => {
+        console.log("TEST SEND MESSAGE")
+        sendMessage({
+            ChatMessageId: '5',
+            ChatId: '5',
+            UserId: '5',
+            Message: '5',
+            SendDateTime: undefined,
+            User: undefined
+        })
+    }
+    useEffect(() => {
+        isConnected && testSendMessage()
+    }, [isConnected])
 
     return <ChatModalTemplate
         messages={[]}
