@@ -241,35 +241,65 @@ namespace server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific user
+        /// Deletes a specific user and transfers beacon ownership to the Deleted User
         /// </summary>
         /// <param name="id">The GUID of the user to delete</param>
         /// <returns>No content if successful</returns>
         /// <response code="204">If the user was successfully deleted</response>
         /// <response code="404">If the user is not found</response>
-        /// <response code="400">If the user has associated beacons</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var user = await _context.Users
+            // Verify the authenticated user matches the profile being deleted or is an admin
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            var userToDelete = await _context.Users
                 .Include(u => u.Beacons)
                 .FirstOrDefaultAsync(u => u.UserId == id);
 
-            if (user == null)
+            if (userToDelete == null)
             {
                 return NotFound();
             }
 
-            if (user.Beacons?.Any() == true)
+            if (authed == null || authed != userToDelete.ClerkId)
             {
-                ModelState.AddModelError("", "Cannot delete user with associated beacons");
-                return BadRequest(ModelState);
+                return Unauthorized("You are not authorized to delete this user");
             }
 
-            _context.Users.Remove(user);
+            // Find or create a "Deleted User" account
+            var deletedUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.DisplayName == "Deleted User" && u.ClerkId == "deleted_user");
+
+            if (deletedUser == null)
+            {
+                // Create a new "Deleted User" if one doesn't exist
+                deletedUser = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    ClerkId = "deleted_user",
+                    DisplayName = "Deleted User",
+                    Bio = "This account represents a deleted user",
+                    Location = "Unknown",
+                    JoinedDate = DateTime.UtcNow
+                };
+                _context.Users.Add(deletedUser);
+                await _context.SaveChangesAsync();
+            }
+
+            // Transfer ownership of all beacons to the "Deleted User"
+            if (userToDelete.Beacons?.Any() == true)
+            {
+                foreach (var beacon in userToDelete.Beacons)
+                {
+                    beacon.UserId = deletedUser.UserId;
+                    beacon.User = deletedUser;
+                }
+            }
+
+            // Delete the user
+            _context.Users.Remove(userToDelete);
             await _context.SaveChangesAsync();
 
             return NoContent();
