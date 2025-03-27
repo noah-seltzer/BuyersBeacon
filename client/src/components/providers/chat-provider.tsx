@@ -80,10 +80,32 @@ export const useChatModal = () => {
 
 export const ChatModalEngine = () => {
     const { isOpen, currentBeaconId, openChat, closeChat } = useChatModal();
-    const { sendMessage, isConnected, initializeChat } = useChat({})
+    const [chats, setChats] = useState<Chat[]>([]);
     const [focusedChat, setFocusedChat] = useState<Chat | null>(null);
     const { isSignedIn, userId } = useAuth()
-    const [getChats, { data: chats, isLoading, isError }] = useLazyGetChatsQuery()
+    const [getChats, { data: fetchedChats, isLoading, isError }] = useLazyGetChatsQuery()
+
+
+
+
+
+    const handleRecieveMessage = (chatId: string, senderId: string, message: string) => {
+
+    }
+
+    const onNewChat = useCallback((chat: Chat) => {
+        const chatIndex = chats?.findIndex(c => c.ChatId === chat.ChatId);
+
+        if (chatIndex !== -1) return;
+
+        toast.info("A new chat has appeared. Maybe its someone that needs your beacon.")
+        setChats([chat, ...chats]);
+    }, [chats])
+
+    const { sendMessage, isConnected, initializeChat } = useChat({
+        onNewChat,
+        handleRecieveMessage
+    })
 
     const handleBeaconIdChange = useCallback(async (currentBeaconId: null | string) => {
         // If chats is null return to home of chat modal 
@@ -97,7 +119,7 @@ export const ChatModalEngine = () => {
         }
 
         // If Chat is not found locally attempt to get it
-        const chat = chats.findIndex(c => c.BeacondId === currentBeaconId);
+        const chat = chats.findIndex(c => c.BeaconId === currentBeaconId);
 
         if (chat === -1) {
             let toastId = toast.loading("Chat not found. Initializing new chat....");
@@ -109,11 +131,11 @@ export const ChatModalEngine = () => {
         }
 
         // If beacon is not found in api create a new chat with beacon owner. 
-    }, [chats])
+    }, [chats, initializeChat, isConnected])
 
     useEffect(() => {
         handleBeaconIdChange(currentBeaconId)
-    }, [currentBeaconId])
+    }, [currentBeaconId, handleBeaconIdChange])
 
     const initializeState = async (userId: string) => {
         await getChats(userId);
@@ -125,6 +147,8 @@ export const ChatModalEngine = () => {
             initializeState(userId);
         }
     }, [isSignedIn, userId])
+
+    console.log("CHATS", chats)
 
     return <ChatModalTemplate
         messages={[]}

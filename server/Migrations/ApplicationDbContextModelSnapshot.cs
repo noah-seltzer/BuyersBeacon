@@ -27,14 +27,14 @@ namespace server.Migrations
                     b.Property<Guid>("ChatsChatId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PartcipantsUserId")
+                    b.Property<Guid>("ParticipantsUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ChatsChatId", "PartcipantsUserId");
+                    b.HasKey("ChatsChatId", "ParticipantsUserId");
 
-                    b.HasIndex("PartcipantsUserId");
+                    b.HasIndex("ParticipantsUserId");
 
-                    b.ToTable("ChatUser");
+                    b.ToTable("ChatUser", (string)null);
                 });
 
             modelBuilder.Entity("server.Models.Beacon", b =>
@@ -259,13 +259,13 @@ namespace server.Migrations
                     b.HasOne("server.Models.Chat", null)
                         .WithMany()
                         .HasForeignKey("ChatsChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("server.Models.User", null)
                         .WithMany()
-                        .HasForeignKey("PartcipantsUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ParticipantsUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -308,7 +308,7 @@ namespace server.Migrations
                     b.HasOne("server.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Chat");

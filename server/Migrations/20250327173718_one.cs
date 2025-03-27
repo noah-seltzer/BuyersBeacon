@@ -130,7 +130,7 @@ namespace server.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -138,23 +138,23 @@ namespace server.Migrations
                 columns: table => new
                 {
                     ChatsChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PartcipantsUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ParticipantsUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatUser", x => new { x.ChatsChatId, x.PartcipantsUserId });
+                    table.PrimaryKey("PK_ChatUser", x => new { x.ChatsChatId, x.ParticipantsUserId });
                     table.ForeignKey(
                         name: "FK_ChatUser_Chats_ChatsChatId",
                         column: x => x.ChatsChatId,
                         principalTable: "Chats",
                         principalColumn: "ChatId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChatUser_Users_PartcipantsUserId",
-                        column: x => x.PartcipantsUserId,
+                        name: "FK_ChatUser_Users_ParticipantsUserId",
+                        column: x => x.ParticipantsUserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -205,9 +205,9 @@ namespace server.Migrations
                 column: "BeaconId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatUser_PartcipantsUserId",
+                name: "IX_ChatUser_ParticipantsUserId",
                 table: "ChatUser",
-                column: "PartcipantsUserId");
+                column: "ParticipantsUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ImageSetId",

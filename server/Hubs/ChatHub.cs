@@ -26,7 +26,7 @@ namespace server.Hubs
             var beacon = await _context.Beacons
                 .Include(b => b.User)
                 .Include(c => c.Chats)
-                .ThenInclude(c => c.Partcipants)
+                .ThenInclude(c => c.Participants)
                 .Where(b => b.BeaconId == beaconId)
                 .FirstOrDefaultAsync();
 
@@ -47,8 +47,8 @@ namespace server.Hubs
 
             // Check if the CLU already is a participant of the chat.
             var existingChat = await (
-                    from chat in _context.Chats.Include(c => c.Partcipants)
-                    where chat.BeaconId == beacon.BeaconId && chat.Partcipants.Any(u => u.UserId == clu.UserId)
+                    from chat in _context.Chats.Include(c => c.Participants)
+                    where chat.BeaconId == beacon.BeaconId && chat.Participants.Any(u => u.UserId == clu.UserId)
                     select chat
                 ).FirstOrDefaultAsync();
 
@@ -63,7 +63,7 @@ namespace server.Hubs
             {
                 ChatId = new Guid(),
                 BeaconId = beaconId,
-                Partcipants = [clu, beacon.User]
+                Participants = [clu, beacon.User]
             };
 
             _context.Chats.Add(newChat);

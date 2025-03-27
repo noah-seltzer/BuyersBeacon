@@ -18,18 +18,18 @@ namespace server.Controllers
             _context = context;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{chatId}/{clerkId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Chat>> GetChat(Guid id)
+        public async Task<ActionResult<Chat>> GetChat(Guid chatId, string clerkId)
         {
-            var chat = await (from chats in _context.Chats.Include(c => c.Messages)
-                              where chats.BeaconId == id
-                              select chats).ToListAsync();
+            var chatRes = await (from chat in _context.Chats.Include(c => c.Messages).Include(c => c.Participants)
+                                 where chat.ChatId == chatId && chat.Participants.Any(u => u.ClerkId == clerkId)
+                              select chat).FirstOrDefaultAsync();
 
-            if (chat == null || !chat.Any()) return NotFound("Chat not found");
+            if (chatRes == null) return NotFound("Chat not found");
 
-            return Ok(chat); 
+            return Ok(chatRes); 
         }
 
 
@@ -39,7 +39,7 @@ namespace server.Controllers
         public async Task<ActionResult<Chat>> GetChats([FromQuery] string clerkId)
         {
             var chat = await (from chats in _context.Chats.Include(c => c.Messages)
-                              where chats.Partcipants.Any(p => p.ClerkId == clerkId)
+                              where chats.Participants.Any(p => p.ClerkId == clerkId)
                               select chats).ToListAsync();
 
             if (chat == null) return NotFound("Chat not found");

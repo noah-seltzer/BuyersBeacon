@@ -12,7 +12,8 @@ export default async function drafts() {
         <CreateBeaconPage user={user} />
       </Suspense>
     )
-  } catch {
+  } catch (err) {
+    console.log("CREATE BEACON PAGE ERROR", err);
     return (
       <div className='text-center py-8'>
         <p className='text-muted-foreground'>No drafts found</p>

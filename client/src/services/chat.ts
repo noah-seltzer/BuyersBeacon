@@ -4,34 +4,35 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { Chat } from '@/types/chat';
+import { useLazyGetChatQuery } from '@/redux/api';
 
 interface UseChatResults {
     sendMessage: (_message: ChatMessage) => Promise<void>,
     isConnected: boolean,
-    initializeChat: (_beaconId: string) => Promise<boolean>
+    initializeChat: (_beaconId: string) => Promise<boolean>,
 }
 
 interface UseChatProps {
-    onNewChat: (_chat: Chat) => void
+    onNewChat: (_chat: Chat) => any;
+    handleRecieveMessage: (chatId: string, senderId: string, message: string) => Promise<void> | void;
 }
 
-const useChat = ({ }: UseChatProps): UseChatResults => {
+export enum SINGAL_R_EVENTS {
+    RECIEVE_MESSAGE = "ReceiveMessage",
+    NEW_CHAT = "NewChat"
+}
+
+
+const useChat = ({
+    onNewChat,
+    handleRecieveMessage
+}: UseChatProps): UseChatResults => {
     const { isSignedIn, isLoaded } = useAuth();
     const { user } = useUser();
+    const [getChat] = useLazyGetChatQuery();
     const [connection, setConnection] = useState<HubConnection | null>(null);
     const [connectionCreated, setConnectionCreated] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
-
-
-    const onNewChat = (chatId: string, beaconId: string, recipientId: string) => {
-        console.log(`📩 [NewChat] Received on client -> ChatId: ${chatId}, BeaconId: ${beaconId}, User: ${recipientId}`);
-        toast.success(`New chat started with ${recipientId}`);
-    }
-
-    const onRecieveMessage = (chatId: string, senderId: string, message: string) => {
-        console.log(`New chat initialized - ChatId: ${chatId},  User: ${senderId}, Message: ${message}`);
-        toast.success(`New chat started with ${senderId}`);
-    }
 
     // Connect when signedIn, 
     useEffect(() => {
@@ -72,17 +73,36 @@ const useChat = ({ }: UseChatProps): UseChatResults => {
             console.log("Disconnected from SignalR");
         });
 
-
-        // Set up listeners
-        connection.on("ReceiveMessage", onRecieveMessage);
-        connection.on("NewChat", onNewChat);
-
         return () => {
             connection.off("messageReceived");
         };
     }, [connection]);
 
 
+    const handleNewChat = useCallback(async (chatId: string, _beaconId: string, recipientId: string) => {
+        // See if message applies to CLU
+        if (recipientId !== user?.id) return;
+        const res = await getChat({ chatId, clerkId: user.id });
+
+        if (!res.data) return;
+
+        onNewChat(res.data)
+    }, [user, onNewChat]);
+
+
+    // Set up listeners
+    useEffect(() => {
+
+        if (!connection || !connectionCreated) return;
+
+        // Remove old ones.
+        connection.off(SINGAL_R_EVENTS.NEW_CHAT)
+        connection.off(SINGAL_R_EVENTS.RECIEVE_MESSAGE)
+
+        // Set up listeners
+        connection.on(SINGAL_R_EVENTS.RECIEVE_MESSAGE, handleRecieveMessage);
+        connection.on(SINGAL_R_EVENTS.NEW_CHAT, handleNewChat);
+    }, [connection, connectionCreated, handleNewChat, handleRecieveMessage])
 
 
     const sendMessage = useCallback(async (message: ChatMessage): Promise<void> => {
@@ -96,7 +116,6 @@ const useChat = ({ }: UseChatProps): UseChatResults => {
     }, [connected, connection])
 
     const initializeChat = useCallback(async (beaconId: string): Promise<boolean> => {
-
         if (!connection) throw Error("Connection must be created before initializing chat");
         if (!user) throw Error("User must be logged in and exist before initailizing chat");
         try {
@@ -115,7 +134,7 @@ const useChat = ({ }: UseChatProps): UseChatResults => {
     return {
         sendMessage,
         isConnected: connected,
-        initializeChat
+        initializeChat,
     }
 
 }

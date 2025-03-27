@@ -118,8 +118,8 @@ export const beaconApi = createApi({
                 { type: CACHES.DRAFTS, id: LIST_ID }
             ]
         }),
-        getChat: builder.query<Chat, string>({
-            query: (id) => `${ENDPOINTS.CHAT}/${id}`
+        getChat: builder.query<Chat, { chatId: string, clerkId: string }>({
+            query: ({ chatId, clerkId }) => `${ENDPOINTS.CHAT}/${chatId}/${clerkId}`
         }),
         getChats: builder.query<Chat[], string>({
             query: (clerkId) => {
@@ -143,5 +143,6 @@ export const {
     useGetBeaconQuery,
     useDeleteBeaconMutation,
     useGetChatsQuery,
+    useLazyGetChatQuery,
     useLazyGetChatsQuery
 } = beaconApi

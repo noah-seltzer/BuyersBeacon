@@ -4,7 +4,7 @@ import { ChatMessage } from "@/types/chat-message";
 
 export interface Chat {
     ChatId: string,
-    BeacondId: string,
+    BeaconId: string,
     Beacon?: Beacon,
     Participants: User[],
     Messages: ChatMessage[],

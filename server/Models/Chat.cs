@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 namespace server.Models
 {
@@ -20,7 +21,8 @@ namespace server.Models
         [JsonPropertyName("Beacon")]
         public Beacon? Beacon { get; set; }
 
-        public ICollection<User>? Partcipants { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public ICollection<User>? Participants { get; set; }
 
         public ICollection<ChatMessage>? Messages { get; set; }
     }
