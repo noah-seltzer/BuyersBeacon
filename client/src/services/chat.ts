@@ -1,21 +1,37 @@
 import { HubConnectionBuilder, HubConnection, LogLevel } from '@microsoft/signalr';
 import { ChatMessage } from "@/types/chat-message"
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
+import { toast } from 'react-toastify';
+import { Chat } from '@/types/chat';
 
 interface UseChatResults {
     sendMessage: (_message: ChatMessage) => Promise<void>,
-    isConnected: boolean
+    isConnected: boolean,
+    initializeChat: (_beaconId: string) => Promise<boolean>
 }
 
 interface UseChatProps {
-
+    onNewChat: (_chat: Chat) => void
 }
+
 const useChat = ({ }: UseChatProps): UseChatResults => {
     const { isSignedIn, isLoaded } = useAuth();
+    const { user } = useUser();
     const [connection, setConnection] = useState<HubConnection | null>(null);
     const [connectionCreated, setConnectionCreated] = useState<boolean>(false);
     const [connected, setConnected] = useState<boolean>(false);
+
+
+    const onNewChat = (chatId: string, beaconId: string, recipientId: string) => {
+        console.log(`📩 [NewChat] Received on client -> ChatId: ${chatId}, BeaconId: ${beaconId}, User: ${recipientId}`);
+        toast.success(`New chat started with ${recipientId}`);
+    }
+
+    const onRecieveMessage = (chatId: string, senderId: string, message: string) => {
+        console.log(`New chat initialized - ChatId: ${chatId},  User: ${senderId}, Message: ${message}`);
+        toast.success(`New chat started with ${senderId}`);
+    }
 
     // Connect when signedIn, 
     useEffect(() => {
@@ -56,6 +72,11 @@ const useChat = ({ }: UseChatProps): UseChatResults => {
             console.log("Disconnected from SignalR");
         });
 
+
+        // Set up listeners
+        connection.on("ReceiveMessage", onRecieveMessage);
+        connection.on("NewChat", onNewChat);
+
         return () => {
             connection.off("messageReceived");
         };
@@ -74,9 +95,27 @@ const useChat = ({ }: UseChatProps): UseChatResults => {
         }
     }, [connected, connection])
 
+    const initializeChat = useCallback(async (beaconId: string): Promise<boolean> => {
+
+        if (!connection) throw Error("Connection must be created before initializing chat");
+        if (!user) throw Error("User must be logged in and exist before initailizing chat");
+        try {
+            await connection.invoke("InitializeChat", beaconId, user.id)
+            toast.success("Chat initialized.")
+            return true
+        } catch (err: any) {
+            toast.error("Error intializing chat. Please try again.")
+            return false;
+        }
+
+    }, [user, connection])
+
+
+
     return {
         sendMessage,
-        isConnected: connected
+        isConnected: connected,
+        initializeChat
     }
 
 }

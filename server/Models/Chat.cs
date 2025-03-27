@@ -16,7 +16,7 @@ namespace server.Models
         [Required]
         public Guid BeaconId { get; set; }
 
-        [ForeignKey("BeacondId")]
+        [ForeignKey("BeaconId")]
         [JsonPropertyName("Beacon")]
         public Beacon? Beacon { get; set; }
 

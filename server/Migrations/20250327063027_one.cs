@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace server.Migrations
 {
     /// <inheritdoc />
-    public partial class chatv1 : Migration
+    public partial class one : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,21 +71,21 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chat",
+                name: "Chats",
                 columns: table => new
                 {
                     ChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BeaconId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BeacondId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    BeaconId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chat", x => x.ChatId);
+                    table.PrimaryKey("PK_Chats", x => x.ChatId);
                     table.ForeignKey(
-                        name: "FK_Chat_Beacons_BeacondId",
-                        column: x => x.BeacondId,
+                        name: "FK_Chats_Beacons_BeaconId",
+                        column: x => x.BeaconId,
                         principalTable: "Beacons",
-                        principalColumn: "BeaconId");
+                        principalColumn: "BeaconId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,25 +107,26 @@ namespace server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatMessage",
+                name: "ChatMessages",
                 columns: table => new
                 {
                     ChatMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SendDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatMessage", x => x.ChatMessageId);
+                    table.PrimaryKey("PK_ChatMessages", x => x.ChatMessageId);
                     table.ForeignKey(
-                        name: "FK_ChatMessage_Chat_ChatId",
+                        name: "FK_ChatMessages_Chats_ChatId",
                         column: x => x.ChatId,
-                        principalTable: "Chat",
+                        principalTable: "Chats",
                         principalColumn: "ChatId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatMessage_Users_UserId",
+                        name: "FK_ChatMessages_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -143,9 +144,9 @@ namespace server.Migrations
                 {
                     table.PrimaryKey("PK_ChatUser", x => new { x.ChatsChatId, x.PartcipantsUserId });
                     table.ForeignKey(
-                        name: "FK_ChatUser_Chat_ChatsChatId",
+                        name: "FK_ChatUser_Chats_ChatsChatId",
                         column: x => x.ChatsChatId,
-                        principalTable: "Chat",
+                        principalTable: "Chats",
                         principalColumn: "ChatId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -189,19 +190,19 @@ namespace server.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Chat_BeacondId",
-                table: "Chat",
-                column: "BeacondId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessage_ChatId",
-                table: "ChatMessage",
+                name: "IX_ChatMessages_ChatId",
+                table: "ChatMessages",
                 column: "ChatId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatMessage_UserId",
-                table: "ChatMessage",
+                name: "IX_ChatMessages_UserId",
+                table: "ChatMessages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Chats_BeaconId",
+                table: "Chats",
+                column: "BeaconId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatUser_PartcipantsUserId",
@@ -225,7 +226,7 @@ namespace server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChatMessage");
+                name: "ChatMessages");
 
             migrationBuilder.DropTable(
                 name: "ChatUser");
@@ -234,7 +235,7 @@ namespace server.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
-                name: "Chat");
+                name: "Chats");
 
             migrationBuilder.DropTable(
                 name: "ImageSets");

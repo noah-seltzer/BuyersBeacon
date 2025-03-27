@@ -80,7 +80,7 @@ export const useChatModal = () => {
 
 export const ChatModalEngine = () => {
     const { isOpen, currentBeaconId, openChat, closeChat } = useChatModal();
-    const { sendMessage, isConnected } = useChat({})
+    const { sendMessage, isConnected, initializeChat } = useChat({})
     const [focusedChat, setFocusedChat] = useState<Chat | null>(null);
     const { isSignedIn, userId } = useAuth()
     const [getChats, { data: chats, isLoading, isError }] = useLazyGetChatsQuery()
@@ -100,13 +100,10 @@ export const ChatModalEngine = () => {
         const chat = chats.findIndex(c => c.BeacondId === currentBeaconId);
 
         if (chat === -1) {
-            const toastId = toast.loading("Chat not found. Initializing new chat....");
-
-            // Create new chat
-            setTimeout(() => {
-                toast.dismiss(toastId)
-                toast.success("New chat created.");
-            }, 2000)
+            let toastId = toast.loading("Chat not found. Initializing new chat....");
+            const res = await initializeChat(currentBeaconId);
+            toast.dismiss(toastId);
+            if (!res) return;
         } else {
             setFocusedChat(chats[chat]);
         }
@@ -118,31 +115,16 @@ export const ChatModalEngine = () => {
         handleBeaconIdChange(currentBeaconId)
     }, [currentBeaconId])
 
-    const initializeChat = async (userId: string) => {
+    const initializeState = async (userId: string) => {
         await getChats(userId);
     }
 
     useEffect(() => {
         if (isSignedIn && userId) {
             console.log("INITIALIZE CHATS")
-            initializeChat(userId);
+            initializeState(userId);
         }
     }, [isSignedIn, userId])
-
-    const testSendMessage = async () => {
-        console.log("TEST SEND MESSAGE")
-        sendMessage({
-            ChatMessageId: '5',
-            ChatId: '5',
-            UserId: '5',
-            Message: '5',
-            SendDateTime: undefined,
-            User: undefined
-        })
-    }
-    useEffect(() => {
-        isConnected && testSendMessage()
-    }, [isConnected])
 
     return <ChatModalTemplate
         messages={[]}

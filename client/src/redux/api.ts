@@ -19,12 +19,14 @@ export const LIST_ID = 'LIST'
 
 export interface GetBeaconQueryInput { drafts?: boolean, userId?: string }
 
+const DEFAULT_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/')
+
 export const beaconApi = createApi({
     tagTypes: [CACHES.BEACONS, CACHES.CATEGORIES, CACHES.DRAFTS],
     reducerPath: 'beaconApi',
     baseQuery: fetchBaseQuery({
         mode: 'cors',
-        baseUrl: (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/') + 'api/',
+        baseUrl: DEFAULT_URL + 'api/',
         prepareHeaders: (headers) => {
             const sessionToken = Cookies.get('__session')
             if (sessionToken) {

@@ -144,12 +144,9 @@ namespace server.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasAnnotation("Relational:JsonPropertyName", "BeaconId");
 
-                    b.Property<Guid?>("BeacondId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("ChatId");
 
-                    b.HasIndex("BeacondId");
+                    b.HasIndex("BeaconId");
 
                     b.ToTable("Chats");
 
@@ -293,7 +290,9 @@ namespace server.Migrations
                 {
                     b.HasOne("server.Models.Beacon", "Beacon")
                         .WithMany("Chats")
-                        .HasForeignKey("BeacondId");
+                        .HasForeignKey("BeaconId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Beacon");
                 });
