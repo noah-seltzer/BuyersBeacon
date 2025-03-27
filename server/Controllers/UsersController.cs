@@ -251,8 +251,8 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            // Verify the authenticated user matches the profile being deleted or is an admin
+        {admin
+            // Verify the authenticated user matches the profile being deleted
             var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
             var userToDelete = await _context.Users
                 .Include(u => u.Beacons)
