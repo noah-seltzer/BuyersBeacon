@@ -23,7 +23,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Chat>> GetChat(Guid chatId, string clerkId)
         {
-            var chatRes = await (from chat in _context.Chats.Include(c => c.Messages).Include(c => c.Participants)
+            var chatRes = await (from chat in _context.Chats.Include(c => c.Messages).Include(c => c.Participants).Include(c => c.Beacon)
                                  where chat.ChatId == chatId && chat.Participants.Any(u => u.ClerkId == clerkId)
                               select chat).FirstOrDefaultAsync();
 

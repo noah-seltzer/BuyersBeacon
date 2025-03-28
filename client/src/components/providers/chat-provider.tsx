@@ -85,6 +85,8 @@ export const ChatModalEngine = () => {
     const { isSignedIn, userId } = useAuth()
     const [getChats, { data: fetchedChats, isLoading, isError }] = useLazyGetChatsQuery()
 
+    const unFocusChat = () => setFocusedChat(null);
+
 
 
 
@@ -94,8 +96,6 @@ export const ChatModalEngine = () => {
     }
 
     const onNewChat = useCallback((chat: Chat) => {
-
-        console.log("NEW CHAT", chat);
         const chatIndex = chats?.findIndex(c => c.ChatId === chat.ChatId);
 
         if (chatIndex !== -1) return;
@@ -145,16 +145,17 @@ export const ChatModalEngine = () => {
 
     useEffect(() => {
         if (isSignedIn && userId) {
-            console.log("INITIALIZE CHATS")
             initializeState(userId);
         }
     }, [isSignedIn, userId])
 
-    console.log("CHATS", chats)
 
     return <ChatModalTemplate
         messages={[]}
         open={isOpen}
         setClosed={closeChat}
+        chats={chats}
+        focusedChat={focusedChat}
+        unFocusChat={unFocusChat}
     />
 }
