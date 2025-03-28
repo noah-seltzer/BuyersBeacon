@@ -94,6 +94,8 @@ export const ChatModalEngine = () => {
     }
 
     const onNewChat = useCallback((chat: Chat) => {
+
+        console.log("NEW CHAT", chat);
         const chatIndex = chats?.findIndex(c => c.ChatId === chat.ChatId);
 
         if (chatIndex !== -1) return;

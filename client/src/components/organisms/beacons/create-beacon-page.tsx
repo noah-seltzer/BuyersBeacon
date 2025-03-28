@@ -46,7 +46,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         helpers.setSubmitting(true);
         const payload = { ...beacon }
         if (user) {
-          payload.UserId = user.id
+          payload.UserId = user.UserId
         }
         const res = await createBeacon(payload).unwrap();
         navigateToBeaconDetailsPage(router, res);
@@ -74,7 +74,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         // Don't set a default CategoryId
       };
       if (user) {
-        draftData.UserId = user.id
+        draftData.UserId = user.UserId
       }
 
       await createBeacon(draftData).unwrap();
@@ -85,6 +85,9 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       setDraftError("Failed to save draft. Please try again.");
     }
   };
+
+
+  console.log("USER", user)
 
   const {
     handleChange,

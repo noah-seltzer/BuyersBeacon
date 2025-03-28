@@ -13,7 +13,7 @@ const PostRegisterPage: FC = async () => {
     headers.set('Authorization', `Bearer ${token}`)
     headers.set("Content-Type", "application/json")
     const beaconUser = await fetch(
-        process.env.API_URL + 'users/clerk/' + clerkUserId,
+        process.env.API_URL + 'api/users/clerk/' + clerkUserId,
         {
             headers,
             method: 'POST',
@@ -21,7 +21,7 @@ const PostRegisterPage: FC = async () => {
     )
 
 
-    console.log(process.env.API_URL + 'users/clerk/' + clerkUserId);
+    console.log(process.env.API_URL + 'api/users/clerk/' + clerkUserId);
 
     console.log(beaconUser.status);
 

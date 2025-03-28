@@ -10,12 +10,14 @@ export const getUserSS = async () => {
     const headers = new Headers()
     headers.set('Authorization', `Bearer ${token}`)
     const beaconUser = await fetch(
-        process.env.API_URL + 'users/clerk/' + clerkUserId,
+        process.env.API_URL + 'api/users/clerk/' + clerkUserId,
         {
             headers
         }
     )
+
     const data = await beaconUser.json()
+    console.log("BEACON USER", data);
     const user: User = {
         UserId: data.UserId,
         ClerkId: data.ClerkId

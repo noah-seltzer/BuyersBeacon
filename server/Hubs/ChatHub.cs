@@ -17,7 +17,6 @@ namespace server.Hubs
 
         public async Task SendMessage(string user, string message)
         {
-            Console.WriteLine("CONNECTION MESSAGE!!!");
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
@@ -54,8 +53,8 @@ namespace server.Hubs
 
 
             // If the chat already exist. Send message to sender
-            if (existingChat != null) { 
-                await Clients.Caller.SendAsync("NewChat", existingChat.ChatId, existingChat.BeaconId, clu.ClerkId);
+            if (existingChat != null) {
+                await Clients.Caller.SendAsync("NewChat", existingChat.ChatId, existingChat.BeaconId,  new List<string> {clu.ClerkId});
                 return;
             }
 
@@ -68,7 +67,7 @@ namespace server.Hubs
 
             _context.Chats.Add(newChat);
             _context.SaveChangesAsync();
-            await Clients.All.SendAsync("NewChat", newChat.ChatId, newChat.BeaconId, beacon.User.ClerkId);
+            await Clients.All.SendAsync("NewChat", newChat.ChatId, newChat.BeaconId, new List<string> { beacon.User.ClerkId, clu.ClerkId });
         }
     }
 }

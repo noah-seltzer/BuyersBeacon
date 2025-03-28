@@ -62,7 +62,6 @@ const useChat = ({
             .start()
             .then(() => {
                 setConnected(true);
-                console.log("Connected to SignalR");
             })
             .catch((err) => console.error("Connection error:", err));
 
@@ -70,7 +69,6 @@ const useChat = ({
             setConnected(false);
             setConnection(connection);
             setConnectionCreated(false);
-            console.log("Disconnected from SignalR");
         });
 
         return () => {
@@ -79,9 +77,10 @@ const useChat = ({
     }, [connection]);
 
 
-    const handleNewChat = useCallback(async (chatId: string, _beaconId: string, recipientId: string) => {
+    const handleNewChat = useCallback(async (chatId: string, _beaconId: string, participants: string[]) => {
         // See if message applies to CLU
-        if (recipientId !== user?.id) return;
+        if (!user || !participants.some(p => p === user.id)) return;
+
         const res = await getChat({ chatId, clerkId: user.id });
 
         if (!res.data) return;
@@ -109,7 +108,6 @@ const useChat = ({
         if (!connection) throw Error("Connection must be created before sending message");
         try {
             await connection.invoke("SendMessage", message.ChatId, message.Message);
-            console.log("Message sent!");
         } catch (err) {
             console.log("Error sending message", err);
         }
