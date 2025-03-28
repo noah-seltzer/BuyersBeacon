@@ -38,7 +38,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Chat>> GetChats([FromQuery] string clerkId)
         {
-            var chat = await (from chats in _context.Chats.Include(c => c.Messages)
+            var chat = await (from chats in _context.Chats.Include(c => c.Messages).Include(c => c.Participants).Include(c => c.Beacon)
                               where chats.Participants.Any(p => p.ClerkId == clerkId)
                               select chats).ToListAsync();
 

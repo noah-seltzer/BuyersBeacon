@@ -86,6 +86,7 @@ export const ChatModalEngine = () => {
     const [getChats, { data: fetchedChats, isLoading, isError }] = useLazyGetChatsQuery()
 
     const unFocusChat = () => setFocusedChat(null);
+    const focusChat = (chat: Chat) => setFocusedChat(chat);
 
 
 
@@ -139,15 +140,18 @@ export const ChatModalEngine = () => {
         handleBeaconIdChange(currentBeaconId)
     }, [currentBeaconId, handleBeaconIdChange])
 
-    const initializeState = async (userId: string) => {
-        await getChats(userId);
-    }
+    const initializeState = useCallback(async (userId: string) => {
+        const res = await getChats(userId);
+        res.data && setChats([...res.data])
+    }, [])
 
     useEffect(() => {
         if (isSignedIn && userId) {
             initializeState(userId);
         }
-    }, [isSignedIn, userId])
+    }, [isSignedIn, userId, initializeState])
+
+    console.log(chats)
 
 
     return <ChatModalTemplate
@@ -157,5 +161,6 @@ export const ChatModalEngine = () => {
         chats={chats}
         focusedChat={focusedChat}
         unFocusChat={unFocusChat}
+        focusChat={focusChat}
     />
 }

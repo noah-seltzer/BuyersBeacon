@@ -4,6 +4,8 @@ import { Chat } from '@/types/chat';
 import React from 'react';
 import { ArrowLeftFromLine, Minimize } from 'lucide-react'
 import { Button } from '../atoms/button';
+import EmptyState from '../molecules/empty-state';
+import ChatListing from '../molecules/chat/chat';
 
 interface ChatModalTemplateProps {
     open: boolean,
@@ -12,12 +14,12 @@ interface ChatModalTemplateProps {
     chats: Chat[],
     focusedChat: Chat | null,
     unFocusChat: () => any
+    focusChat: (_chat: Chat) => any
 }
 
 
-const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ messages, setClosed, open, chats, focusedChat, unFocusChat }: ChatModalTemplateProps) => {
+const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ messages, setClosed, open, chats, focusedChat, unFocusChat, focusChat }: ChatModalTemplateProps) => {
 
-    console.log("FOCUSED CHAT", focusedChat);
     if (!open) return null;
 
 
@@ -85,7 +87,26 @@ const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ messages, setClos
                             </div>
                         </>
                         :
-                        <div></div>
+                        <>
+                            {
+                                chats.length === 0 ?
+                                    <div className="flex items-center justify-center h-full w-full">
+                                        <EmptyState
+                                            iconH={100}
+                                            iconW={100}
+                                            primaryText="No chats found"
+                                        />
+                                    </div>
+                                    :
+                                    <div className="flex flex-col items-center overflow-y-auto">
+                                        {chats.map(c => <ChatListing
+                                            chat={c}
+                                            selectChat={focusChat}
+                                        />)}
+                                    </div>
+
+                            }
+                        </>
                 }
             </div>
         </div>

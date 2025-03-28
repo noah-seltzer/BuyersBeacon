@@ -3,18 +3,20 @@
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Button } from './atoms/button'
-import { Moon, Sun, Search, Menu, X, Bell } from 'lucide-react'
+import { Moon, Sun, Search, Menu, X, Bell, MessageCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { SignedOut, SignedIn, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
+import { useChatModal } from './providers/chat-provider'
 
 export function Navbar() {
     const { theme, setTheme } = useTheme()
+    const { openChat, isOpen } = useChatModal()
     const pathname = usePathname()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    
-    
+
+
     const NavLink = ({
         href,
         children,
@@ -86,28 +88,38 @@ export function Navbar() {
                             <Moon className='h-5 w-5' />
                         )}
                     </Button>
+                    <SignedIn>
+                        <Button
+                            variant='ghost'
+                            size='icon'
+                            onClick={() => openChat()}
+                            className='text-foreground/80'
+                        >
+                            <MessageCircle className={`h-5 w-5 ${isOpen ? 'text-primary' : 'text-grey'}`} />
+                        </Button>
+                    </SignedIn>
                     <SignedOut>
                         <SignInButton
                             fallbackRedirectUrl='/auth'
                             signUpFallbackRedirectUrl='/auth'
                         >
-                        <Button
-                            variant='default'
-                            className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
-                        >
-                            Sign In
-                        </Button>
+                            <Button
+                                variant='default'
+                                className='bg-tertiary hover:bg-primary/90 text-white hidden md:flex'
+                            >
+                                Sign In
+                            </Button>
                         </SignInButton>
                         <SignUpButton
                             fallbackRedirectUrl='/auth'
                             signInFallbackRedirectUrl='/auth'
                         >
-                        <Button
-                            variant='default'
-                            className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
-                        >
-                            Sign Up
-                        </Button>
+                            <Button
+                                variant='default'
+                                className='bg-secondary hover:bg-primary/90 text-white hidden md:flex'
+                            >
+                                Sign Up
+                            </Button>
                         </SignUpButton>
                     </SignedOut>
 
