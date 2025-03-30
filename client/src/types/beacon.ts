@@ -19,7 +19,7 @@ export interface ImageSet {
 export interface Beacon {
   Category?: Category;
   BeaconId?: string;
-  UserId?: string;
+  userId?: string;
   ItemName: string;
   CategoryId?: string;
   ItemDescription: string;

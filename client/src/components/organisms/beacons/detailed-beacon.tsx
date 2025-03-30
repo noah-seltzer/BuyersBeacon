@@ -18,8 +18,7 @@ interface DetailedBeaconProps {
 }
 
 const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
-  // Update the userId extraction
-  const userId = beacon.userId || beacon.User?.userId;
+  const userId = beacon.userId;
 
   const { user: clerkUser } = useUser();
   const { data: userData, isLoading } = useGetUserByIdQuery(userId || "", {
