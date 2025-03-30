@@ -13,17 +13,15 @@ namespace server.Models
         public Guid ImageSetId { get; set; }
 
         [Required]
-        public string FileName  { get; set; }
-
+        public string FileName { get; set; }
 
         public string? ImageUrl { get; set; }
 
-        public string? ExternalImageId {  get; set; }
+        public string? ExternalImageId { get; set; }
 
         public string? MimeType { get; set; }
 
         [ForeignKey("ImageSetId")]
         public ImageSet? ImageSet { get; set; }
-
-    }   
+    }
 }

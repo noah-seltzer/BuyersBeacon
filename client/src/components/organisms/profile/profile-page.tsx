@@ -73,7 +73,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
   };
 
   // Prioritize the user's stored avatarUrl over Clerk's imageUrl
-  const avatarUrl = profile.avatarUrl || (isOwnProfile && clerkUser?.imageUrl) || "/default-avatar.png";
+  const avatarUrl = profile.avatarUrl || (isOwnProfile && clerkUser?.imageUrl) || "/default-avatar.webp";
 
   const formattedJoinDate = profile.joinedDate
     ? new Date(profile.joinedDate).toLocaleDateString(undefined, {
@@ -103,25 +103,19 @@ export const ProfilePage: FC<ProfilePageProps> = ({
               <div className="p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
                 <div className="relative w-24 h-24 mb-6">
-                  {avatarUrl ? (
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/10 shadow-md">
-                      <Image
-                        src={avatarUrl}
-                        alt={profile.displayName}
-                        fill
-                        className="object-cover"
-                        sizes="96px"
-                        onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = "none";
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center border-4 border-background/80">
-                      <User2 className="w-12 h-12 text-primary/60" />
-                    </div>
-                  )}
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/10 shadow-md">
+                    <Image
+                      src={avatarUrl}
+                      alt={profile.displayName}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "/default-avatar.webp";
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* User Rating Stars */}

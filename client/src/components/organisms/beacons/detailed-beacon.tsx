@@ -2,16 +2,15 @@ import { Button } from "@/components/atoms/button";
 import BodyText from "@/components/atoms/text/body";
 import SubTitle from "@/components/atoms/text/sub-title";
 import Title from "@/components/atoms/text/title";
+import BeaconInfoCard from "@/components/molecules/beacon-info-card";
 import ImagePreview from "@/components/molecules/image-preview";
+import UserCard from "@/components/molecules/user-card";
 import { Beacon, Category } from "@/types/beacon";
-import { MapPin, DollarSign, ArrowLeft, User2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { Card } from "@/components/atoms/card";
-import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { useGetUserByIdQuery } from "@/redux/api";
 import { ClimbingBoxLoader } from "react-spinners";
-import UserRatingSummary from "@/components/molecules/user-rating-summary";
 
 interface DetailedBeaconProps {
   beacon: Beacon;
@@ -19,8 +18,7 @@ interface DetailedBeaconProps {
 }
 
 const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
-  // Update the userId extraction
-  const userId = beacon.userId || beacon.User?.userId;
+  const userId = beacon.userId;
 
   const { user: clerkUser } = useUser();
   const { data: userData, isLoading } = useGetUserByIdQuery(userId || "", {
@@ -30,16 +28,6 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
-
-  const formatPrice = (price: number | undefined) => {
-    if (typeof price !== "number") return "$0.00";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
 
   const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
 
@@ -100,87 +88,11 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
 
         {/* Sidebar */}
         <div className="space-y-8">
-          {/* Author Card */}
-          <Card className="p-6">
-            <div className="flex flex-col gap-4">
-              {/* User Info - Make the whole section clickable */}
-              <Link
-                href={`/profile/${userData?.id}`}
-                className="flex items-center gap-4 hover:opacity-80"
-              >
-                <div className="relative h-12 w-12">
-                  {avatarUrl ? (
-                    <Image
-                      src={avatarUrl}
-                      alt={userData?.displayName || "User"}
-                      fill
-                      className="rounded-full object-cover border-4 border-background"
-                      sizes="48px"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        img.style.display = "none"; // Hide the image on error
-                      }}
-                    />
-                  ) : (
-                    <User2 className="h-12 w-12 text-muted-foreground" /> // Show a user icon instead
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Posted by</p>
-                  <p className="font-medium">
-                    {userData?.displayName || "Anonymous User"}
-                  </p>
-                  {userData?.id && (
-                    <div className="mt-1">
-                      <UserRatingSummary userId={userData.id} showTags={false} />
-                    </div>
-                  )}
-                </div>
-              </Link>
+          {/* Author Card*/}
+          <UserCard userData={userData} avatarUrl={avatarUrl} />
 
-              {/* View Profile Button */}
-              {userData?.id && (
-                <Button variant="outline" asChild className="w-full">
-                  <Link href={`/profile/${userData.id}`}>
-                    <User2 className="mr-2 h-4 w-4" />
-                    View Profile
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </Card>
-
-          {/* Beacon Details Card - Now without the title */}
-          <Card className="p-6">
-            <div className="space-y-6">
-              {/* Price */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Price</p>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-6 w-6 text-primary" />
-                  <span className="text-4xl font-bold text-primary">
-                    {formatPrice(beacon.ItemPrice)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Location */}
-              {location && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Location</p>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-lg">{location}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Contact Button */}
-              <Button size="lg" className="w-full">
-                Get in Touch
-              </Button>
-            </div>
-          </Card>
+          {/* Beacon Details Card */}
+          <BeaconInfoCard price={beacon.ItemPrice} location={location} />
         </div>
       </div>
     </div>

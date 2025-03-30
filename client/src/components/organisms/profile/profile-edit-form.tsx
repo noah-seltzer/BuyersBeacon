@@ -25,8 +25,8 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Prioritize the local avatarUrl over Clerk's imageUrl
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png");
+
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || clerkUser?.imageUrl || "/default-avatar.webp");
 
   const { handleSubmit, handleChange, values, isSubmitting, setFieldValue } = useFormik({
     initialValues: {
@@ -109,26 +109,22 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
             className="relative w-24 h-24 cursor-pointer group" 
             onClick={handleImageClick}
           >
-            {avatarUrl ? (
-              <>
-                <Image
-                  src={avatarUrl}
-                  alt={user.displayName}
-                  fill
-                  className="rounded-full object-cover border-4 border-background"
-                  sizes="96px"
-                  onError={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    img.src = "/default-avatar.png";
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
-              </>
-            ) : (
-              <User2 className="w-24 h-24 text-muted-foreground" />
-            )}
+            <>
+              <Image
+                src={avatarUrl}
+                alt={user.displayName}
+                fill
+                className="rounded-full object-cover border-4 border-background"
+                sizes="96px"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = "/default-avatar.webp";
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-6 h-6 text-white" />
+              </div>
+            </>
             
             {isUploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
