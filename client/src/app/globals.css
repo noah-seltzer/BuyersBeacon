@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import custom utility classes */
-@import "../styles/utilities.css";
 
 @layer base {
   :root {
