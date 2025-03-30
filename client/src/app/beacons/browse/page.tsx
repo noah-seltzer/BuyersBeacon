@@ -1,16 +1,13 @@
 "use client";
 import { useGetBeaconsQuery } from "@/redux/api";
 import { FC, useState, useEffect, useMemo } from "react";
-import { Beacon } from "@/types/beacon";
-import { MapPin, Search, X } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation"; 
-import ImagePreview from "@/components/molecules/image-preview";
+import { Search, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
 import { Input } from "@/components/atoms/input";
 import { Button } from "@/components/atoms/button";
 import PageHeading from "@/components/atoms/text/page-heading";
+import PageContainer from "@/components/ui/page-container";
 
 const BrowseBeaconsPage: FC = () => {
   const { data: beacons } = useGetBeaconsQuery();
@@ -56,15 +53,15 @@ const BrowseBeaconsPage: FC = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <PageContainer>
         <PageHeading 
           title="Browse Beacons"
           subtitle={`${filteredBeacons.length} Beacons ${query ? 'found' : 'available'}`}
         />
-      </div>
+      </PageContainer>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <PageContainer>
         {/* Search Bar */}
         <div className="mb-8">
           <form onSubmit={handleSearch} className="flex gap-2">
@@ -124,7 +121,7 @@ const BrowseBeaconsPage: FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-2">No Beacons Found</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              We couldn't find any beacons matching "{query}". Try using different keywords or browse all beacons.
+              We couldn't find any beacons matching "{query}". Try different keywords or browse all beacons.
             </p>
             <Button onClick={clearSearch} variant="outline" className="rounded-full">
               View All Beacons
@@ -138,8 +135,8 @@ const BrowseBeaconsPage: FC = () => {
             <BeaconThumbnail key={beacon.BeaconId} beacon={beacon} />
           ))}
         </div>
+        </PageContainer>
       </div>
-    </div>
   );
 };
 
