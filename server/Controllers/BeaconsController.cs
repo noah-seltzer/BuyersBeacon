@@ -21,17 +21,20 @@ namespace server.Controllers
         private ICategoryService _categoryService;
         private IBeaconService _beaconService;
         private IImageService _imageService;
+        private IClerkService _clerkService;
 
         public BeaconsController(ApplicationDbContext context, 
             ICategoryService categoryService, 
             IBeaconService beaconService, 
-            IImageService imageService)
+            IImageService imageService,
+            IClerkService clerkService)
         {
             _context = context;
             _blobServiceManager = new BlobServiceManager();
             _categoryService = categoryService;
             _beaconService = beaconService;
             _imageService = imageService;
+            _clerkService = clerkService;
         }
         
         /// <summary>
@@ -86,13 +89,14 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+
+            var authedClerkUser = await _clerkService.GetClerkUserFromToken(Request);
+            if (authedClerkUser == null)
             {
-                return Unauthorized();
+                return Unauthorized(new { error = "Not authenticated" });
             }
 
-            var drafts = await _beaconService.GetList(new Guid(userId), true);
+            var drafts = await _beaconService.GetList(authedClerkUser.UserId, true);
             return Ok(drafts);
         }
 
@@ -207,8 +211,8 @@ namespace server.Controllers
         {
             try
             {
-                var clerkId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(clerkId))
+                var authedClerkUser = await _clerkService.GetClerkUserFromToken(Request);
+                if (authedClerkUser == null)
                 {
                     return Unauthorized(new { error = "Not authenticated" });
                 }
@@ -224,7 +228,7 @@ namespace server.Controllers
                     return NotFound();
                 }
 
-                if (beacon.User?.ClerkId != clerkId)
+                if (beacon.User?.ClerkId != authedClerkUser.ClerkId)
                 {
                     return Unauthorized(new { error = "You are not authorized to delete this beacon" });
                 }
