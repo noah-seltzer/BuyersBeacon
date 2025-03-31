@@ -215,6 +215,8 @@ namespace server.Controllers
 
                 var beacon = await _context.Beacons
                     .Include(b => b.User)
+                    .Include(b => b.ImageSet)
+                        .ThenInclude(i => i.Images)
                     .FirstOrDefaultAsync(b => b.BeaconId == id);
 
                 if (beacon == null)
@@ -222,10 +224,20 @@ namespace server.Controllers
                     return NotFound();
                 }
 
-                // Verify that the current user is the owner of the beacon
                 if (beacon.User?.ClerkId != clerkId)
                 {
                     return Unauthorized(new { error = "You are not authorized to delete this beacon" });
+                }
+
+                // First delete the associated images and image set if they exist
+                if (beacon.ImageSet != null)
+                {
+                    if (beacon.ImageSet.Images != null && beacon.ImageSet.Images.Any())
+                    {
+                        _context.Images.RemoveRange(beacon.ImageSet.Images);
+                    }
+                    
+                    _context.ImageSets.Remove(beacon.ImageSet);
                 }
 
                 _context.Beacons.Remove(beacon);
