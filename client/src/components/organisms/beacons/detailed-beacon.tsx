@@ -60,7 +60,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
         description: "Your beacon has been successfully deleted.",
         variant: "success",
       });
-      router.push("/beacons/browse");
+      router.push(`/profile/${userId}`);
     } catch (error) {
       console.error("Failed to delete beacon:", error);
       toast({
