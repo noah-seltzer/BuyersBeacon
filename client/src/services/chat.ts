@@ -109,7 +109,8 @@ const useChat = ({
     const sendMessage = useCallback(async (message: ChatMessage): Promise<void> => {
         if (!connection) throw Error("Connection must be created before sending message");
         try {
-            await connection.invoke("SendMessage", message.ChatId, message.Message);
+            console.log("SENDING MESSAGE", message)
+            await connection.invoke("SendMessage", message.ChatId, message.UserId, message.Message);
         } catch (err) {
             console.log("Error sending message", err);
         }

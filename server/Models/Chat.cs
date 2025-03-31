@@ -22,8 +22,10 @@ namespace server.Models
         public Beacon? Beacon { get; set; }
 
         [DeleteBehavior(DeleteBehavior.Restrict)]
+        [JsonPropertyName("Participants")]
         public ICollection<User>? Participants { get; set; }
 
+        [JsonPropertyName("Messages")]
         public ICollection<ChatMessage>? Messages { get; set; }
     }
 }

@@ -15,9 +15,48 @@ namespace server.Hubs
             _context = context;
         }
 
-        public async Task SendMessage(string user, string message)
+        public async Task SendMessage(Guid chatId, string senderClerkId, string message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            Console.WriteLine(chatId);
+            Console.WriteLine(senderClerkId);
+            Console.WriteLine(message);
+            await Clients.All.SendAsync("ReceiveMessage", message);
+
+            // See if the chat exist where senderClerkId is participant
+            var chat = await (
+                from c in _context.Chats.Include(c => c.Participants)
+                where c.ChatId == chatId && c.Participants.Any(p => p.ClerkId == senderClerkId)
+                select c
+            ).FirstOrDefaultAsync();
+            
+            if (chat == null)
+            {
+                throw new Exception("Chat not found");
+            }
+
+            // Since we now each chat can have to 2 participants, the other use is the reciever
+            User sender = chat.Participants.Where(p => p.ClerkId == senderClerkId).FirstOrDefault();
+
+            if (sender == null) {
+                throw new Exception("Sender or reciever not found");
+            }
+
+            // Create message
+            ChatMessage newMessage = new ChatMessage
+            {
+                ChatMessageId = new Guid(),
+                ChatId = chat.ChatId, 
+                UserId = sender.UserId, 
+                Message = message
+            };
+
+            // Save message
+            _context.Add(newMessage);
+            await _context.SaveChangesAsync();
+
+
+            // Emit new message event
+            await Clients.All.SendAsync("ReceiveMessage", chat.ChatId, sender.UserId, newMessage.Message);
         }
 
         public async Task InitializeChat(Guid beaconId, string clerkId) {

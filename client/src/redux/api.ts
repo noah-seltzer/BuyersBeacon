@@ -227,10 +227,9 @@ export const beaconApi = createApi({
     getUserByClerkId: builder.query<User, string>({
       query: (clerkId) => `users/clerk/${clerkId}`,
       transformResponse: (response: any) => {
-        const userId = response.userId;
         return {
-          id: response.userId,
-          clerk_user_id: response.clerkId,
+          UserId: response.UserId,
+          ClerkId: response.ClerkId,
           displayName: "Anonymous User",
           bio: "No bio yet",
           location: "Location not set",
@@ -301,6 +300,7 @@ export const {
   useUpdateProfileMutation,
   useGetUserByIdQuery,
   useGetUserByClerkIdQuery,
+  useLazyGetUserByClerkIdQuery,
   useUploadProfileImageMutation,
   useDeleteUserMutation,
   // Review hooks

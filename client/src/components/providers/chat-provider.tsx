@@ -8,11 +8,13 @@ import React, {
 } from 'react';
 import ChatModalTemplate from '../templates/chat-modal-template';
 import { Chat } from '@/types/chat';
-import { useLazyGetChatsQuery } from '@/redux/api';
+import { useLazyGetChatsQuery, useLazyGetUserByClerkIdQuery } from '@/redux/api';
 import { useAuth } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { skipToken } from '@reduxjs/toolkit/query';
 import useChat from '@/services/chat';
+import { ChatMessage } from '@/types/chat-message';
+import { User } from '@/types/user';
 
 // Define the shape of the chat context
 interface ChatModalContextType {
@@ -81,17 +83,43 @@ export const useChatModal = () => {
 
 export const ChatModalEngine = () => {
     const { isOpen, currentBeaconId, closeChat, openChat } = useChatModal();
+    const [user, setUser] = useState<User | null>(null);
     const [chats, setChats] = useState<Chat[]>([]);
     const [focusedChat, setFocusedChat] = useState<Chat | null>(null);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const { isSignedIn, userId } = useAuth()
-    const [getChats, { data: fetchedChats, isLoading, isError }] = useLazyGetChatsQuery()
+    const [getChats] = useLazyGetChatsQuery()
+    const [getUserByClerkId] = useLazyGetUserByClerkIdQuery()
 
-    const unFocusChat = () => setFocusedChat(null);
-    const focusChat = (chat: Chat) => setFocusedChat(chat);
-
-    const handleRecieveMessage = (chatId: string, senderId: string, message: string) => {
-
+    const unFocusChat = () => {
+        setMessages([])
+        setFocusedChat(null);
     }
+
+    const focusChat = (chat: Chat) => {
+        setMessages(chat.Messages ?? []);
+        setFocusedChat(chat);
+    }
+
+    const handleRecieveMessage = useCallback((chatId: string, senderId: string, message: string) => {
+        // Do we have the chat?
+        const index = chats.findIndex(c => c.ChatId === chatId);
+        if (index === -1) return;
+
+        let messageObject = {
+            ChatId: chatId,
+            UserId: senderId,
+            Message: message
+        };
+
+        if (chats[index].ChatId === focusedChat?.ChatId) {
+            setMessages([...messages, messageObject]);
+        }
+
+        chats[index].Messages.push(messageObject);
+        setChats([...chats])
+        toast.info("New message");
+    }, [chats, focusedChat, setChats, setMessages, messages])
 
     const onNewChat = useCallback((chat: Chat) => {
         const chatIndex = chats?.findIndex(c => c.ChatId === chat.ChatId);
@@ -100,7 +128,7 @@ export const ChatModalEngine = () => {
 
         toast.info("A new chat has appeared. Maybe its someone that needs your beacon.")
         setChats([chat, ...chats]);
-    }, [chats])
+    }, [chats, setChats])
 
     const { sendMessage, isConnected, initializeChat } = useChat({
         onNewChat,
@@ -115,6 +143,7 @@ export const ChatModalEngine = () => {
 
         if (!currentBeaconId) {
             setFocusedChat(null);
+            setMessages([])
             return;
         }
 
@@ -128,6 +157,7 @@ export const ChatModalEngine = () => {
             if (!res) return;
         } else {
             setFocusedChat(chats[chat]);
+            setMessages(chats[chat].Messages ?? []);
         }
 
         // If beacon is not found in api create a new chat with beacon owner. 
@@ -140,6 +170,9 @@ export const ChatModalEngine = () => {
     const initializeState = useCallback(async (userId: string) => {
         const res = await getChats(userId);
         res.data && setChats([...res.data])
+
+        const user = await getUserByClerkId(userId);
+        setUser(user.data ?? null);
     }, [])
 
     useEffect(() => {
@@ -148,14 +181,38 @@ export const ChatModalEngine = () => {
         }
     }, [isSignedIn, userId, initializeState])
 
+    const handleSendMessag = useCallback(async (message: string) => {
+        if (!focusedChat) {
+            toast.error("Cannot send message chat not selected");
+            return;
+        }
+
+        if (!userId) {
+            toast.error("Cannot send message user not found");
+            return;
+        }
+
+        const cM: ChatMessage = {
+            ChatId: focusedChat.ChatId,
+            UserId: userId?.toString(),
+            Message: message
+        }
+
+        await sendMessage(cM);
+    }, [focusedChat, userId])
+
+    console.log(messages.length)
+
 
     return <ChatModalTemplate
-        messages={[]}
+        messages={messages}
+        sendMessage={handleSendMessag}
         open={isOpen}
         setClosed={closeChat}
         chats={chats}
         focusedChat={focusedChat}
         unFocusChat={unFocusChat}
         focusChat={focusChat}
+        clu={user}
     />
 }
