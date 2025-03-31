@@ -13,7 +13,7 @@ import { useUser } from "@clerk/nextjs";
 import { useDeleteBeaconMutation, useGetUserByIdQuery } from "@/redux/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { useToast } from "@/components/atoms/use-toast";
 import { ClimbingBoxLoader } from "react-spinners";
 
 interface DetailedBeaconProps {
@@ -25,6 +25,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   const userId = beacon.userId;
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
   const { user: clerkUser } = useUser();
   const { data: userData, isLoading } = useGetUserByIdQuery(userId || "", {
@@ -43,18 +44,30 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   const handleDeleteBeacon = async () => {
     if (!beacon.BeaconId) {
       console.error("Cannot delete: Beacon ID is undefined");
-      toast.error("Cannot delete: Beacon ID is missing");
+      toast({
+        title: "Cannot Delete",
+        description: "Beacon ID is missing",
+        variant: "destructive",
+      });
       return;
     }
     
     try {
       setIsDeleting(true);
       await deleteBeacon(beacon.BeaconId).unwrap();
-      toast.success("Beacon deleted successfully");
+      toast({
+        title: "Beacon Deleted",
+        description: "Your beacon has been successfully deleted.",
+        variant: "success",
+      });
       router.push("/beacons/browse");
     } catch (error) {
       console.error("Failed to delete beacon:", error);
-      toast.error("Failed to delete beacon. Please try again.");
+      toast({
+        title: "Deletion Failed",
+        description: "Failed to delete beacon. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsDeleting(false);
     }
