@@ -99,21 +99,23 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
                   <span>Delete Beacon</span>
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
+                  <AlertDialogTitle className="text-white text-xl font-bold">Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-300">
                     This action cannot be undone. This will permanently delete your beacon.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogFooter className="flex gap-2 mt-6">
+                  <AlertDialogCancel className="bg-zinc-800 hover:bg-zinc-700 text-white border-none">
+                    Cancel
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteBeacon}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    className="bg-red-600 hover:bg-red-700 text-white border-none"
                     disabled={isDeleting}
                   >
-                    {isDeleting ? 'Deleting...' : 'Delete'}
+                    {isDeleting ? 'Deleting...' : 'Delete Beacon'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
