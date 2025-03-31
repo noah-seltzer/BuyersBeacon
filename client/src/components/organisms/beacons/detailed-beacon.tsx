@@ -6,10 +6,14 @@ import BeaconInfoCard from "@/components/molecules/beacon-info-card";
 import ImagePreview from "@/components/molecules/image-preview";
 import UserCard from "@/components/molecules/user-card";
 import { Beacon, Category } from "@/types/beacon";
-import { ArrowLeft } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/atoms/alert-dialog";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { useGetUserByIdQuery } from "@/redux/api";
+import { useDeleteBeaconMutation, useGetUserByIdQuery } from "@/redux/api";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { ClimbingBoxLoader } from "react-spinners";
 
 interface DetailedBeaconProps {
@@ -19,17 +23,36 @@ interface DetailedBeaconProps {
 
 const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   const userId = beacon.userId;
+  const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { user: clerkUser } = useUser();
   const { data: userData, isLoading } = useGetUserByIdQuery(userId || "", {
     skip: !userId,
   });
+  const [deleteBeacon] = useDeleteBeaconMutation();
 
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
 
   const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
+  
+  const isOwner = clerkUser?.id === userData?.clerk_user_id;
+  
+  const handleDeleteBeacon = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteBeacon(beacon.BeaconId).unwrap();
+      toast.success("Beacon deleted successfully");
+      router.push("/beacons/browse");
+    } catch (error) {
+      console.error("Failed to delete beacon:", error);
+      toast.error("Failed to delete beacon. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -44,16 +67,53 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
     <div className="flex flex-col gap-8 pt-4">
       {/* Back Button and Title Row */}
       <div className="flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          asChild
-          className="self-start flex items-center gap-2 text-foreground/80 hover:text-foreground px-4 py-2"
-        >
-          <Link href="/beacons/browse">
-            <ArrowLeft className="h-5 w-5" />
-            <span className="text-base">Return to Browse</span>
-          </Link>
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button
+            variant="ghost"
+            asChild
+            className="self-start flex items-center gap-2 text-foreground/80 hover:text-foreground px-4 py-2"
+          >
+            <Link href="/beacons/browse">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="text-base">Return to Browse</span>
+            </Link>
+          </Button>
+
+          {/* Delete Button - only shown to beacon owner */}
+          {isOwner && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete Beacon</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your beacon.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteBeacon}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
 
         {/* Title and Category */}
         <div className="flex items-center gap-3">

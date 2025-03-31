@@ -192,25 +192,40 @@ namespace server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific beacon
+        /// Deletes a specific beacon, ensuring only the owner can delete it
         /// </summary>
         /// <param name="id">The GUID of the beacon to delete</param>
         /// <returns>No content if successful</returns>
         /// <response code="204">If the beacon was successfully deleted</response>
+        /// <response code="401">If the user is not authorized to delete this beacon</response>
         /// <response code="404">If the beacon is not found</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBeacon(Guid id)
         {
             try
             {
+                var clerkId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(clerkId))
+                {
+                    return Unauthorized(new { error = "Not authenticated" });
+                }
+
                 var beacon = await _context.Beacons
+                    .Include(b => b.User)
                     .FirstOrDefaultAsync(b => b.BeaconId == id);
 
                 if (beacon == null)
                 {
                     return NotFound();
+                }
+
+                // Verify that the current user is the owner of the beacon
+                if (beacon.User?.ClerkId != clerkId)
+                {
+                    return Unauthorized(new { error = "You are not authorized to delete this beacon" });
                 }
 
                 _context.Beacons.Remove(beacon);
