@@ -4,9 +4,9 @@ using server.Models;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using server.Services;
-using server.Hubs;
 using server.Util;
 using dotenv.net;
+using server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,8 +49,8 @@ builder.Services.AddCors(options =>
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "https://buyers-beacon-client.vercel.app")
                              .AllowAnyHeader()
-                             .AllowAnyMethod()
-                             .AllowCredentials();
+                             .AllowCredentials()
+                             .AllowAnyMethod();
         });
 });
 
@@ -63,7 +63,9 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<ICategoryService, CategoryService>()
     .AddScoped<IBeaconService, BeaconService>()
     .AddScoped<IImageService, ImageService>()
-    .AddScoped<IClerkService, ClerkService>();
+    .AddScoped<IClerkService, ClerkService>()
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<IReviewService, ReviewService>();
 
 var app = builder.Build();
 
@@ -83,15 +85,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<ChatHub>("/chathub");
-
-
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuyersBeacon API V1");
     c.RoutePrefix = string.Empty; // This makes Swagger UI the default page
 });
+
+
+app.MapHub<ChatHub>("/chathub");
 
 
 app.Run();

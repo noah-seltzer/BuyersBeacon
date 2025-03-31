@@ -3,19 +3,22 @@ import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import Title from "@/components/atoms/text/title";
 import DetailedBeacon from "@/components/organisms/beacons/detailed-beacon";
 import { Beacon } from "@/types/beacon";
+import { User } from "@/types/user";
 
-interface BeaconDetailsPageTemplate {
+interface BeaconDetailsPageTemplateProps {
   beacon: Beacon | undefined,
   isLoading: boolean,
   handleOnChat: () => any,
-  isOwner: boolean
+  isOwner: boolean,
+  loading: boolean;
+  userIcon?: string,
+  user: User | null
 }
 
-const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat, isOwner }: BeaconDetailsPageTemplate) => {
-
+const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat, isOwner, loading, user, userIcon }: BeaconDetailsPageTemplateProps) => {
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-8">
+    <div className="flex flex-col items-center py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {isLoading || !beacon || !beacon?.Category ? (
@@ -24,7 +27,15 @@ const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat, isOwner }:
               <Title className="mt-10">Loading Beacon....</Title>
             </div>
           ) : (
-            <DetailedBeacon handleOnChat={handleOnChat} beacon={beacon} category={beacon.Category} isOwner={isOwner} />
+            <DetailedBeacon
+              handleOnChat={handleOnChat}
+              beacon={beacon}
+              category={beacon.Category}
+              isOwner={isOwner}
+              loading={loading}
+              user={user}
+              userIcon={userIcon}
+            />
           )}
         </div>
       </div>

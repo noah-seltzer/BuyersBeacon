@@ -1,22 +1,30 @@
 'use client'
 
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { User } from "@/types/user"
 import { useDispatch } from "react-redux"
 import { setUser, setUserId } from "@/redux/auth-slice"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 
-
-export type SignInClientStateManagerProps = { user: User, redirectUrl?: string }
+export type SignInClientStateManagerProps = {
+    user: User;
+    redirectUrl?: string;
+}
 
 const SignInClientStateManager: FC<SignInClientStateManagerProps> = ({ user, redirectUrl }) => {
     const dispatch = useDispatch()
-    dispatch(setUserId(user.UserId))
-    dispatch(setUser(user))
-    if (redirectUrl) {
-        redirect(redirectUrl)
-    }
-    return <></>
+    const router = useRouter()
+
+    useEffect(() => {
+        dispatch(setUserId(user.UserId))
+        dispatch(setUser(user))
+
+        if (redirectUrl) {
+            router.push(redirectUrl)
+        }
+    }, [dispatch, user, redirectUrl, router])
+
+    return null
 }
 
 export default SignInClientStateManager

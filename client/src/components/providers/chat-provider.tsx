@@ -38,6 +38,7 @@ export const ChatModalProvider: React.FC<{ children: ReactNode }> = ({ children 
     const [currentBeaconId, setCurrentBeaconId] = useState<string | null>(null);
 
     const openChat = useCallback((beaconId?: string) => {
+        console.log("OPEN CHATE")
         setCurrentBeaconId(beaconId ?? null);
         setIsOpen(true);
     }, []);
@@ -79,7 +80,7 @@ export const useChatModal = () => {
 
 
 export const ChatModalEngine = () => {
-    const { isOpen, currentBeaconId, openChat, closeChat } = useChatModal();
+    const { isOpen, currentBeaconId, closeChat, openChat } = useChatModal();
     const [chats, setChats] = useState<Chat[]>([]);
     const [focusedChat, setFocusedChat] = useState<Chat | null>(null);
     const { isSignedIn, userId } = useAuth()
@@ -87,10 +88,6 @@ export const ChatModalEngine = () => {
 
     const unFocusChat = () => setFocusedChat(null);
     const focusChat = (chat: Chat) => setFocusedChat(chat);
-
-
-
-
 
     const handleRecieveMessage = (chatId: string, senderId: string, message: string) => {
 
@@ -150,8 +147,6 @@ export const ChatModalEngine = () => {
             initializeState(userId);
         }
     }, [isSignedIn, userId, initializeState])
-
-    console.log(chats)
 
 
     return <ChatModalTemplate

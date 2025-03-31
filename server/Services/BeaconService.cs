@@ -4,7 +4,7 @@ using server.Models;
 
 namespace server.Services
 {
-    public class BeaconService: IBeaconService
+    public class BeaconService : IBeaconService
     {
         private readonly ApplicationDbContext _context;
 
@@ -12,38 +12,20 @@ namespace server.Services
         {
             _context = context;
         }
-        
+
 
         public async Task<Beacon?> GetById(Guid id)
         {
-            return await _context.Beacons
+            var beacon = await _context.Beacons
                 .Where(b => b.BeaconId == id)
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
-                .ThenInclude(i => i.Images)
+                    .ThenInclude(i => i.Images)
                 .Include(b => b.User)
-                .Select(b =>  new Beacon
-                {
-                    BeaconId = Guid.NewGuid(), // Assign a new unique ID
-                    UserId = b.UserId, // Copy UserId
-                    CategoryId = b.CategoryId,
-                    DateCreate = b.DateCreate,
-                    DateUpdate = b.DateUpdate, // Set updated timestamp for cloning
-                    ItemName = b.ItemName,
-                    ItemDescription = b.ItemDescription,
-                    ItemPrice = b.ItemPrice,
-                    LocCity = b.LocCity,
-                    LocRegion = b.LocRegion,
-                    LocCountry = b.LocCountry,
-                    LocPostalCode = b.LocPostalCode,
-                    IsDraft = b.IsDraft,
-                    LastDraftSave = b.LastDraftSave,
-                    Category = b.Category,
-                    ImageSet = b.ImageSet,
-                    Chats = b.Chats,
-                    User = b.User != null ? new User { ClerkId = b.User.ClerkId } : null
-                })
                 .FirstOrDefaultAsync();
+
+            Console.WriteLine($"DEBUG: Beacon User Data: {beacon?.User?.DisplayName ?? "null"}");
+            return beacon;
         }
 
         public async Task<IEnumerable<Beacon>> GetList(Guid? user_id = null, bool drafts = false)
@@ -52,8 +34,13 @@ namespace server.Services
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                 .ThenInclude(i => i.Images)
-                .Where(b => b.IsDraft == drafts)
-                .Where(b => user_id == null ? true : b.UserId == user_id);
+                .Include(b => b.User)
+                .Where(b => b.IsDraft == drafts);
+
+            if (user_id.HasValue)
+            {
+                beacons = beacons.Where(b => b.UserId == user_id);
+            }
 
             return await beacons.ToListAsync();
         }

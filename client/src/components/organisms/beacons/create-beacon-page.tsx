@@ -66,16 +66,13 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     try {
       setDraftError(null);
 
-      // Save whatever data we have, no validation needed
       const draftData = {
         ...values,
         ItemPrice: values.ItemPrice || 0,
         IsDraft: true,
-        // Don't set a default CategoryId
+        UserId: user?.UserId,
+        LastDraftSave: new Date().toISOString()
       };
-      if (user) {
-        draftData.UserId = user.UserId
-      }
 
       await createBeacon(draftData).unwrap();
       setDraftSaved(true);

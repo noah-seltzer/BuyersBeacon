@@ -4,6 +4,7 @@ import './globals.css'
 import { PropsWithChildren, FC } from 'react'
 import Providers from '@/components/providers'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from "@/components/atoms/toaster"
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -33,6 +34,7 @@ const RootLayout: FC<PropsWithChildren> = ({ children }) => {
                     disableTransitionOnChange
                 >
                     <Providers>{children}</Providers>
+                    <Toaster />
                 </ThemeProvider>
             </body>
         </html>

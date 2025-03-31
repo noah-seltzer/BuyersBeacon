@@ -2,101 +2,98 @@ import { Button } from "@/components/atoms/button";
 import BodyText from "@/components/atoms/text/body";
 import SubTitle from "@/components/atoms/text/sub-title";
 import Title from "@/components/atoms/text/title";
+import BeaconInfoCard from "@/components/molecules/beacon-info-card";
 import ImagePreview from "@/components/molecules/image-preview";
+import UserCard from "@/components/molecules/user-card";
 import { Beacon, Category } from "@/types/beacon";
-import { MapPin, DollarSign, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ClimbingBoxLoader } from "react-spinners";
+import { User } from "@/types/user";
 
 interface DetailedBeaconProps {
   beacon: Beacon;
   category: Category;
   handleOnChat: () => any;
   isOwner: boolean;
+  loading: boolean;
+  userIcon?: string,
+  user: User | null
 }
 
-const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner }: DetailedBeaconProps) => {
+const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner, user, loading, userIcon }: DetailedBeaconProps) => {
+
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
 
-  const formatPrice = (price: number | undefined) => {
-    if (typeof price !== "number") return "$0.00";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
 
+  if (loading || !user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <ClimbingBoxLoader size={35} color="#24dbb7" className="mb-10" />
+        <Title className="mt-10">Loading...</Title>
+      </div>
+    );
+  }
+
+
+  const avatarUrl = user?.avatarUrl || userIcon || "/default-avatar.png";
   return (
-    <div className="flex flex-col gap-8">
-      <Button
-        variant="ghost"
-        asChild
-        className="self-start flex items-center gap-2 text-foreground/80 hover:text-foreground px-4 py-2"
-      >
-        <Link href="/beacons/browse">
-          <ArrowLeft className="h-5 w-5" />
-          <span className="text-base">Return to Browse</span>
-        </Link>
-      </Button>
+    <div className="flex flex-col gap-8 pt-4">
+      {/* Back Button and Title Row */}
+      <div className="flex flex-col gap-4">
+        <Button
+          variant="ghost"
+          asChild
+          className="self-start flex items-center gap-2 text-foreground/80 hover:text-foreground px-4 py-2"
+        >
+          <Link href="/beacons/browse">
+            <ArrowLeft className="h-5 w-5" />
+            <span className="text-base">Return to Browse</span>
+          </Link>
+        </Button>
 
-      {/* Header Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
+        {/* Title and Category */}
+        <div className="flex items-center gap-3">
+          <Title>{beacon.ItemName}</Title>
           <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
             {category.CategoryName}
           </span>
         </div>
-        <Title>{beacon.ItemName}</Title>
+      </div>
 
-        {/* Price and Location Row */}
-        <div className="flex flex-wrap items-center gap-6 mt-2">
-          {/* Price */}
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-primary" />
-            <span className="text-3xl font-bold text-primary">
-              {formatPrice(beacon.ItemPrice)}
-            </span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Column */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Image Gallery */}
+          <div className="overflow-hidden rounded-xl border bg-background">
+            <ImagePreview
+              images={beacon.imageSet?.images || []}
+              alt={beacon.ItemName}
+              emptyStatePrimaryText="No images available"
+              showCoverPhotoLabel={false}
+            />
           </div>
 
-          {/* Location */}
-          {location && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-5 h-5" />
-              <span className="text-lg">{location}</span>
+          {/* Description Section */}
+          <div className="space-y-6">
+            <SubTitle>About this Beacon</SubTitle>
+            <div className="prose prose-gray max-w-none">
+              <BodyText>{beacon.ItemDescription}</BodyText>
             </div>
-          )}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-8">
+          {/* Author Card*/}
+          <UserCard userData={user} avatarUrl={avatarUrl} />
+
+          {/* Beacon Details Card */}
+          <BeaconInfoCard price={beacon.ItemPrice} location={location} isOwner={isOwner} handleOnChat={handleOnChat} />
         </div>
       </div>
-
-      {/* Image Gallery */}
-      <div className="w-full overflow-hidden rounded-lg border">
-        <ImagePreview
-          images={beacon.imageSet?.images || []}
-          alt={beacon.ItemName}
-          emptyStatePrimaryText="No images available"
-        />
-      </div>
-
-      {/* Description Section */}
-      <div className="space-y-4">
-        <SubTitle>About this Beacon</SubTitle>
-        <div className="prose prose-gray max-w-none">
-          <BodyText>{beacon.ItemDescription}</BodyText>
-        </div>
-      </div>
-
-      {/* Contact Section */}
-      {
-        !isOwner && handleOnChat &&
-        <div className="flex justify-end mt-4">
-          <Button variant="default" size="lg" className="px-8" onClick={handleOnChat}>
-            Get in Touch
-          </Button>
-        </div>
-      }
     </div>
   );
 };

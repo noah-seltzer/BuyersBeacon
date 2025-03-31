@@ -4,6 +4,7 @@ using server.Data;
 using server.Models;
 using server.Services;
 using System.Security.Authentication;
+using server.Models.DTOs;
 
 namespace server.Controllers
 {
@@ -50,21 +51,26 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var user = await _context.Users
-                .Where(u => u.UserId == id)
-                .Select(u => new User
-                {
-                    UserId = u.UserId,
-                    ClerkId = u.ClerkId
-                })
-                .FirstOrDefaultAsync();
+            var user = await _context.Users.FindAsync(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return user;
+            // Get Clerk user data if available
+            var clerkUser = await _clerkService.GetClerkUserFromToken(HttpContext.Request);
+            
+            return Ok(new {
+                userId = user.UserId,
+                clerkId = user.ClerkId,
+                displayName = user.DisplayName,
+                bio = user.Bio,
+                location = user.Location,
+                joinedDate = user.JoinedDate,
+                avatarUrl = user.AvatarUrl,
+                // Fall back to Clerk's image URL if needed
+            });
         }
 
         /// <summary>
@@ -164,33 +170,21 @@ namespace server.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<User>> CreateUser(User userDto)
+        public async Task<ActionResult<User>> CreateUser([FromBody] CreateUserDto userDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Check if ClerkId already exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.ClerkId == userDto.ClerkId);
-            if (existingUser != null)
-            {
-                ModelState.AddModelError("ClerkId", "A user with this Clerk ID already exists");
-                return BadRequest(ModelState);
-            }
-
             var user = new User
             {
-                UserId = Guid.NewGuid(),
-                ClerkId = userDto.ClerkId
+                ClerkId = userDto.ClerkId,
+                DisplayName = "Anonymous User",
+                Bio = "No bio yet",
+                Location = "Location not set",
+                JoinedDate = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            userDto.UserId = user.UserId;
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, userDto);
+            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
         }
 
         /// <summary>
@@ -247,18 +241,74 @@ namespace server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific user
+        /// Deletes a specific user and transfers beacon ownership to the Deleted User
         /// </summary>
         /// <param name="id">The GUID of the user to delete</param>
         /// <returns>No content if successful</returns>
         /// <response code="204">If the user was successfully deleted</response>
         /// <response code="404">If the user is not found</response>
-        /// <response code="400">If the user has associated beacons</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            // Verify the authenticated user matches the profile being deleted
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            var userToDelete = await _context.Users
+                .Include(u => u.Beacons)
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (userToDelete == null)
+            {
+                return NotFound();
+            }
+
+            if (authed == null || authed != userToDelete.ClerkId)
+            {
+                return Unauthorized("You are not authorized to delete this user");
+            }
+
+            // Find or create a "Deleted User" account
+            var deletedUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.DisplayName == "Deleted User" && u.ClerkId == "deleted_user");
+
+            if (deletedUser == null)
+            {
+                // Create a new "Deleted User" if one doesn't exist
+                deletedUser = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    ClerkId = "deleted_user",
+                    DisplayName = "Deleted User",
+                    Bio = "This account represents a deleted user",
+                    Location = "Unknown",
+                    JoinedDate = DateTime.UtcNow
+                };
+                _context.Users.Add(deletedUser);
+                await _context.SaveChangesAsync();
+            }
+
+            // Transfer ownership of all beacons to the "Deleted User"
+            if (userToDelete.Beacons?.Any() == true)
+            {
+                foreach (var beacon in userToDelete.Beacons)
+                {
+                    beacon.UserId = deletedUser.UserId;
+                    beacon.User = deletedUser;
+                }
+            }
+
+            // Delete the user
+            _context.Users.Remove(userToDelete);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpGet("profile/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<User>> GetUserProfile(Guid id)
         {
             var user = await _context.Users
                 .Include(u => u.Beacons)
@@ -269,16 +319,100 @@ namespace server.Controllers
                 return NotFound();
             }
 
-            if (user.Beacons.Any())
+            return Ok(new
             {
-                ModelState.AddModelError("", "Cannot delete user with associated beacons");
-                return BadRequest(ModelState);
+                user.UserId,
+                user.DisplayName,
+                user.Bio,
+                user.Location,
+                user.JoinedDate,
+                user.AvatarUrl,
+                BeaconCount = user.Beacons?.Count ?? 0
+            });
+        }
+
+        [HttpPut("profile/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProfile(Guid id, UpdateProfileDto profile)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            // Verify the authenticated user matches the profile being updated
+            var authed = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            if (authed == null || authed != user.ClerkId)
+            {
+                return Unauthorized();
+            }
 
-            return NoContent();
+            user.DisplayName = profile.DisplayName;
+            user.Bio = profile.Bio;
+            user.Location = profile.Location;
+            
+            // Update avatar URL if provided
+            if (!string.IsNullOrEmpty(profile.AvatarUrl))
+            {
+                user.AvatarUrl = profile.AvatarUrl;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(user);
+        }
+
+        [HttpPost("profile-image")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UploadProfileImage([FromServices] IImageService imageService)
+        {
+            // Verify the authenticated user
+            var clerkId = await _clerkService.VerifyUserSessionToken(HttpContext.Request);
+            if (clerkId == null)
+            {
+                return Unauthorized();
+            }
+            
+            // Find the user
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
+                
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            
+            // Check if there's an image in the request
+            if (Request.Form.Files.Count == 0)
+            {
+                return BadRequest("No image file provided");
+            }
+            
+            var imageFile = Request.Form.Files[0];
+            if (imageFile.Length == 0)
+            {
+                return BadRequest("Empty image file");
+            }
+            
+            try
+            {
+                // Upload image to blob storage
+                var imageUrl = await imageService.UploadImageAsync(imageFile);
+                
+                // Update user's avatar URL
+                user.AvatarUrl = imageUrl;
+                await _context.SaveChangesAsync();
+                
+                return Ok(new { url = imageUrl });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to upload image: {ex.Message}");
+            }
         }
 
         private bool UserExists(Guid id)
@@ -286,4 +420,4 @@ namespace server.Controllers
             return _context.Users.Any(e => e.UserId == id);
         }
     }
-} 
+}

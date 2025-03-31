@@ -235,6 +235,70 @@ namespace server.Migrations
                     b.ToTable("ImageSets");
                 });
 
+            modelBuilder.Entity("server.Models.Review", b =>
+                {
+                    b.Property<Guid>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("ReviewerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("server.Models.ReviewTag", b =>
+                {
+                    b.Property<Guid>("ReviewTagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReviewId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ReviewTagId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ReviewTags");
+                });
+
+            modelBuilder.Entity("server.Models.Tag", b =>
+                {
+                    b.Property<Guid>("TagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TagId");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("server.Models.User", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -242,10 +306,35 @@ namespace server.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasAnnotation("Relational:JsonPropertyName", "UserId");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("ClerkId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "ClerkId");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("JoinedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("TotalReviews")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId");
 
@@ -336,6 +425,44 @@ namespace server.Migrations
                     b.Navigation("Beacon");
                 });
 
+            modelBuilder.Entity("server.Models.Review", b =>
+                {
+                    b.HasOne("server.Models.User", "Reviewer")
+                        .WithMany("GivenReviews")
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("server.Models.User", "User")
+                        .WithMany("ReceivedReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Reviewer");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("server.Models.ReviewTag", b =>
+                {
+                    b.HasOne("server.Models.Review", "Review")
+                        .WithMany("ReviewTags")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("server.Models.Tag", "Tag")
+                        .WithMany("ReviewTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("server.Models.Beacon", b =>
                 {
                     b.Navigation("Chats");
@@ -358,9 +485,23 @@ namespace server.Migrations
                     b.Navigation("Images");
                 });
 
+            modelBuilder.Entity("server.Models.Review", b =>
+                {
+                    b.Navigation("ReviewTags");
+                });
+
+            modelBuilder.Entity("server.Models.Tag", b =>
+                {
+                    b.Navigation("ReviewTags");
+                });
+
             modelBuilder.Entity("server.Models.User", b =>
                 {
                     b.Navigation("Beacons");
+
+                    b.Navigation("GivenReviews");
+
+                    b.Navigation("ReceivedReviews");
                 });
 #pragma warning restore 612, 618
         }

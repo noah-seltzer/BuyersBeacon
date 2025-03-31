@@ -66,7 +66,7 @@ namespace server.Hubs
             };
 
             _context.Chats.Add(newChat);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             await Clients.All.SendAsync("NewChat", newChat.ChatId, newChat.BeaconId, new List<string> { beacon.User.ClerkId, clu.ClerkId });
         }
     }

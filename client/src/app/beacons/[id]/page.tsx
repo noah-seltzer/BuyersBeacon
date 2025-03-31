@@ -1,21 +1,26 @@
 "use client";
 import { Suspense, useCallback } from "react";
 import BeaconDetailsPageTemplate from "@/components/templates/beacon-deatails.template";
-import { useGetBeaconQuery } from "@/redux/api";
+import { useGetBeaconQuery, useGetUserByClerkIdQuery } from "@/redux/api";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useParams } from "next/navigation";
 import { useChatModal } from "@/components/providers/chat-provider";
 import { useUser } from "@clerk/nextjs";
+import PageContainer from "@/components/ui/page-container";
 
 
 const BeaconDetailsPage = () => {
     const { id } = useParams();
-    const { user } = useUser();
+    const { user: clerkUser } = useUser();
     const { openChat } = useChatModal();
     const {
         data: beacon,
-        isLoading,
+        isLoading: isLoadingBeacon,
     } = useGetBeaconQuery(id?.toString() ?? skipToken);
+    const {
+        data: user,
+        isLoading: isLoadingUser
+    } = useGetUserByClerkIdQuery(beacon?.User?.ClerkId ?? skipToken)
 
 
     const handleOnChat = useCallback((beaconId: string) => {
@@ -24,12 +29,17 @@ const BeaconDetailsPage = () => {
 
 
     return <Suspense fallback={<div>Loading</div>}>
-        <BeaconDetailsPageTemplate
-            isOwner={beacon?.User?.ClerkId === user?.id}
-            isLoading={isLoading}
-            beacon={beacon}
-            handleOnChat={() => id && handleOnChat(id.toString())}
-        />;
+        <PageContainer>
+            <BeaconDetailsPageTemplate
+                isOwner={beacon?.User?.ClerkId === clerkUser?.id}
+                isLoading={isLoadingBeacon || isLoadingUser}
+                beacon={beacon}
+                handleOnChat={() => id && handleOnChat(id.toString())}
+                loading={isLoadingBeacon || isLoadingUser}
+                user={user ?? null}
+                userIcon={user?.avatarUrl ?? clerkUser?.imageUrl ?? "/default-avatar.png"}
+            />;
+        </PageContainer>
     </Suspense>
 };
 
