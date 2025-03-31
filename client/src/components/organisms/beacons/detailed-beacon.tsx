@@ -41,6 +41,12 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
   const isOwner = clerkUser?.id === userData?.clerk_user_id;
   
   const handleDeleteBeacon = async () => {
+    if (!beacon.BeaconId) {
+      console.error("Cannot delete: Beacon ID is undefined");
+      toast.error("Cannot delete: Beacon ID is missing");
+      return;
+    }
+    
     try {
       setIsDeleting(true);
       await deleteBeacon(beacon.BeaconId).unwrap();
