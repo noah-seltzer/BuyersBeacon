@@ -38,7 +38,7 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
     onSubmit: async (values) => {
       try {
         await updateProfile({
-          id: user.id,
+          id: user.UserId,
           ...values,
         }).unwrap();
 
@@ -48,7 +48,7 @@ export const ProfileEditForm: FC<ProfileEditFormProps> = ({ user }) => {
           variant: "success",
         });
 
-        router.push(`/profile/${user.id}`);
+        router.push(`/profile/${user.UserId}`);
       } catch (error) {
         console.error("Failed to update profile:", error);
         toast({

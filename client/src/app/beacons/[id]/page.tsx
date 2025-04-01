@@ -1,7 +1,7 @@
 "use client";
 import { Suspense, useCallback } from "react";
 import BeaconDetailsPageTemplate from "@/components/templates/beacon-deatails.template";
-import { useGetBeaconQuery, useGetUserByClerkIdQuery } from "@/redux/api";
+import { useGetBeaconQuery, useGetUserByIdQuery } from "@/redux/api";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useParams } from "next/navigation";
 import { useChatModal } from "@/components/providers/chat-provider";
@@ -20,7 +20,9 @@ const BeaconDetailsPage = () => {
     const {
         data: user,
         isLoading: isLoadingUser
-    } = useGetUserByClerkIdQuery(beacon?.User?.ClerkId ?? skipToken)
+    } = useGetUserByIdQuery(beacon?.UserId ?? skipToken, {
+        skip: !beacon?.UserId
+    })
 
 
     const handleOnChat = useCallback((beaconId: string) => {
@@ -38,7 +40,7 @@ const BeaconDetailsPage = () => {
                 loading={isLoadingBeacon || isLoadingUser}
                 user={user ?? null}
                 userIcon={user?.avatarUrl ?? clerkUser?.imageUrl ?? "/default-avatar.png"}
-            />;
+            />
         </PageContainer>
     </Suspense>
 };

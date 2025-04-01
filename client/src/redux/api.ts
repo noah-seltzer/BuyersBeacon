@@ -211,14 +211,16 @@ export const beaconApi = createApi({
       query: (id) => `users/${id}`,
       transformResponse: (response: any) => {
         return {
-          id: response.userId,
-          clerk_user_id: response.clerkId,
+          UserId: response.userId,
+          ClerkId: response.clerkId,
           displayName: response.displayName || "Anonymous User",
           bio: response.bio || "No bio yet",
           location: response.location || "Location not set",
           avatarUrl: response.avatarUrl,
-          imageUrl: response.imageUrl,
+          imageUrl: response.imageUrl || response.avatarUrl,
           joinedDate: response.joinedDate || new Date().toISOString(),
+          averageRating: response.averageRating || 0,
+          totalReviews: response.totalReviews || 0
         };
       },
       providesTags: (_result, _error, id) => [{ type: CACHES.USERS, id }],

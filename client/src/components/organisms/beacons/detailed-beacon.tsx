@@ -37,7 +37,6 @@ const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner, user, loading
     );
   }
 
-
   const avatarUrl = user?.avatarUrl || userIcon || "/default-avatar.png";
   return (
     <div className="flex flex-col gap-8 pt-4">

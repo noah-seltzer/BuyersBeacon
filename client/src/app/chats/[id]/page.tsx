@@ -1,8 +1,7 @@
-import ChatDeatilsTempalte from "@/components/templates/chate-details-template"
+import ChatDetailsTemplate from "@/components/templates/chate-details-template"
 
 const ChatDetailsPage = () => {
-    return <ChatDeatilsTempalte />
+    return <ChatDetailsTemplate />
 }
-
 
 export default ChatDetailsPage

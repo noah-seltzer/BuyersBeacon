@@ -84,7 +84,6 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
   };
 
 
-  console.log("USER", user)
 
   const {
     handleChange,
