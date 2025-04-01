@@ -7,6 +7,7 @@ namespace server.Data
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext() : base() { }
 
 
         public DbSet<User> Users { get; set; }
