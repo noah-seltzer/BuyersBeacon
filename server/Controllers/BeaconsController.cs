@@ -21,17 +21,20 @@ namespace server.Controllers
         private ICategoryService _categoryService;
         private IBeaconService _beaconService;
         private IImageService _imageService;
+        private IClerkService _clerkService;
 
         public BeaconsController(ApplicationDbContext context, 
             ICategoryService categoryService, 
             IBeaconService beaconService, 
-            IImageService imageService)
+            IImageService imageService,
+            IClerkService clerkService)
         {
             _context = context;
             _blobServiceManager = new BlobServiceManager();
             _categoryService = categoryService;
             _beaconService = beaconService;
             _imageService = imageService;
+            _clerkService = clerkService;
         }
         
         /// <summary>
@@ -86,13 +89,14 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetDrafts()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+
+            var authedClerkUser = await _clerkService.GetClerkUserFromToken(Request);
+            if (authedClerkUser == null)
             {
-                return Unauthorized();
+                return Unauthorized(new { error = "Not authenticated" });
             }
 
-            var drafts = await _beaconService.GetList(new Guid(userId), true);
+            var drafts = await _beaconService.GetList(authedClerkUser.UserId, true);
             return Ok(drafts);
         }
 
@@ -192,25 +196,52 @@ namespace server.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific beacon
+        /// Deletes a specific beacon, ensuring only the owner can delete it
         /// </summary>
         /// <param name="id">The GUID of the beacon to delete</param>
         /// <returns>No content if successful</returns>
         /// <response code="204">If the beacon was successfully deleted</response>
+        /// <response code="401">If the user is not authorized to delete this beacon</response>
         /// <response code="404">If the beacon is not found</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBeacon(Guid id)
         {
             try
             {
+                var authedClerkUser = await _clerkService.GetClerkUserFromToken(Request);
+                if (authedClerkUser == null)
+                {
+                    return Unauthorized(new { error = "Not authenticated" });
+                }
+
                 var beacon = await _context.Beacons
+                    .Include(b => b.User)
+                    .Include(b => b.ImageSet)
+                        .ThenInclude(i => i.Images)
                     .FirstOrDefaultAsync(b => b.BeaconId == id);
 
                 if (beacon == null)
                 {
                     return NotFound();
+                }
+
+                if (beacon.User?.ClerkId != authedClerkUser.ClerkId)
+                {
+                    return Unauthorized(new { error = "You are not authorized to delete this beacon" });
+                }
+
+                // First delete the associated images and image set if they exist
+                if (beacon.ImageSet != null)
+                {
+                    if (beacon.ImageSet.Images != null && beacon.ImageSet.Images.Any())
+                    {
+                        _context.Images.RemoveRange(beacon.ImageSet.Images);
+                    }
+                    
+                    _context.ImageSets.Remove(beacon.ImageSet);
                 }
 
                 _context.Beacons.Remove(beacon);
