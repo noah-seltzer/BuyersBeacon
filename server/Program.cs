@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using server.Services;
 using server.Util;
 using dotenv.net;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,21 @@ builder.Services.AddScoped<ICategoryService, CategoryService>()
     .AddScoped<IReviewService, ReviewService>();
 
 var app = builder.Build();
+
+// Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        SeedData.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
