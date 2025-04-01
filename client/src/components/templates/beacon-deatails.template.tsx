@@ -12,13 +12,11 @@ interface BeaconDetailsPageTemplate {
 const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
   const {
     data: beacon,
-    error,
     isLoading,
   } = useGetBeaconQuery(beaconId ?? skipToken);
 
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-8">
+    <div className="flex flex-col items-center py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {isLoading || !beacon || !beacon?.Category ? (

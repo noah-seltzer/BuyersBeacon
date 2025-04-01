@@ -4,7 +4,7 @@ using server.Models;
 
 namespace server.Services
 {
-    public class BeaconService: IBeaconService
+    public class BeaconService : IBeaconService
     {
         private readonly ApplicationDbContext _context;
 
@@ -14,12 +14,16 @@ namespace server.Services
         }
         public async Task<Beacon?> GetById(Guid id)
         {
-            return await _context.Beacons
+            var beacon = await _context.Beacons
                 .Where(b => b.BeaconId == id)
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
-                .ThenInclude(i => i.Images)
+                    .ThenInclude(i => i.Images)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync();
+
+            Console.WriteLine($"DEBUG: Beacon User Data: {beacon?.User?.DisplayName ?? "null"}");
+            return beacon;
         }
 
         public async Task<IEnumerable<Beacon>> GetList(Guid? user_id = null, bool drafts = false)
@@ -28,21 +32,13 @@ namespace server.Services
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                 .ThenInclude(i => i.Images)
-                .Where(b => b.IsDraft == drafts)
-                .Where(b => user_id == null ? true : b.UserId == user_id);
+                .Include(b => b.User)
+                .Where(b => b.IsDraft == drafts);
 
-            //if (user_id != null)
-            //{
-            //    beacons.Where(b => b.UserId == user_id);
-            //}
-
-            //if (drafts == true)
-            //{
-            //    beacons.Where(b => b.IsDraft == true);
-            //} else
-            //{
-            //    beacons.Where(b => b.IsDraft == false);
-            //}
+            if (user_id.HasValue)
+            {
+                beacons = beacons.Where(b => b.UserId == user_id);
+            }
 
             return await beacons.ToListAsync();
         }
@@ -54,7 +50,7 @@ namespace server.Services
             {
                 BeaconId = Guid.NewGuid(),
                 UserId = beacon.UserId,
-                CategoryId = null, // Drafts don't require a category
+                CategoryId = beacon.CategoryId, // Drafts don't require a category
                 DateCreate = DateTime.UtcNow,
                 DateUpdate = DateTime.UtcNow,
                 ItemName = string.IsNullOrEmpty(beacon.ItemName) ? "Untitled Draft" : beacon.ItemName,
@@ -84,18 +80,6 @@ namespace server.Services
             beacon.LocCountry = newBeacon.LocCountry;
             beacon.LocPostalCode = newBeacon.LocPostalCode;
             return beacon;
-        }
-
-        public async Task<IEnumerable<Beacon>> SearchList(string searchText, string searchCategory)
-        {
-            var beacons = await _context.Beacons
-                .Where(b => b.ItemName.Contains(searchText))
-                .Where(b => b.Category.CategoryName == searchCategory)
-                .Include(b => b.Category)
-                .Include(b => b.ImageSet)
-                .ThenInclude(i => i.Images)
-                .ToListAsync();
-            return beacons;
         }
     }
 }

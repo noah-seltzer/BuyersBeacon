@@ -7,7 +7,6 @@ import CreateBeaconTemplate from "@/components/templates/create-beacon-template"
 import { useFormik } from "formik";
 import { Beacon } from "@/types/beacon";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
 
 const EditBeaconPage: FC = () => {
   const { id } = useParams();
@@ -36,7 +35,7 @@ const EditBeaconPage: FC = () => {
       ItemDescription: "",
       ItemPrice: 0,
       Images: [],
-    } as Beacon,
+    } as unknown as Beacon,
     onSubmit: async (values) => {
       // Handle submit logic here
       console.log("Submitting:", values);
@@ -62,7 +61,7 @@ const EditBeaconPage: FC = () => {
       </div>
     );
   }
-  
+
   if (beaconError || categoriesError) {
     return (
       <div className="min-h-screen flex items-center justify-center text-destructive">

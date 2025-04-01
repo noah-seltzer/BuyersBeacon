@@ -1,7 +1,7 @@
 import { Beacon } from "@/types/beacon";
 
 export const createBeaconFormdata = (beacon: Beacon) => {
-    var formData = new FormData()
+    const formData = new FormData()
     formData.append('ItemName', beacon.ItemName || 'Draft')
     formData.append(
         'ItemDescription',
@@ -10,10 +10,12 @@ export const createBeaconFormdata = (beacon: Beacon) => {
     if (beacon.CategoryId) {
         formData.append('CategoryId', beacon.CategoryId)
     }
-    formData.append(
-        'UserId',
-        'D11FAABB-2B72-4E25-88B5-1B9AD7B8A530'
-    )
+    if (beacon.UserId) {
+        formData.append(
+            'UserId',
+            beacon.UserId
+        )
+    }
 
     // Add price and location fields
     formData.append('ItemPrice', beacon.ItemPrice ? beacon.ItemPrice.toString() : '0')
@@ -39,6 +41,6 @@ export const createBeaconFormdata = (beacon: Beacon) => {
         })
     }
 
-    formData.append('IsDraft', beacon.IsDraft ? 'false' : 'true')
+    formData.append('IsDraft', beacon.IsDraft ? 'true' : 'false')
     return formData
 }

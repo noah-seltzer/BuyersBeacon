@@ -12,10 +12,15 @@ interface ImagePreviewProps {
   alt: string;
   emptyStatePrimaryText: string;
   className?: string;
+  showCoverPhotoLabel?: boolean;
 }
 
-const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePreviewProps) => {
-
+const ImagePreview = ({
+  images,
+  alt,
+  emptyStatePrimaryText,
+  showCoverPhotoLabel = true,
+}: ImagePreviewProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const nextImage = () => {
@@ -26,22 +31,20 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePr
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const imageUrls = images?.map(img => img.imageUrl) || [];
-
   const getCurrentImageSrc = () => {
     if (!images || !images[currentImageIndex]) return null;
     const image = images[currentImageIndex];
 
     if (image.imageUrl) {
-      return image.imageUrl;
+      return image.imageUrl || null;
     }
 
     if (typeof image.file === "string") {
-      return image.file;
+      return image.file || null;
     }
 
     if (image.file instanceof File) {
-      return URL.createObjectURL(image.file)
+      return URL.createObjectURL(image.file);
     }
 
     return null;
@@ -59,13 +62,16 @@ const ImagePreview = ({ images, alt, emptyStatePrimaryText, className }: ImagePr
             alt={alt ?? "Beacon Image"}
             fill
             className="object-cover"
+            onError={() => {
+              setCurrentImageIndex(0);
+            }}
           />
 
           <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded-md text-sm">
             {currentImageIndex + 1} / {images.length}
           </div>
 
-          {currentImageIndex === 0 && (
+          {showCoverPhotoLabel && currentImageIndex === 0 && (
             <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded-md text-sm flex items-center">
               <Star className="h-4 w-4 mr-1" />
               Cover Photo

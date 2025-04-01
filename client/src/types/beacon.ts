@@ -1,10 +1,10 @@
 export interface BeaconImage {
-  imageId: string;
-  imageSetId: string;
-  fileName: string;
-  imageUrl: string;
-  externalImageId: string;
-  mimeType: string;
+  imageId?: string;
+  imageSetId?: string;
+  fileName?: string;
+  imageUrl?: string;
+  externalImageId?: string;
+  mimeType?: string;
   file?: File;
 }
 
@@ -17,7 +17,7 @@ export interface ImageSet {
 export interface Beacon {
   Category?: Category;
   BeaconId?: string;
-  UserId?: string;
+  userId?: string;
   ItemName: string;
   CategoryId?: string;
   ItemDescription: string;
@@ -29,8 +29,15 @@ export interface Beacon {
   LocRegion?: string;
   LocCountry?: string;
   LocPostalCode?: string;
+<<<<<<< HEAD
   imageSet: ImageSet;
 }
+=======
+  imageSet?: ImageSet;
+  User?: User;
+  };
+
+>>>>>>> main
 
 export interface Category {
   CategoryName: string;

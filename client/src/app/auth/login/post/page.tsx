@@ -1,29 +1,18 @@
-import { auth } from '@clerk/nextjs/server'
-import { FC } from 'react'
-import SignInClientStateManager from '@/components/SignInClientState'
-import { User } from '@/types/user'
+import { FC } from "react";
+import SignInClientStateManager from "@/components/SignInClientState";
+import { getUserSS } from "@/lib/user";
 
 const PostLoginPage: FC = async () => {
-    const { userId: clerkUserId, getToken } = await auth()
-    const token = await getToken()
-    const headers = new Headers()
-    headers.set('Authorization', `Bearer ${token}`)
-    const beaconUser = await fetch(
-        process.env.API_URL + 'users/clerk/' + clerkUserId,
-        {
-            headers
-        }
-    )
-    const data = await beaconUser.json()
-    const user: User = {
-        id: data.userId,
-        clerk_user_id: data.clerkId
-    }
+  try {
+    const user = await getUserSS();
     return (
-        <>
-            <SignInClientStateManager user={user} redirectUrl="/" />
-        </>
-    )
-}
+      <>
+        <SignInClientStateManager user={user} redirectUrl="/" />
+      </>
+    );
+  } catch {
+    return <></>;
+  }
+};
 
-export default PostLoginPage
+export default PostLoginPage;

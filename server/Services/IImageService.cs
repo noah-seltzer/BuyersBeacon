@@ -8,8 +8,6 @@ namespace server.Services
         public string GenerateGuidFilename();
         public Image GenerateImage(IFormFile formFile, ImageSet? imageSet);
         public Task<Beacon> CreateImagesetForNewBeacon(Beacon beacon, Beacon beaconInput);
-
-
-
+        public Task<string> UploadImageAsync(IFormFile imageFile);
     }
 }
