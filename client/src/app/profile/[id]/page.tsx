@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetUserByIdQuery } from '@/redux/api';
+import { useGetUserByIdQuery, useGetBeaconsQuery } from '@/redux/api';
 import { ProfilePage } from '@/components/organisms/profile/profile-page';
 import { useParams } from 'next/navigation';
 import { ClimbingBoxLoader } from "react-spinners";
@@ -8,17 +8,28 @@ import Title from '@/components/atoms/text/title';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { useAuth, useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useChatModal } from '@/components/providers/chat-provider';
 
 export default function PublicProfilePage() {
   const params = useParams();
   const userId = params.id as string;
   const { data: profile, isLoading } = useGetUserByIdQuery(userId);
   const currentUserId = useSelector((state: RootState) => state.auth.userId);
+  const { openChat } = useChatModal();
+  
+  const { data: beacons } = useGetBeaconsQuery({ userId: userId, drafts: false });
+  const firstBeacon = beacons?.[0];
   
   const { userId: clerkUserId } = useAuth();
   const { user: clerkUser } = useUser();
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  
+  const handleOnChat = useCallback(() => {
+    if (firstBeacon?.BeaconId) {
+      openChat(firstBeacon.BeaconId);
+    }
+  }, [firstBeacon, openChat]);
   
   useEffect(() => {
     if (profile && clerkUser) {
@@ -46,5 +57,5 @@ export default function PublicProfilePage() {
     );
   }
 
-  return <ProfilePage profile={profile} isOwnProfile={isOwnProfile} />;
+  return <ProfilePage profile={profile} isOwnProfile={isOwnProfile} handleOnChat={handleOnChat} />;
 } 

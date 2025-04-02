@@ -32,7 +32,7 @@ const BeaconInfoCard = ({ price, location, isOwner, handleOnChat }: BeaconInfoCa
           <div className="flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-primary" />
             <span className="text-4xl font-bold text-primary">
-              {formatPrice(price)}
+              {formatPrice(price).substring(1)}
             </span>
           </div>
         </div>
