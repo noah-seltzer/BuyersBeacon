@@ -52,7 +52,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
   isOwnProfile,
 }) => {
   const { data: beacons, isLoading: beaconsLoading } = useGetBeaconsQuery({
-    userId: profile.id,
+    userId: profile.UserId,
     drafts: false,
   });
 
@@ -64,7 +64,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
   
   const handleDeleteUser = async () => {
     try {
-      await deleteUser(profile.id).unwrap();
+      await deleteUser(profile.UserId).unwrap();
       toast({
         title: "Account Deleted",
         description: "Your account has been successfully deleted.",
@@ -132,7 +132,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
 
                 {/* User Rating Stars */}
                 <div className="mb-4">
-                  <UserRatingSummary userId={profile.id} showTags={false} />
+                  <UserRatingSummary userId={profile.UserId} showTags={false} />
                 </div>
 
                 {/* Membership Info */}
@@ -155,7 +155,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
                       variant="default"
                       className="w-full rounded-full text-white"
                     >
-                      <Link href={`/profile/${profile.id}/edit`}>
+                      <Link href={`/profile/${profile.UserId}/edit`}>
                         <Pencil className="w-3.5 h-3.5 mr-1.5" />
                         Edit Profile
                       </Link>
@@ -252,7 +252,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           {/* Reviews List */}
           <div className="lg:col-span-2">
             <div className="bg-background rounded-xl shadow-sm border border-border/50 p-1">
-              <ReviewsList userId={profile.id} pageSize={5} />
+              <ReviewsList userId={profile.UserId} pageSize={5} />
             </div>
           </div>
 
@@ -260,7 +260,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           {!isOwnProfile && (
             <div className="lg:col-span-1">
               <div className="bg-background rounded-xl shadow-sm border border-border/50">
-                <ReviewForm userId={profile.id} />
+                <ReviewForm userId={profile.UserId} />
               </div>
             </div>
           )}

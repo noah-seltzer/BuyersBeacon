@@ -31,8 +31,8 @@ export function UserMenu() {
     skip: !clerkUser?.id,
   });
 
-  const { data: fullProfile } = useGetUserByIdQuery(beaconUser?.id || "", {
-    skip: !beaconUser?.id,
+  const { data: fullProfile } = useGetUserByIdQuery(beaconUser?.UserId || "", {
+    skip: !beaconUser?.UserId,
   });
 
   const displayName =
@@ -91,7 +91,7 @@ export function UserMenu() {
             <>
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/profile/${beaconUser.id}`}
+                  href={`/profile/${beaconUser.UserId}`}
                   className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
                 >
                   <User2 className="mr-3 h-4 w-4 text-primary/80" />
@@ -101,7 +101,7 @@ export function UserMenu() {
 
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/profile/${beaconUser.id}`}
+                  href={`/profile/${beaconUser.UserId}`}
                   className="flex items-center w-full cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
                 >
                   <Boxes className="mr-3 h-4 w-4 text-primary/80" />

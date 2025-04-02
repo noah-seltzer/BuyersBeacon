@@ -6,14 +6,15 @@ using System.Text.Json.Serialization;
 using server.Services;
 using server.Util;
 using dotenv.net;
+using server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 DotEnv.Load();
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-
-var connString =  builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddSignalR();
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connString));
@@ -21,13 +22,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "BuyersBeacon API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "BuyersBeacon API",
         Version = "v1",
         Description = "API documentation for BuyersBeacon server"
     });
-    
+
     // Enable XML comments in Swagger
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -41,15 +42,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-           policy.WithOrigins(
-                            "http://localhost:3000",
-                            "http://localhost:3000", 
-                            "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
-                            "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
-                            "https://buyers-beacon-client.vercel.app")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                      });
+            policy.WithOrigins(
+                             "http://localhost:3000",
+                             "http://localhost:3000",
+                             "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
+                             "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
+                             "https://buyers-beacon-client.vercel.app")
+                             .AllowAnyHeader()
+                             .AllowCredentials()
+                             .AllowAnyMethod();
+        });
 });
 
 builder.Services.AddControllers()
@@ -89,6 +91,9 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuyersBeacon API V1");
     c.RoutePrefix = string.Empty; // This makes Swagger UI the default page
 });
+
+
+app.MapHub<ChatHub>("/chathub");
 
 
 app.Run();

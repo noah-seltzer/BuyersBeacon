@@ -9,12 +9,13 @@ import { User } from "@/types/user";
 import { FC } from "react";
 import PageHeading from "@/components/atoms/text/page-heading";
 import SectionHeading from "@/components/atoms/text/section-heading";
+
 const DraftsPage: FC<{ user: User }> = ({ user }) => {
   const {
     data: drafts,
     isLoading,
     error,
-  } = useGetBeaconsQuery(user ? { drafts: true, userId: user.id } : skipToken);
+  } = useGetBeaconsQuery(user ? { drafts: true, userId: user.UserId } : skipToken);
   const [deleteDraft] = useDeleteBeaconMutation();
 
   const handleDelete = async (id: string) => {
@@ -107,4 +108,5 @@ const DraftsPage: FC<{ user: User }> = ({ user }) => {
     </div>
   );
 };
+
 export default DraftsPage;

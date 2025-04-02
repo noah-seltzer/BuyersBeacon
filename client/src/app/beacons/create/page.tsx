@@ -13,7 +13,8 @@ export default async function CreateBeaconRoute() {
         <CreateBeaconPage user={user} />
       </Suspense>
     );
-  } catch {
+  } catch (err: any) {
+    console.log(err.message)
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto text-center">

@@ -5,12 +5,14 @@ import { DollarSign, MapPin } from "lucide-react";
 interface BeaconInfoCardProps {
   price: number | undefined;
   location?: string;
+  isOwner: boolean,
+  handleOnChat: () => any;
 }
 
 /**
  * A reusable card component for displaying beacon price and location info
  */
-const BeaconInfoCard = ({ price, location }: BeaconInfoCardProps) => {
+const BeaconInfoCard = ({ price, location, isOwner, handleOnChat }: BeaconInfoCardProps) => {
   const formatPrice = (price: number | undefined) => {
     if (typeof price !== "number") return "$0.00";
     return new Intl.NumberFormat("en-US", {
@@ -46,10 +48,11 @@ const BeaconInfoCard = ({ price, location }: BeaconInfoCardProps) => {
           </div>
         )}
 
-        {/* Contact Button */}
-        <Button size="lg" className="w-full">
-          Get in Touch
-        </Button>
+        {!isOwner &&
+          <Button size="lg" className="w-full" onClick={() => handleOnChat()}>
+            Get in Touch
+          </Button>
+        }
       </div>
     </Card>
   );

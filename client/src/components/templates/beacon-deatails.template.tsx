@@ -2,18 +2,20 @@
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import Title from "@/components/atoms/text/title";
 import DetailedBeacon from "@/components/organisms/beacons/detailed-beacon";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetBeaconQuery } from "@/redux/api";
+import { Beacon } from "@/types/beacon";
+import { User } from "@/types/user";
 
-interface BeaconDetailsPageTemplate {
-  beaconId?: string;
+interface BeaconDetailsPageTemplateProps {
+  beacon: Beacon | undefined,
+  isLoading: boolean,
+  handleOnChat: () => any,
+  isOwner: boolean,
+  loading: boolean;
+  userIcon?: string,
+  user: User | null
 }
 
-const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
-  const {
-    data: beacon,
-    isLoading,
-  } = useGetBeaconQuery(beaconId ?? skipToken);
+const BeaconDetailsPageTemplate = ({ beacon, isLoading, handleOnChat, isOwner, loading, user, userIcon }: BeaconDetailsPageTemplateProps) => {
 
   return (
     <div className="flex flex-col items-center py-8">
@@ -25,7 +27,15 @@ const BeaconDetailsPageTemplate = ({ beaconId }: BeaconDetailsPageTemplate) => {
               <Title className="mt-10">Loading Beacon....</Title>
             </div>
           ) : (
-            <DetailedBeacon beacon={beacon} category={beacon.Category} />
+            <DetailedBeacon
+              handleOnChat={handleOnChat}
+              beacon={beacon}
+              category={beacon.Category}
+              isOwner={isOwner}
+              loading={loading}
+              user={user}
+              userIcon={userIcon}
+            />
           )}
         </div>
       </div>
