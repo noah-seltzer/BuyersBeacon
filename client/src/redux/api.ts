@@ -28,8 +28,10 @@ enum CACHES {
 export const LIST_ID = "LIST";
 
 export interface GetBeaconQueryInput {
-  drafts?: boolean;
-  userId?: string;
+  Drafts?: boolean;
+  ClerkId?: string;
+  CategoryId?: string;
+  QueryString?: string;
 }
 
 const DEFAULT_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api/')
@@ -114,8 +116,10 @@ export const beaconApi = createApi({
     getBeacons: builder.query<Beacon[], GetBeaconQueryInput>({
       query: (params) => {
         const queryParams = new URLSearchParams();
-        if (params?.userId) queryParams.append("userId", params.userId);
-        if (params?.drafts) queryParams.append("drafts", "true");
+        if (params?.ClerkId) queryParams.append("ClerkId", params.ClerkId);
+        if (params?.Drafts) queryParams.append("Drafts", "true");
+        if (params?.CategoryId) queryParams.append("CategoryId", params.CategoryId);
+        if (params?.QueryString) queryParams.append("QueryString", params.QueryString);
         return `${ENDPOINTS.BEACONS}?${queryParams.toString()}`;
       },
       transformResponse: (response: Beacon[]) =>

@@ -44,11 +44,16 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] bool drafts = false, [FromQuery] string? userId = null)
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
+            [FromQuery] Guid? CategoryId,
+            [FromQuery] string? QueryString,
+            [FromQuery] bool Drafts = false, 
+            [FromQuery] string? ClerkId = null
+            )
         {
             try
             {
-                var beacons = await _beaconService.GetList(userId != null ? new Guid(userId) : null, drafts);
+                var beacons = await _context.Beacons.ToListAsync();
                 return Ok(beacons);
             }
             catch (Exception ex)

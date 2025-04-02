@@ -1,13 +1,15 @@
 "use client";
 import { GetBeaconQueryInput, useGetAllCategoriesQuery, useGetBeaconsQuery } from "@/redux/api";
 import { FC, useCallback, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import PageContainer from "@/components/ui/page-container";
 import SearchBar, { SearchBarInputs } from "@/components/organisms/forms/search-bar";
-import { FormikHelpers, useFormik } from "formik";
+import { useFormik } from "formik";
 import { Category } from "@/types/beacon";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import EmptyState from "@/components/molecules/empty-state";
+import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
+import PageHeading from "@/components/atoms/text/page-heading";
 
 const initialValues: SearchBarInputs = {
   CategoryId: '',
@@ -16,25 +18,25 @@ const initialValues: SearchBarInputs = {
 
 const BrowseBeaconsPage: FC = () => {
   const router = useRouter();
-  const { userId, isLoaded } = useAuth()
+  const { userId: clerkId } = useAuth()
   const [query, setQuery] = useState<GetBeaconQueryInput>({
     Drafts: false,
   });
   const { data: categories, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-  const { data } = useGetBeaconsQuery(query)
+  const { data: beacons } = useGetBeaconsQuery(query)
 
-  const processSubmitQuery = useCallback((value: SearchBarInputs) => {
+  const processSubmitQuery = useCallback((values: SearchBarInputs) => {
 
-    if (!userId) return;
+    if (!clerkId) return;
 
     setQuery({
       Drafts: false,
-      ClerkId: userId,
+      ClerkId: clerkId,
       CategoryId: values.CategoryId,
-      QueryString: value.QueryString
+      QueryString: values.QueryString
     })
 
-  }, [userId])
+  }, [clerkId])
 
   const {
     values,
@@ -43,6 +45,7 @@ const BrowseBeaconsPage: FC = () => {
     handleChange,
     touched,
     isSubmitting,
+    setValues
   } = useFormik({
     onSubmit: processSubmitQuery,
     initialValues,
@@ -51,22 +54,22 @@ const BrowseBeaconsPage: FC = () => {
 
 
   const handleClearSearch = () => {
+    setValues({
+      CategoryId: '',
+      QueryString: ''
+    }, false)
     router.push('/beacons/browse');
   };
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      {/* <PageContainer>
+
+      <PageContainer>
         <PageHeading
           title="Browse Beacons"
-          subtitle={`${filteredBeacons.length} Beacons ${query ? 'found' : 'available'}`}
+          subtitle={`${beacons ? beacons.length : 0} Beacons found`}
         />
-      </PageContainer> */}
 
-      {/* Main Content */}
-      <PageContainer>
-        {/* Search Bar */}
         <SearchBar
           values={values}
           errors={errors}
@@ -81,15 +84,14 @@ const BrowseBeaconsPage: FC = () => {
           onClearSearch={handleClearSearch}
           loadingCategories={isCategoriesLoading}
         />
-        {/* No Results */}
-        {data?.length === 0 && <EmptyState primaryText={"No Beacons found"} />}
 
-        {/* Beacons Grid */}
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredBeacons.map((beacon) => (
+        {beacons?.length === 0 && <EmptyState primaryText={"No Beacons found"} />}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {beacons?.map((beacon) => (
             <BeaconThumbnail key={beacon.BeaconId} beacon={beacon} />
           ))}
-        </div> */}
+        </div>
       </PageContainer>
     </div>
   );
