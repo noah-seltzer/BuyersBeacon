@@ -103,6 +103,7 @@ const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ clu, messages, se
                                     placeholder="Type a message..."
                                     className="w-full p-2 border rounded"
                                     onKeyDown={(e) => {
+                                        console.log("HELLO WORLD", e.key)
                                         if (e.key === 'Enter') {
                                             sendMessage(e.currentTarget.value);
                                             e.currentTarget.value = '';

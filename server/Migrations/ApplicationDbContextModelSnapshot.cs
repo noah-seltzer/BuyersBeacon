@@ -183,6 +183,8 @@ namespace server.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ChatMessages");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "Messages");
                 });
 
             modelBuilder.Entity("server.Models.Image", b =>
