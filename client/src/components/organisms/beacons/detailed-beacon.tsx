@@ -10,40 +10,35 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { useDeleteBeaconMutation, useGetUserByIdQuery } from "@/redux/api";
+import { useDeleteBeaconMutation } from "@/redux/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/atoms/use-toast";
 import { ClimbingBoxLoader } from "react-spinners";
+import { User } from "@/types/user";
 
 interface DetailedBeaconProps {
   beacon: Beacon;
   category: Category;
+  handleOnChat: () => any;
+  isOwner: boolean;
+  loading: boolean;
+  userIcon?: string,
+  user: User | null
 }
 
-const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
-  const userId = beacon.userId;
+const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner, user, loading, userIcon }: DetailedBeaconProps) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
-
-  const { user: clerkUser } = useUser();
-  const { data: userData, isLoading } = useGetUserByIdQuery(userId || "", {
-    skip: !userId,
-  });
   const [deleteBeacon] = useDeleteBeaconMutation();
 
   const location = [beacon.LocCity, beacon.LocRegion, beacon.LocCountry]
     .filter(Boolean)
     .join(", ");
 
-  const avatarUrl = userData?.avatarUrl || clerkUser?.imageUrl || "/default-avatar.png";
-  
-  const isOwner = clerkUser?.id === userData?.clerk_user_id;
-  
   const handleDeleteBeacon = async () => {
     if (!beacon.BeaconId) {
-      console.error("Cannot delete: Beacon ID is undefined");
       toast({
         title: "Cannot Delete",
         description: "Beacon ID is missing",
@@ -60,9 +55,8 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
         description: "Your beacon has been successfully deleted.",
         variant: "success",
       });
-      router.push(`/profile/${userId}`);
+      router.push(`/profile/${user?.UserId}`);
     } catch (error) {
-      console.error("Failed to delete beacon:", error);
       toast({
         title: "Deletion Failed",
         description: "Failed to delete beacon. Please try again.",
@@ -73,7 +67,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
     }
   };
 
-  if (isLoading) {
+  if (loading || !user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <ClimbingBoxLoader size={35} color="#24dbb7" className="mb-10" />
@@ -82,6 +76,7 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
     );
   }
 
+  const avatarUrl = user?.avatarUrl || userIcon || "/default-avatar.png";
   return (
     <div className="flex flex-col gap-8 pt-4">
       {/* Back Button and Title Row */}
@@ -170,10 +165,10 @@ const DetailedBeacon = ({ beacon, category }: DetailedBeaconProps) => {
         {/* Sidebar */}
         <div className="space-y-8">
           {/* Author Card*/}
-          <UserCard userData={userData} avatarUrl={avatarUrl} />
+          <UserCard userData={user} avatarUrl={avatarUrl} />
 
           {/* Beacon Details Card */}
-          <BeaconInfoCard price={beacon.ItemPrice} location={location} />
+          <BeaconInfoCard price={beacon.ItemPrice} location={location} isOwner={isOwner} handleOnChat={handleOnChat} />
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ using server.Models;
 
 namespace server.Services
 {
-    public class BeaconService: IBeaconService
+    public class BeaconService : IBeaconService
     {
         private readonly ApplicationDbContext _context;
 
@@ -12,6 +12,8 @@ namespace server.Services
         {
             _context = context;
         }
+
+
         public async Task<Beacon?> GetById(Guid id)
         {
             var beacon = await _context.Beacons

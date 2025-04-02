@@ -1,12 +1,11 @@
 "use client";
-
 import { useTheme } from "next-themes";
 
 import Link from "next/link";
 
 import { Button } from "./atoms/button";
 
-import { Moon, Sun, Search, Menu, X, User, Loader2 } from "lucide-react";
+import { Moon, Sun, Search, Menu, X, User, Loader2, MessageCircle } from "lucide-react";
 
 import Lighthouse from "./atoms/icons/light-house";
 
@@ -29,6 +28,7 @@ import {
 import { useGetUserByClerkIdQuery } from "@/redux/api";
 
 import { UserMenu } from "./molecules/user-menu";
+import { useChatModal } from "./providers/chat-provider";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
@@ -50,6 +50,9 @@ export function Navbar() {
   const { isLoaded: isAuthLoaded, userId } = useAuth();
 
   const { user: clerkUser, isLoaded: isUserLoaded } = useUser();
+
+  const { openChat, isOpen } = useChatModal()
+
 
   // Only show theme toggle after component is mounted to prevent hydration mismatch
 
@@ -246,6 +249,17 @@ export function Navbar() {
                 </SignedOut>
 
                 <SignedIn>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    onClick={() => {
+                      openChat()
+                    }}
+                    className='text-foreground/80'
+                  >
+                    <MessageCircle className={`h-5 w-5 ${isOpen ? 'text-primary' : 'text-grey'}`} />
+                  </Button>
+
                   <div className="flex items-center gap-3">
                     <Button
                       asChild

@@ -7,6 +7,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
+import { ChatModalEngine, ChatModalProvider } from "./providers/chat-provider";
 
 const Providers: FC<PropsWithChildren> = ({ children }) => {
   const { theme } = useTheme();
@@ -28,8 +29,8 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
               theme === "dark" ? "hsl(0 0% 93%)" : "hsl(222 47% 11%)",
             colorTextSecondary:
               theme === "dark" ? "hsl(215 20.2% 65.1%)" : "hsl(215 25% 27%)",
-            colorAlphaShade:
-              theme === "dark" ? "hsl(215 28% 17%)" : "hsl(210 40% 96.1%)",
+            // colorAlphaShade:
+            //   theme === "dark" ? "hsl(215 28% 17%)" : "hsl(210 40% 96.1%)",
             borderRadius: "0.5rem",
           },
           elements: {
@@ -41,9 +42,12 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
         signInUrl="/auth/login"
         signUpUrl="/auth/register"
       >
-        <ToastContainer />
-        <Navbar />
-        <main className="pt-16">{children}</main>
+        <ChatModalProvider>
+          <ChatModalEngine />
+          <ToastContainer />
+          <Navbar />
+          <main className="pt-16">{children}</main>
+        </ChatModalProvider>
       </ClerkProvider>
     </Provider>
   );

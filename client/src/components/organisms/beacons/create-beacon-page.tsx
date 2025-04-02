@@ -14,7 +14,7 @@ import { User } from "@/types/user";
 
 const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
   const [createBeacon] = useCreateBeaconMutation();
-  
+
   const [categoryOptions, setCategoryOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -46,7 +46,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         helpers.setSubmitting(true);
         const payload = { ...beacon }
         if (user) {
-          payload.UserId = user.id
+          payload.UserId = user.UserId
         }
         const res = await createBeacon(payload).unwrap();
         navigateToBeaconDetailsPage(router, res);
@@ -69,9 +69,9 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       const draftData = {
         ...values,
         ItemPrice: values.ItemPrice || 0,
-        IsDraft: true, 
-        UserId: user?.id, 
-        LastDraftSave: new Date().toISOString() 
+        IsDraft: true,
+        UserId: user?.UserId,
+        LastDraftSave: new Date().toISOString()
       };
 
       await createBeacon(draftData).unwrap();
@@ -82,6 +82,8 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       setDraftError("Failed to save draft. Please try again.");
     }
   };
+
+
 
   const {
     handleChange,
@@ -99,7 +101,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       Images: [],
       ItemPrice: 0,
       imageSet: {}
-    } as Beacon,
+    } as unknown as Beacon,
     onSubmit: processSubmit,
   });
 

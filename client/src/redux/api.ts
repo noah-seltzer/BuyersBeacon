@@ -8,10 +8,12 @@ import {
   UserRating,
   PaginatedReviewsResponse,
 } from "@/types/user";
+import { Chat } from "@/types/chat";
 
 export enum ENDPOINTS {
   CATEGORIES = "Categories",
   BEACONS = "Beacons",
+  CHAT = "Chat"
 }
 
 enum CACHES {
@@ -30,6 +32,8 @@ export interface GetBeaconQueryInput {
   userId?: string;
 }
 
+const DEFAULT_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api/')
+
 export const beaconApi = createApi({
   tagTypes: [
     CACHES.BEACONS,
@@ -42,7 +46,7 @@ export const beaconApi = createApi({
   reducerPath: "beaconApi",
   baseQuery: fetchBaseQuery({
     mode: "cors",
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5037/api",
+    baseUrl: DEFAULT_URL,
     prepareHeaders: (headers) => {
       const sessionToken = Cookies.get("__session");
       if (sessionToken) {
@@ -207,14 +211,16 @@ export const beaconApi = createApi({
       query: (id) => `users/${id}`,
       transformResponse: (response: any) => {
         return {
-          id: response.userId,
-          clerk_user_id: response.clerkId,
+          UserId: response.userId,
+          ClerkId: response.clerkId,
           displayName: response.displayName || "Anonymous User",
           bio: response.bio || "No bio yet",
           location: response.location || "Location not set",
           avatarUrl: response.avatarUrl,
-          imageUrl: response.imageUrl,
+          imageUrl: response.imageUrl || response.avatarUrl,
           joinedDate: response.joinedDate || new Date().toISOString(),
+          averageRating: response.averageRating || 0,
+          totalReviews: response.totalReviews || 0
         };
       },
       providesTags: (_result, _error, id) => [{ type: CACHES.USERS, id }],
@@ -223,10 +229,9 @@ export const beaconApi = createApi({
     getUserByClerkId: builder.query<User, string>({
       query: (clerkId) => `users/clerk/${clerkId}`,
       transformResponse: (response: any) => {
-        const userId = response.userId;
         return {
-          id: response.userId,
-          clerk_user_id: response.clerkId,
+          UserId: response.UserId,
+          ClerkId: response.ClerkId,
           displayName: "Anonymous User",
           bio: "No bio yet",
           location: "Location not set",
@@ -237,8 +242,8 @@ export const beaconApi = createApi({
       async onQueryStarted(clerkId, { dispatch, queryFulfilled }) {
         try {
           const { data: initialUser } = await queryFulfilled;
-          if (initialUser?.id) {
-            dispatch(beaconApi.endpoints.getUserById.initiate(initialUser.id));
+          if (initialUser?.UserId) {
+            dispatch(beaconApi.endpoints.getUserById.initiate(initialUser.UserId));
           }
         } catch (error) {
           console.error("Error fetching user:", error);
@@ -268,7 +273,23 @@ export const beaconApi = createApi({
         { type: CACHES.BEACONS, id: LIST_ID },
       ],
     }),
+    getChat: builder.query<Chat, { chatId: string, clerkId: string }>({
+      query: ({ chatId, clerkId }) => `${ENDPOINTS.CHAT}/${chatId}/${clerkId}`
+    }),
+    getChats: builder.query<Chat[], string>({
+      query: (clerkId) => {
+        return {
+          url: `${ENDPOINTS.CHAT}`,
+          params: {
+            clerkId
+          }
+
+        }
+
+      }
+    })
   }),
+
 });
 
 export const {
@@ -281,6 +302,7 @@ export const {
   useUpdateProfileMutation,
   useGetUserByIdQuery,
   useGetUserByClerkIdQuery,
+  useLazyGetUserByClerkIdQuery,
   useUploadProfileImageMutation,
   useDeleteUserMutation,
   // Review hooks
@@ -289,4 +311,6 @@ export const {
   useCreateReviewMutation,
   useDeleteReviewMutation,
   useGetTagsQuery,
+  useLazyGetChatQuery,
+  useLazyGetChatsQuery
 } = beaconApi;
