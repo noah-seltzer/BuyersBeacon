@@ -40,6 +40,7 @@ import {
 } from "@/components/atoms/alert-dialog";
 import { useDeleteUserMutation } from "@/redux/api";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/atoms/use-toast";
 
 interface ProfilePageProps {
   profile: User;
@@ -51,7 +52,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
   isOwnProfile,
 }) => {
   const { data: beacons, isLoading: beaconsLoading } = useGetBeaconsQuery({
-    userId: profile.id,
+    userId: profile.UserId,
     drafts: false,
   });
 
@@ -59,16 +60,27 @@ export const ProfilePage: FC<ProfilePageProps> = ({
   const { signOut } = useAuth();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const router = useRouter();
+  const { toast } = useToast();
   
   const handleDeleteUser = async () => {
     try {
-      await deleteUser(profile.id);
+      await deleteUser(profile.UserId).unwrap();
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been successfully deleted.",
+        variant: "success",
+      });
       // Sign out the user
       await signOut();
       // Redirect to home page
       router.push("/");
     } catch (error) {
       console.error("Error deleting user:", error);
+      toast({
+        title: "Deletion Failed",
+        description: "Failed to delete your account. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,7 +132,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
 
                 {/* User Rating Stars */}
                 <div className="mb-4">
-                  <UserRatingSummary userId={profile.id} showTags={false} />
+                  <UserRatingSummary userId={profile.UserId} showTags={false} />
                 </div>
 
                 {/* Membership Info */}
@@ -143,7 +155,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
                       variant="default"
                       className="w-full rounded-full text-white"
                     >
-                      <Link href={`/profile/${profile.id}/edit`}>
+                      <Link href={`/profile/${profile.UserId}/edit`}>
                         <Pencil className="w-3.5 h-3.5 mr-1.5" />
                         Edit Profile
                       </Link>
@@ -160,21 +172,24 @@ export const ProfilePage: FC<ProfilePageProps> = ({
                           {isDeleting ? "Deleting..." : "Delete Account"}
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
+                          <AlertDialogTitle className="text-white text-xl font-bold">Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-300">
                             This action cannot be undone. This will permanently delete your
                             account and transfer all your beacons to a "Deleted User" account.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700">Cancel</AlertDialogCancel>
+                        <AlertDialogFooter className="flex gap-2 mt-6">
+                          <AlertDialogCancel className="bg-zinc-800 hover:bg-zinc-700 text-white border-none">
+                            Cancel
+                          </AlertDialogCancel>
                           <AlertDialogAction
                             onClick={handleDeleteUser}
-                            className="bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
+                            className="bg-red-600 hover:bg-red-700 text-white border-none"
+                            disabled={isDeleting}
                           >
-                            Delete Account
+                            {isDeleting ? 'Deleting...' : 'Delete Account'}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -237,7 +252,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           {/* Reviews List */}
           <div className="lg:col-span-2">
             <div className="bg-background rounded-xl shadow-sm border border-border/50 p-1">
-              <ReviewsList userId={profile.id} pageSize={5} />
+              <ReviewsList userId={profile.UserId} pageSize={5} />
             </div>
           </div>
 
@@ -245,7 +260,7 @@ export const ProfilePage: FC<ProfilePageProps> = ({
           {!isOwnProfile && (
             <div className="lg:col-span-1">
               <div className="bg-background rounded-xl shadow-sm border border-border/50">
-                <ReviewForm userId={profile.id} />
+                <ReviewForm userId={profile.UserId} />
               </div>
             </div>
           )}

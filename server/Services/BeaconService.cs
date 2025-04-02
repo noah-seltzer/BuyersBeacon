@@ -12,6 +12,8 @@ namespace server.Services
         {
             _context = context;
         }
+
+
         public async Task<Beacon?> GetById(Guid id)
         {
             var beacon = await _context.Beacons

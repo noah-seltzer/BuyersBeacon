@@ -23,7 +23,7 @@ export default function PublicProfilePage() {
   useEffect(() => {
     if (profile && clerkUser) {
       // Check if the profile belongs to the current user by comparing with Clerk userId
-      setIsOwnProfile(profile.clerk_user_id === clerkUser.id);
+      setIsOwnProfile(profile.ClerkId === clerkUser.id);
     }
   }, [profile, clerkUser]);
   

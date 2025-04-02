@@ -1,6 +1,11 @@
+import { Beacon } from "./beacon";
+import { Chat } from "./chat";
+
 export interface User {
-  id: string;
-  clerk_user_id: string;
+  UserId: string;
+  ClerkId: string;
+  Beacons?: Beacon[],
+  Chats?: Chat[],
   displayName: string;
   bio: string;
   location: string;

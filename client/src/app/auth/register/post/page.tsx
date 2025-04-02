@@ -6,22 +6,27 @@ import SignInClientStateManager from '@/components/SignInClientState'
 
 const PostRegisterPage: FC = async () => {
     const { userId: clerkUserId, getToken } = await auth()
+
     const token = await getToken()
+    console.log(token);
     const headers = new Headers()
     headers.set('Authorization', `Bearer ${token}`)
     headers.set("Content-Type", "application/json")
     const beaconUser = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + 'users/clerk/' + clerkUserId,
+        process.env.API_URL + "users/clerk/" + clerkUserId,
         {
             headers,
-            method: 'POST',
+            method: "POST",
         }
-    )
+    );
+
+
+    console.log(beaconUser.status);
 
     const data = await beaconUser.json()
     const user: User = {
-        id: data.userId,
-        clerk_user_id: data.clerkId,
+        UserId: data.UserId,
+        ClerkId: data.ClerkId,
         displayName: "",
         bio: "",
         location: "",

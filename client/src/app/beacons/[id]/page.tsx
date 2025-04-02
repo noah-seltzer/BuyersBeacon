@@ -1,21 +1,48 @@
-import { Suspense } from "react";
+"use client";
+import { Suspense, useCallback } from "react";
 import BeaconDetailsPageTemplate from "@/components/templates/beacon-deatails.template";
+import { useGetBeaconQuery, useGetUserByIdQuery } from "@/redux/api";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useParams } from "next/navigation";
+import { useChatModal } from "@/components/providers/chat-provider";
+import { useUser } from "@clerk/nextjs";
 import PageContainer from "@/components/ui/page-container";
 
-interface BeaconDetailsPageProps {
-    params: Promise<{ id: string }>
-}
 
-const BeaconDetailsPage = async (props: BeaconDetailsPageProps) => {
-    const { id } = await props.params;
+const BeaconDetailsPage = () => {
+    const { id } = useParams();
+    const { user: clerkUser } = useUser();
+    const { openChat } = useChatModal();
+    const {
+        data: beacon,
+        isLoading: isLoadingBeacon,
+    } = useGetBeaconQuery(id?.toString() ?? skipToken);
+    const {
+        data: user,
+        isLoading: isLoadingUser
+    } = useGetUserByIdQuery(beacon?.UserId ?? skipToken, {
+        skip: !beacon?.UserId
+    })
 
-    return (
-        <Suspense fallback={<div>Loading</div>}>
-            <PageContainer>
-                <BeaconDetailsPageTemplate beaconId={id} />
-            </PageContainer>
-        </Suspense>
-    );
+
+    const handleOnChat = useCallback((beaconId: string) => {
+        openChat(beaconId);
+    }, [])
+
+
+    return <Suspense fallback={<div>Loading</div>}>
+        <PageContainer>
+            <BeaconDetailsPageTemplate
+                isOwner={beacon?.User?.ClerkId === clerkUser?.id}
+                isLoading={isLoadingBeacon || isLoadingUser}
+                beacon={beacon}
+                handleOnChat={() => id && handleOnChat(id.toString())}
+                loading={isLoadingBeacon || isLoadingUser}
+                user={user ?? null}
+                userIcon={user?.avatarUrl ?? clerkUser?.imageUrl ?? "/default-avatar.png"}
+            />
+        </PageContainer>
+    </Suspense>
 };
 
 export default BeaconDetailsPage;

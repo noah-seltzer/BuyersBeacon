@@ -16,7 +16,7 @@ const SignInClientStateManager: FC<SignInClientStateManagerProps> = ({ user, red
     const router = useRouter()
 
     useEffect(() => {
-        dispatch(setUserId(user.id))
+        dispatch(setUserId(user.UserId))
         dispatch(setUser(user))
 
         if (redirectUrl) {

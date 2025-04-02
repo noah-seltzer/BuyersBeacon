@@ -174,10 +174,10 @@ export const BeaconThumbnail: FC<BeaconThumbnailProps> = ({ beacon }) => {
 
             {/* User info with rating - show only if user ID exists */}
 
-            {beacon.userId && (
+            {beacon.UserId && (
               <div className="pt-2 mt-2 border-t border-border/40">
                 <UserInfoWithRating
-                  userId={beacon.userId}
+                  userId={beacon.UserId}
                   isWrappedInLink={true}
                 />
               </div>
