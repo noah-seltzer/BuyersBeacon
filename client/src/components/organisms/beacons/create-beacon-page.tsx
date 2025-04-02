@@ -66,9 +66,17 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     try {
       setDraftError(null);
 
+      // For drafts, only title is required
+      if (!values.ItemName?.trim()) {
+        setDraftError("Please provide a title for your beacon draft.");
+        return;
+      }
+
       const draftData = {
         ...values,
+        ItemDescription: values.ItemDescription || "Draft description",
         ItemPrice: values.ItemPrice || 0,
+        CategoryId: values.CategoryId || (categoryOptions.length > 0 ? categoryOptions[0].value : "00000000-0000-0000-0000-000000000001"),
         IsDraft: true,
         UserId: user?.UserId,
         LastDraftSave: new Date().toISOString()
@@ -77,9 +85,20 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       await createBeacon(draftData).unwrap();
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save draft:", error);
-      setDraftError("Failed to save draft. Please try again.");
+      
+      if (error?.data?.errors) {
+        if (error.data.errors.CategoryId) {
+          setDraftError("Server error: Category validation failed. Try again or select a category.");
+        } else if (error.data.errors.ItemName) {
+          setDraftError("Please provide a title for your beacon draft.");
+        } else {
+          setDraftError("There was an issue with your beacon draft. Please check all fields and try again.");
+        }
+      } else {
+        setDraftError("Failed to save draft. Please check your connection and try again.");
+      }
     }
   };
 
