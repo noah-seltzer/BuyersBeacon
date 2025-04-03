@@ -46,7 +46,7 @@ namespace server.Services
 
             var options = new AuthenticateRequestOptions(
                 secretKey,
-                authorizedParties: new string[] { "http://localhost:3000", "https://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net", "http://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net" }
+                authorizedParties: new string[] { "http://localhost:3000", "https://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net", "http://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net", "https://buyers-beacon-client.vercel.app" }
 );
 
             
