@@ -27,7 +27,8 @@ const PostRegisterPage: FC = async () => {
 
     console.log(beaconUser.status);
 
-    const data = await beaconUser.json()
+    const data = JSON.parse(text)
+    console.log('data', data)
     const user: User = {
         UserId: data.UserId,
         ClerkId: data.ClerkId,
