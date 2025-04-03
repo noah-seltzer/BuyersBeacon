@@ -53,7 +53,19 @@ namespace server.Controllers
         {
             try
             {
-                var beacons = await _context.Beacons.ToListAsync();
+                var query = _context.Beacons.AsQueryable();
+
+                if (!(CategoryId == null))
+                {
+                    query = query.Where(b => b.CategoryId == CategoryId);
+                }
+
+                if (!String.IsNullOrEmpty(QueryString))
+                {
+                    query = query.Where(b => b.ItemName.Contains(QueryString));
+                }
+
+                var beacons = await query.ToListAsync();
                 return Ok(beacons);
             }
             catch (Exception ex)
