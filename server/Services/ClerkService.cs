@@ -54,6 +54,7 @@ namespace server.Services
             
             if (state.Token == null)
             {
+                Console.WriteLine("Auth failed: " + state.ErrorReason.Message);
                 return null;
             }
 
