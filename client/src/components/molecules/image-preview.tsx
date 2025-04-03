@@ -119,7 +119,6 @@ const ImagePreview = ({
       ) : (
         <EmptyState
           primaryText={emptyStatePrimaryText}
-          icon={ImageIcon}
           iconH={100}
           className="h-full"
           iconW={100}
