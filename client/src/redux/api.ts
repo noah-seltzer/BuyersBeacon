@@ -32,7 +32,7 @@ export interface GetBeaconQueryInput {
   userId?: string;
 }
 
-const DEFAULT_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api/')
+const DEFAULT_URL = (process.env.API_URL || 'http://localhost:5037/api/')
 
 export const beaconApi = createApi({
   tagTypes: [
