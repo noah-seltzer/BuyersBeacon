@@ -30,7 +30,7 @@ namespace BuyersBeaconServerTest
 
 
             _testId = Guid.NewGuid();
-            Console.WriteLine(_testId
+            //Console.WriteLine(_testId
             _testBeacon = new Beacon()
             {
                 BeaconId = _testId,
@@ -52,8 +52,9 @@ namespace BuyersBeaconServerTest
         public async void Test1()
         {
             //_mockDbContext.Setup(c => c.Beacons).Returns(_mockBeaconDbSet.Object);
-            //_mockDbContext
+            _mockDbContext.Object.Beacons.SingleAsync();
             var beacons = await _beaconService.GetById(_testId);
+            Assert.NotNull(beacons);
             //Assert.NotNull(beacons);
             //_mockBeaconDbSet.As<Beacon>().Setup()
 

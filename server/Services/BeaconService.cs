@@ -40,7 +40,7 @@ namespace server.Services
                 beacons = beacons.Where(b => b.UserId == user_id);
             }
 
-            return await beacons.ToListAsync();
+            return beacons.ToList();
         }
 
 
