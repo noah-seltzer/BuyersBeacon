@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { FC, Suspense } from "react";
 import BrowseBeaconsPage from "@/components/organisms/beacons/browse-beacon-page";
 
 
