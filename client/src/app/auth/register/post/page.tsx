@@ -22,6 +22,8 @@ const PostRegisterPage: FC = async () => {
       }
     );
 
+    const text = await beaconUser.text()
+    console.log('text', text)
 
     console.log(beaconUser.status);
 
