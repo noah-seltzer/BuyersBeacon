@@ -38,7 +38,11 @@ namespace server.Services
         }
         public async Task<string?> VerifyUserSessionToken(HttpRequest request)
         {
-            var secretKey = DotEnv.Read()["CLERK_SECRET_KEY"];
+            var secretKey = Environment.GetEnvironmentVariable("CLERK_SECRET_KEY");
+            if (secretKey == null)
+            {
+                secretKey = DotEnv.Read()["CLERK_SECRET_KEY"]; 
+            }
 
             var options = new AuthenticateRequestOptions(
                 secretKey,

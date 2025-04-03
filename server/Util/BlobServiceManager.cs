@@ -9,7 +9,11 @@ namespace server.Util
     {
         public BlobServiceManager()
         {
-            var str = DotEnv.Read()["AZURE_STORAGE_CONNECTION_STRING"];
+            var str = Environment.GetEnvironmentVariable("CLERK_SECRET_KEY");
+            if (str == null)
+            {
+                str = DotEnv.Read()["CLERK_SECRET_KEY"];
+            }
             this.Client = new BlobServiceClient(str);
             this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
         }
