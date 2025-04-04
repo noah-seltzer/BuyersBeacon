@@ -341,16 +341,42 @@ export function Navbar() {
           <NavLink href="/help" onClick={() => setIsMenuOpen(false)}>
             Help Center
           </NavLink>
+          
+          <SignedOut>
+            <div className="flex gap-3 mt-2">
+              <SignInButton mode="modal">
+                <Button
+                  variant="outline"
+                  className="rounded-full px-5 flex-1"
+                  size="sm"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
 
-          <Button
-            variant="default"
-            className="bg-primary hover:bg-primary/90 text-white w-full mt-2 rounded-full"
-            asChild
-          >
-            <Link href="/beacons/create" onClick={() => setIsMenuOpen(false)}>
-              Create Beacon
-            </Link>
-          </Button>
+              <SignUpButton mode="modal">
+                <Button
+                  variant="default"
+                  className="bg-primary hover:bg-primary/90 text-white rounded-full px-5 flex-1"
+                  size="sm"
+                >
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </div>
+          </SignedOut>
+          
+          <SignedIn>
+            <Button
+              variant="default"
+              className="bg-primary hover:bg-primary/90 text-white w-full mt-2 rounded-full"
+              asChild
+            >
+              <Link href="/beacons/create" onClick={() => setIsMenuOpen(false)}>
+                Create Beacon
+              </Link>
+            </Button>
+          </SignedIn>
         </div>
       </div>
     </header>
