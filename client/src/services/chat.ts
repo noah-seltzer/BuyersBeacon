@@ -38,7 +38,9 @@ const useChat = ({
     useEffect(() => {
         if (isLoaded && isSignedIn && !connectionCreated) {
             const newConnection = new HubConnectionBuilder()
-                .withUrl( process.env.API_URL + 'chathub')
+                .withUrl( process.env.API_URL + 'chathub', {
+                    withCredentials: true
+                })
                 .withAutomaticReconnect()
                 .configureLogging(LogLevel.Information)
                 .build();
