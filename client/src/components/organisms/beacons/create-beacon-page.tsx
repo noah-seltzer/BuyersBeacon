@@ -158,9 +158,10 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
   });
 
   // Create a preview object with the category name
-  const previewBeacon = {
+  const previewBeacon: Beacon = {
     ...values,
     Category: values.CategoryId ? {
+      CategoryId: values.CategoryId,
       CategoryName: categoryOptions.find(cat => cat.value === values.CategoryId)?.label || "Category"
     } : undefined
   };

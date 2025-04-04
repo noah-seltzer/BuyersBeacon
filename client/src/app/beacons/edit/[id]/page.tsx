@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useGetBeaconQuery, useGetAllCategoriesQuery } from "@/redux/api";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
 import { useFormik } from "formik";
-import { Beacon } from "@/types/beacon";
+import { Beacon, BeaconImage } from "@/types/beacon";
 import { Loader2 } from "lucide-react";
 
 const EditBeaconPage: FC = () => {
@@ -48,10 +48,16 @@ const EditBeaconPage: FC = () => {
       console.log("Setting beacon values:", beacon);
 
       const images = beacon.imageSet?.images || [];
-      const transformedImages = images.map(img => ({
-        ...img,
-        file: img.imageUrl || undefined
-      }));
+      // Transform existing images to include URL as string file property for display
+      const transformedImages: BeaconImage[] = images.map(img => {
+        // Create a copy without modifying the original
+        const newImg: BeaconImage = {
+          ...img,
+          // Use the imageUrl as the file property for display purposes
+          file: img.imageUrl || undefined
+        };
+        return newImg;
+      });
       
       setValues({
         ...beacon,
@@ -78,9 +84,10 @@ const EditBeaconPage: FC = () => {
     );
   }
   
-  const previewBeacon = {
+  const previewBeacon: Beacon = {
     ...values,
     Category: values.CategoryId ? {
+      CategoryId: values.CategoryId,
       CategoryName: categoryOptions.find(cat => cat.value === values.CategoryId)?.label || beacon?.Category?.CategoryName || "Category"
     } : beacon?.Category
   };

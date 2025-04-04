@@ -6,7 +6,8 @@ export interface BeaconImage {
   imageUrl?: string;
   externalImageId?: string;
   mimeType?: string;
-  file?: File;
+  // file can be a File object (for new uploads) or string (for existing images)
+  file?: File | string;
 }
 
 export interface ImageSet {
