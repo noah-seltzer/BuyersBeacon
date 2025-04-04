@@ -149,7 +149,7 @@ export function Navbar() {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-8">
               <NavLink href="/beacons/browse">Browse Beacons</NavLink>
 
               <NavLink href="/about">About Us</NavLink>
@@ -159,7 +159,7 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
-            <form onSubmit={handleSearch} className="hidden md:block">
+            <form onSubmit={handleSearch} className="hidden lg:block">
               <div
                 className={cn(
                   "relative rounded-full transition-all duration-200 flex items-center",
@@ -216,16 +216,16 @@ export function Navbar() {
 
             {isLoading ? (
               <div className="flex items-center gap-3">
-                <div className="h-8 w-24 rounded-full bg-muted animate-pulse hidden md:flex"></div>
+                <div className="h-8 w-24 rounded-full bg-muted animate-pulse hidden lg:flex"></div>
 
-                <div className="h-8 w-24 rounded-full bg-primary/20 animate-pulse hidden md:flex"></div>
+                <div className="h-8 w-24 rounded-full bg-primary/20 animate-pulse hidden lg:flex"></div>
 
                 <div className="h-9 w-9 rounded-full bg-muted/60 animate-pulse"></div>
               </div>
             ) : (
               <>
                 <SignedOut>
-                  <div className="hidden md:flex gap-3">
+                  <div className="hidden lg:flex gap-3">
                     <SignInButton mode="modal">
                       <Button
                         variant="outline"
@@ -264,7 +264,7 @@ export function Navbar() {
                     <Button
                       asChild
                       variant="default"
-                      className="bg-primary hover:bg-primary/90 text-white rounded-full hidden md:flex"
+                      className="bg-primary hover:bg-primary/90 text-white rounded-full hidden lg:flex"
                       size="sm"
                     >
                       <Link href="/beacons/create">
@@ -281,7 +281,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -298,7 +298,7 @@ export function Navbar() {
 
       <div
         className={cn(
-          "md:hidden fixed inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg transition-all duration-300 ease-in-out",
+          "lg:hidden fixed inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg transition-all duration-300 ease-in-out",
 
           isMenuOpen
             ? "top-16 opacity-100"
