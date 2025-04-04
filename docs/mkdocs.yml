@@ -1,0 +1,72 @@
+site_name: BuyersBeacon Documentation
+
+# GitHub repository information
+repo_url: https://github.com/noah-seltzer/BuyersBeacon
+repo_name: noah-seltzer/BuyersBeacon
+edit_uri: edit/main/docs/docs/
+
+# Disable live reload to prevent tab navigation issues
+use_directory_urls: true
+livereload: false
+
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/lighthouse
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: Roboto Mono
+  
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Basic Concepts: getting-started/concepts.md
+  - Client: client.md
+  - Server: server.md
+  - Authentication: authentication.md
+  - Deployment: deployment.md
+  - Contributing: contributing.md
+  - Further Information: further_info.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+      title: On this page
+  - tables
+
+plugins:
+  - search

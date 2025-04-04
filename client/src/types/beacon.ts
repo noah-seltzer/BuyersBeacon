@@ -1,5 +1,4 @@
 import { User } from "@/types/user";
-
 export interface BeaconImage {
   imageId?: string;
   imageSetId?: string;
@@ -7,7 +6,8 @@ export interface BeaconImage {
   imageUrl?: string;
   externalImageId?: string;
   mimeType?: string;
-  file?: File;
+  // file can be a File object (for new uploads) or string (for existing images)
+  file?: File | string;
 }
 
 export interface ImageSet {

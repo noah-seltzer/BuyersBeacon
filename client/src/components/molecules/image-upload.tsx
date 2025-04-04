@@ -73,7 +73,9 @@ export function ImageUpload({
                 src={
                   !!image.file && typeof image.file === "string"
                     ? image.file
-                    : URL.createObjectURL(image.file as Blob)
+                    : image.imageUrl 
+                      ? image.imageUrl
+                      : URL.createObjectURL(image.file as Blob)
                 }
                 alt={`Image ${index + 1}`}
                 fill

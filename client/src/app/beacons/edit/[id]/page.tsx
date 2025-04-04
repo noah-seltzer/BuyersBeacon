@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useGetBeaconQuery, useGetAllCategoriesQuery } from "@/redux/api";
 import CreateBeaconTemplate from "@/components/templates/create-beacon-template";
 import { useFormik } from "formik";
-import { Beacon } from "@/types/beacon";
+import { Beacon, BeaconImage } from "@/types/beacon";
 import { Loader2 } from "lucide-react";
 
 const EditBeaconPage: FC = () => {
@@ -35,7 +35,7 @@ const EditBeaconPage: FC = () => {
       ItemDescription: "",
       ItemPrice: 0,
       Images: [],
-    } as Beacon,
+    } as unknown as Beacon,
     onSubmit: async (values) => {
       // Handle submit logic here
       console.log("Submitting:", values);
@@ -46,10 +46,24 @@ const EditBeaconPage: FC = () => {
   useEffect(() => {
     if (beacon) {
       console.log("Setting beacon values:", beacon);
+
+      const images = beacon.imageSet?.images || [];
+      // Transform existing images to include URL as string file property for display
+      const transformedImages: BeaconImage[] = images.map(img => {
+        // Create a copy without modifying the original
+        const newImg: BeaconImage = {
+          ...img,
+          // Use the imageUrl as the file property for display purposes
+          file: img.imageUrl || undefined
+        };
+        return newImg;
+      });
+      
       setValues({
         ...beacon,
         CategoryId: beacon.CategoryId || "",
         ItemPrice: beacon.ItemPrice || 0,
+        Images: transformedImages,
       });
     }
   }, [beacon, setValues]);
@@ -61,7 +75,7 @@ const EditBeaconPage: FC = () => {
       </div>
     );
   }
-  
+
   if (beaconError || categoriesError) {
     return (
       <div className="min-h-screen flex items-center justify-center text-destructive">
@@ -69,12 +83,20 @@ const EditBeaconPage: FC = () => {
       </div>
     );
   }
+  
+  const previewBeacon: Beacon = {
+    ...values,
+    Category: values.CategoryId ? {
+      CategoryId: values.CategoryId,
+      CategoryName: categoryOptions.find(cat => cat.value === values.CategoryId)?.label || beacon?.Category?.CategoryName || "Category"
+    } : beacon?.Category
+  };
 
   return (
     <CreateBeaconTemplate
       handleSubmit={handleSubmit}
       handleChange={handleChange}
-      values={values}
+      values={previewBeacon}
       errors={errors}
       touched={touched}
       categoryOptions={categoryOptions}

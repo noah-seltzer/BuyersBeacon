@@ -28,13 +28,19 @@ namespace server.Services
             return beacon;
         }
 
-        public async Task<IEnumerable<Beacon>> GetList(Guid? user_id = null, bool drafts = false)
+        public async Task<IEnumerable<Beacon>> GetList(
+            Guid? user_id = null,
+            bool drafts = false,
+            Guid? CategoryId = null, 
+            string? QueryString = null
+            )
         {
-            var beacons = _context.Beacons
+            var query = _context.Beacons
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                 .ThenInclude(i => i.Images)
                 .AsQueryable();
+
 
             // If user_id is provided, filter by user regardless of draft status
             if (user_id.HasValue)
@@ -56,7 +62,14 @@ namespace server.Services
                 query = query.Where(b => b.ItemName.Contains(QueryString));
             }
 
-            return await beacons.ToListAsync();
+                if (!String.IsNullOrEmpty(QueryString))
+                {
+                    query = query.Where(b => b.ItemName.Contains(QueryString));
+                }
+
+                query = query.Where(b => b.IsDraft == drafts);
+            }
+            return await query.ToListAsync();
         }
 
 
