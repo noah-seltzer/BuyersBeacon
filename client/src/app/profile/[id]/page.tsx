@@ -26,9 +26,8 @@ export default function PublicProfilePage() {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   
   const handleOnChat = useCallback(() => {
-    if (firstBeacon?.BeaconId) {
-      openChat(firstBeacon.BeaconId);
-    }
+    if (!firstBeacon || !firstBeacon.BeaconId) return
+    openChat(firstBeacon.BeaconId);
   }, [firstBeacon, openChat]);
   
   useEffect(() => {
