@@ -46,9 +46,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
             [FromQuery] Guid? CategoryId,
-            [FromQuery] string? QueryString,
-            [FromQuery] bool Drafts = false, 
-            [FromQuery] string? ClerkId = null
+            [FromQuery] string? QueryString
             )
         {
             try

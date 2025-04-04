@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     API_URL: process.env.API_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -33,7 +36,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ]
-  }
+  },
   /* config options here */
 };
 

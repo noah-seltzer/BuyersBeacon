@@ -34,7 +34,7 @@ export interface GetBeaconQueryInput {
   QueryString?: string;
 }
 
-const DEFAULT_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5037/api/')
+const DEFAULT_URL = (process.env.API_URL || 'http://localhost:5037/api/')
 
 export const beaconApi = createApi({
   tagTypes: [
@@ -113,8 +113,8 @@ export const beaconApi = createApi({
       providesTags: () => [{ type: CACHES.TAGS, id: LIST_ID }],
     }),
 
-    getBeacons: builder.query<Beacon[], GetBeaconQueryInput>({
-      query: (params) => {
+    getBeacons: builder.query<Beacon[], GetBeaconQueryInput | void>({
+      query: (params = {}) => {
         const queryParams = new URLSearchParams();
         if (params?.ClerkId) queryParams.append("ClerkId", params.ClerkId);
         if (params?.Drafts) queryParams.append("Drafts", "true");

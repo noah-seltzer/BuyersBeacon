@@ -1,5 +1,5 @@
 "use client";
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, Suspense } from "react";
 import { Navbar } from "@/components/navbar";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
@@ -45,7 +45,9 @@ const Providers: FC<PropsWithChildren> = ({ children }) => {
         <ChatModalProvider>
           <ChatModalEngine />
           <ToastContainer />
-          <Navbar />
+          <Suspense>
+            <Navbar />
+          </Suspense>
           <main className="pt-16">{children}</main>
         </ChatModalProvider>
       </ClerkProvider>

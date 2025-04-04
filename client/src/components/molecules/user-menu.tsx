@@ -131,7 +131,7 @@ export function UserMenu() {
             <span className="font-medium">Account Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => openUserProfile({ tab: "security" })}
+            onClick={() => openUserProfile()}
             className="flex items-center cursor-pointer rounded-lg p-2.5 hover:bg-primary/10 focus:bg-primary/10"
           >
             <Shield className="mr-3 h-4 w-4 text-primary/80" />
