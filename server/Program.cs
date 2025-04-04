@@ -49,7 +49,6 @@ builder.Services.AddCors(options =>
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "https://buyers-beacon-client.vercel.app")
                              .AllowAnyHeader()
-                             .AllowCredentials()
                              .AllowAnyMethod();
         });
 });
