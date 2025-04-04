@@ -157,11 +157,19 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     },
   });
 
+  // Create a preview object with the category name
+  const previewBeacon = {
+    ...values,
+    Category: values.CategoryId ? {
+      CategoryName: categoryOptions.find(cat => cat.value === values.CategoryId)?.label || "Category"
+    } : undefined
+  };
+
   return (
     <CreateBeaconTemplate
       handleSubmit={handleSubmit}
       handleChange={handleChange}
-      values={values}
+      values={previewBeacon}
       errors={errors}
       touched={touched}
       categoryOptions={categoryOptions}
