@@ -30,6 +30,8 @@ export const LIST_ID = "LIST";
 export interface GetBeaconQueryInput {
   drafts?: boolean;
   userId?: string;
+  CategoryId?: string;
+  QueryString?: string;
 }
 
 const DEFAULT_URL = (process.env.API_URL || 'http://localhost:5037/api/')
@@ -116,6 +118,8 @@ export const beaconApi = createApi({
         const queryParams = new URLSearchParams();
         if (params?.userId) queryParams.append("userId", params.userId);
         if (params?.drafts) queryParams.append("drafts", "true");
+        if (params?.CategoryId) queryParams.append("CategoryId", params.CategoryId);
+        if (params?.QueryString) queryParams.append("QueryString", params.QueryString);
         return `${ENDPOINTS.BEACONS}?${queryParams.toString()}`;
       },
       transformResponse: (response: Beacon[]) =>

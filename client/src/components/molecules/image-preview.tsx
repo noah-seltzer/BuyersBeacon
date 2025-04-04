@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { BeaconImage } from "@/types/beacon";
-import { ChevronLeft, ChevronRight, Star, ImageIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/atoms/button";

@@ -46,7 +46,7 @@ const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner, user, loading
       });
       return;
     }
-    
+
     try {
       setIsDeleting(true);
       await deleteBeacon(beacon.BeaconId).unwrap();
@@ -97,8 +97,8 @@ const DetailedBeacon = ({ beacon, category, handleOnChat, isOwner, user, loading
           {isOwner && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   size="sm"
                   className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded"
                   disabled={isDeleting}

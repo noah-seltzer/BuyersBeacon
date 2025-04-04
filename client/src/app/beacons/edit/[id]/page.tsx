@@ -35,7 +35,7 @@ const EditBeaconPage: FC = () => {
       ItemDescription: "",
       ItemPrice: 0,
       Images: [],
-    } as Beacon,
+    } as unknown as Beacon,
     onSubmit: async (values) => {
       // Handle submit logic here
       console.log("Submitting:", values);
@@ -61,7 +61,7 @@ const EditBeaconPage: FC = () => {
       </div>
     );
   }
-  
+
   if (beaconError || categoriesError) {
     return (
       <div className="min-h-screen flex items-center justify-center text-destructive">

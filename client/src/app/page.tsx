@@ -149,8 +149,8 @@ const Home: FC = () => {
                           index === 0
                             ? "/beacons/create"
                             : index === 1
-                            ? "/beacons/browse"
-                            : "/help"
+                              ? "/beacons/browse"
+                              : "/help"
                         }
                         className="inline-flex items-center text-primary hover:text-primary/80 font-medium"
                       >
@@ -284,8 +284,8 @@ const Home: FC = () => {
                         i === 0
                           ? "/beacons/browse"
                           : i === 1
-                          ? "/beacons/create"
-                          : "#"
+                            ? "/beacons/create"
+                            : "#"
                       }
                       className="text-sm text-foreground/70 hover:text-primary transition-colors"
                     >
