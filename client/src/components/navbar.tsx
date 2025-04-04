@@ -1,20 +1,9 @@
 "use client";
+
 import { useTheme } from "next-themes";
-
 import Link from "next/link";
-
-import { Button } from "./atoms/button";
-
-import { Moon, Sun, Search, Menu, X, User, Loader2, MessageCircle } from "lucide-react";
-
-import Lighthouse from "./atoms/icons/light-house";
-
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-import { cn } from "@/lib/utils";
-
 import { useState, useEffect, FormEvent, KeyboardEvent } from "react";
-
 import {
   SignedOut,
   SignedIn,
@@ -24,44 +13,42 @@ import {
   useUser,
   useAuth,
 } from "@clerk/nextjs";
+import {
+  Moon,
+  Sun,
+  Search,
+  Menu,
+  X,
+  User,
+  Loader2,
+  MessageCircle,
+} from "lucide-react";
 
+import { Button } from "./atoms/button";
+import Lighthouse from "./atoms/icons/light-house";
+import { cn } from "@/lib/utils";
 import { useGetUserByClerkIdQuery } from "@/redux/api";
-
 import { UserMenu } from "./molecules/user-menu";
 import { useChatModal } from "./providers/chat-provider";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
-
   const pathname = usePathname();
-
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [isFocused, setIsFocused] = useState(false);
-
   const [mounted, setMounted] = useState(false);
-
   const { isLoaded: isAuthLoaded, userId } = useAuth();
-
   const { user: clerkUser, isLoaded: isUserLoaded } = useUser();
-
-  const { openChat, isOpen } = useChatModal()
-
-
-  // Only show theme toggle after component is mounted to prevent hydration mismatch
+  const { openChat, isOpen } = useChatModal();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const query = searchParams.get("query") || "";
-
   const [inputValue, setInputValue] = useState(query);
 
   const { data: beaconUser, isLoading: isBeaconUserLoading } =
@@ -83,12 +70,10 @@ export function Navbar() {
 
   const handleSearch = (e?: FormEvent) => {
     e?.preventDefault();
-
     if (inputValue.trim()) {
       router.push(
         `/beacons/browse?query=${encodeURIComponent(inputValue.trim())}`
       );
-
       setIsFocused(false);
     }
   };
@@ -101,15 +86,11 @@ export function Navbar() {
 
   const NavLink = ({
     href,
-
     children,
-
     onClick,
   }: {
     href: string;
-
     children: React.ReactNode;
-
     onClick?: () => void;
   }) => {
     const isActive =
@@ -121,11 +102,8 @@ export function Navbar() {
         onClick={onClick}
         className={cn(
           "text-sm font-medium relative py-1.5 px-1 transition-colors duration-200",
-
           "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-0.5 after:rounded-full",
-
           "after:bg-primary after:transition-transform after:duration-300",
-
           isActive
             ? "text-foreground after:scale-x-100"
             : "text-foreground/70 after:scale-x-0 hover:text-foreground hover:after:scale-x-100"
@@ -143,34 +121,28 @@ export function Navbar() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
               <Lighthouse className="h-8 w-8 text-primary" />
-
               <span className="text-xl font-bold tracking-tight text-primary">
                 BuyersBeacon
               </span>
             </Link>
-
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-8">
               <NavLink href="/beacons/browse">Browse Beacons</NavLink>
-
               <NavLink href="/about">About Us</NavLink>
-
               <NavLink href="/help">Help Center</NavLink>
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
-            <form onSubmit={handleSearch} className="hidden md:block">
+            <form onSubmit={handleSearch} className="hidden lg:block">
               <div
                 className={cn(
                   "relative rounded-full transition-all duration-200 flex items-center",
-
                   isFocused
                     ? "bg-muted border border-primary/40 pr-8"
                     : "bg-muted/70 hover:bg-muted pr-3"
                 )}
               >
                 <Search className="h-4 w-4 text-muted-foreground mx-2" />
-
                 <input
                   type="text"
                   value={inputValue}
@@ -181,7 +153,6 @@ export function Navbar() {
                   placeholder="Search beacons..."
                   className="bg-transparent text-sm py-1 border-none focus:outline-none w-full max-w-[140px] focus:max-w-[200px] transition-all duration-200"
                 />
-
                 {isFocused && inputValue && (
                   <button
                     type="submit"
@@ -212,20 +183,16 @@ export function Navbar() {
               </div>
             )}
 
-            {/* Show loading skeleton while authentication loads */}
-
             {isLoading ? (
               <div className="flex items-center gap-3">
-                <div className="h-8 w-24 rounded-full bg-muted animate-pulse hidden md:flex"></div>
-
-                <div className="h-8 w-24 rounded-full bg-primary/20 animate-pulse hidden md:flex"></div>
-
+                <div className="h-8 w-24 rounded-full bg-muted animate-pulse hidden lg:flex"></div>
+                <div className="h-8 w-24 rounded-full bg-primary/20 animate-pulse hidden lg:flex"></div>
                 <div className="h-9 w-9 rounded-full bg-muted/60 animate-pulse"></div>
               </div>
             ) : (
               <>
                 <SignedOut>
-                  <div className="hidden md:flex gap-3">
+                  <div className="hidden lg:flex gap-3">
                     <SignInButton mode="modal">
                       <Button
                         variant="outline"
@@ -235,7 +202,6 @@ export function Navbar() {
                         Sign In
                       </Button>
                     </SignInButton>
-
                     <SignUpButton mode="modal">
                       <Button
                         variant="default"
@@ -250,28 +216,30 @@ export function Navbar() {
 
                 <SignedIn>
                   <Button
-                    variant='ghost'
-                    size='icon'
+                    variant="ghost"
+                    size="icon"
                     onClick={() => {
-                      openChat()
+                      openChat();
                     }}
-                    className='text-foreground/80'
+                    className="text-foreground/80"
                   >
-                    <MessageCircle className={`h-5 w-5 ${isOpen ? 'text-primary' : 'text-grey'}`} />
+                    <MessageCircle
+                      className={`h-5 w-5 ${
+                        isOpen ? "text-primary" : "text-grey"
+                      }`}
+                    />
                   </Button>
-
                   <div className="flex items-center gap-3">
                     <Button
                       asChild
                       variant="default"
-                      className="bg-primary hover:bg-primary/90 text-white rounded-full hidden md:flex"
+                      className="bg-primary hover:bg-primary/90 text-white rounded-full hidden lg:flex"
                       size="sm"
                     >
                       <Link href="/beacons/create">
                         <span className="flex items-center">Create Beacon</span>
                       </Link>
                     </Button>
-
                     <UserMenu />
                   </div>
                 </SignedIn>
@@ -281,7 +249,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -295,11 +263,9 @@ export function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-
       <div
         className={cn(
-          "md:hidden fixed inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg transition-all duration-300 ease-in-out",
-
+          "lg:hidden fixed inset-x-0 bg-background/95 backdrop-blur-md border-b shadow-lg transition-all duration-300 ease-in-out",
           isMenuOpen
             ? "top-16 opacity-100"
             : "-top-96 opacity-0 pointer-events-none"
@@ -309,7 +275,6 @@ export function Navbar() {
           <form onSubmit={handleSearch} className="w-full">
             <div className="relative rounded-full bg-muted flex items-center p-2 mb-2">
               <Search className="h-4 w-4 text-muted-foreground mx-2" />
-
               <input
                 type="text"
                 value={inputValue}
@@ -318,7 +283,6 @@ export function Navbar() {
                 placeholder="Search beacons..."
                 className="bg-transparent text-sm border-none focus:outline-none w-full"
               />
-
               {inputValue.trim() && (
                 <button
                   type="submit"
@@ -333,24 +297,47 @@ export function Navbar() {
           <NavLink href="/beacons/browse" onClick={() => setIsMenuOpen(false)}>
             Browse Beacons
           </NavLink>
-
           <NavLink href="/about" onClick={() => setIsMenuOpen(false)}>
             About Us
           </NavLink>
-
           <NavLink href="/help" onClick={() => setIsMenuOpen(false)}>
             Help Center
           </NavLink>
 
-          <Button
-            variant="default"
-            className="bg-primary hover:bg-primary/90 text-white w-full mt-2 rounded-full"
-            asChild
-          >
-            <Link href="/beacons/create" onClick={() => setIsMenuOpen(false)}>
-              Create Beacon
-            </Link>
-          </Button>
+          <SignedOut>
+            <div className="flex gap-3 mt-2">
+              <SignInButton mode="modal">
+                <Button
+                  variant="outline"
+                  className="rounded-full px-5 flex-1"
+                  size="sm"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button
+                  variant="default"
+                  className="bg-primary hover:bg-primary/90 text-white rounded-full px-5 flex-1"
+                  size="sm"
+                >
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </div>
+          </SignedOut>
+
+          <SignedIn>
+            <Button
+              variant="default"
+              className="bg-primary hover:bg-primary/90 text-white w-full mt-2 rounded-full"
+              asChild
+            >
+              <Link href="/beacons/create" onClick={() => setIsMenuOpen(false)}>
+                Create Beacon
+              </Link>
+            </Button>
+          </SignedIn>
         </div>
       </div>
     </header>
