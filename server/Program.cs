@@ -14,7 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 DotEnv.Load();
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddSignalR();
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -45,7 +44,7 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins(
                              "http://localhost:3000",
-                             "http://localhost:3000",
+                             "http://localhost:3000", 
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "https://buyers-beacon-client.vercel.app")
@@ -54,6 +53,7 @@ builder.Services.AddCors(options =>
                              .AllowAnyMethod();
         });
 });
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -109,7 +109,7 @@ app.UseSwaggerUI(c =>
 });
 
 
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<ChatHub>("/api/chathub");
 
 
 app.Run();

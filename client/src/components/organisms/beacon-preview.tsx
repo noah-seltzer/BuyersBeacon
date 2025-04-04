@@ -35,8 +35,8 @@ export function BeaconPreview({ beacon }: BeaconPreviewProps) {
     skip: !clerkUser?.id,
   });
   
-  const { data: fullProfile, isLoading: isProfileLoading } = useGetUserByIdQuery(beaconUser?.id || "", {
-    skip: !beaconUser?.id,
+  const { data: fullProfile, isLoading: isProfileLoading } = useGetUserByIdQuery(beaconUser?.UserId || "", {
+    skip: !beaconUser?.UserId,
   });
 
   useEffect(() => {

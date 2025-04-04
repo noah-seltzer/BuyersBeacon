@@ -116,9 +116,17 @@ export const ChatModalEngine = () => {
             setMessages([...messages, messageObject]);
         }
 
-        chats[index].Messages.push(messageObject);
-        setChats([...chats])
-        toast.info("New message");
+        if (!chats[index].Messages) {
+            chats[index].Messages = [];
+        }
+        
+        const updatedChats = [...chats];
+        updatedChats[index] = {
+            ...updatedChats[index],
+            Messages: [...(updatedChats[index].Messages || []), messageObject]
+        };
+        
+        setChats(updatedChats);
     }, [chats, focusedChat, setChats, setMessages, messages])
 
     const onNewChat = useCallback((chat: Chat) => {

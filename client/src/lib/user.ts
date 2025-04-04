@@ -12,7 +12,7 @@ export const getUserSS = async () => {
             throw new Error('Not Signed In')
         }
         
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL
+        const apiBaseUrl = process.env.API_URL || DEFAULT_API_URL
         
         const headers = new Headers()
         headers.set('Authorization', `Bearer ${token}`)

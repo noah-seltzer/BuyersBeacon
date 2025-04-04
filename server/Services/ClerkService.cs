@@ -38,11 +38,15 @@ namespace server.Services
         }
         public async Task<string?> VerifyUserSessionToken(HttpRequest request)
         {
-            var secretKey = DotEnv.Read()["CLERK_SECRET_KEY"];
+            var secretKey = Environment.GetEnvironmentVariable("CLERK_SECRET_KEY");
+            if (secretKey == null)
+            {
+                secretKey = DotEnv.Read()["CLERK_SECRET_KEY"]; 
+            }
 
             var options = new AuthenticateRequestOptions(
                 secretKey,
-                authorizedParties: new string[] { "http://localhost:3000" }
+                authorizedParties: new string[] { "http://localhost:3000", "https://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net", "http://buyersbeacon-g8bvgkcseuaxdqfj.canadacentral-01.azurewebsites.net", "https://buyers-beacon-client.vercel.app" }
 );
 
             
@@ -50,6 +54,7 @@ namespace server.Services
             
             if (state.Token == null)
             {
+                Console.WriteLine("Auth failed: " + state.ErrorReason.Message);
                 return null;
             }
 
