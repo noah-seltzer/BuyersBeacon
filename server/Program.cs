@@ -14,7 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 DotEnv.Load();
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddSignalR();
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -54,6 +53,7 @@ builder.Services.AddCors(options =>
                              .AllowAnyMethod();
         });
 });
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
