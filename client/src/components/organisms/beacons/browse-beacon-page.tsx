@@ -1,7 +1,7 @@
 "use client";
 import { GetBeaconQueryInput, useGetAllCategoriesQuery, useGetBeaconsQuery } from "@/redux/api";
-import { FC, useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FC, useCallback, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
 import { Category } from "@/types/beacon";
 import EmptyState from "@/components/molecules/empty-state";
@@ -17,9 +17,16 @@ const initialValues: SearchBarInputs = {
 
 const BrowseBeaconsPage: FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.get('QueryString') || '';
+  const categoryId = searchParams.get('CategoryId') || '';
+  
   const [query, setQuery] = useState<GetBeaconQueryInput>({
     drafts: false,
+    QueryString: queryString,
+    CategoryId: categoryId
   });
+  
   const { data: categories, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
   const { data: beacons } = useGetBeaconsQuery(query)
 
@@ -40,7 +47,10 @@ const BrowseBeaconsPage: FC = () => {
     setValues
   } = useFormik({
     onSubmit: processSubmitQuery,
-    initialValues,
+    initialValues: {
+      CategoryId: categoryId,
+      QueryString: queryString
+    },
     enableReinitialize: true
   })
 
@@ -48,7 +58,10 @@ const BrowseBeaconsPage: FC = () => {
     setValues({
       CategoryId: '',
       QueryString: ''
-    }, false)
+    }, false);
+    setQuery({
+      drafts: false
+    });
     router.push('/beacons/browse');
   };
 

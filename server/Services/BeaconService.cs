@@ -35,7 +35,11 @@ namespace server.Services
             string? QueryString = null
             )
         {
-            var query = _context.Beacons.AsQueryable();
+            var query = _context.Beacons
+                .Include(b => b.Category)
+                .Include(b => b.ImageSet)
+                .ThenInclude(i => i.Images)
+                .AsQueryable();
 
             //If getting list of drafts, then check for User ID as well
             if (drafts && user_id.HasValue)
