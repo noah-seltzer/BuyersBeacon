@@ -125,10 +125,13 @@ const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ clu, messages, se
                                     </div>
                                     :
                                     <div className="flex flex-col items-center overflow-y-auto">
-                                        {chats.map(c => <ChatListing
-                                            chat={c}
-                                            selectChat={focusChat}
-                                        />)}
+                                        {chats.map(c => (
+                                            <ChatListing
+                                                key={c.ChatId}
+                                                chat={c}
+                                                selectChat={focusChat}
+                                            />
+                                        ))}
                                     </div>
 
                             }

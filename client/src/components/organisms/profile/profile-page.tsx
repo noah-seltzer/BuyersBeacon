@@ -45,11 +45,13 @@ import { useToast } from "@/components/atoms/use-toast";
 interface ProfilePageProps {
   profile: User;
   isOwnProfile?: boolean;
+  handleOnChat?: () => void;
 }
 
 export const ProfilePage: FC<ProfilePageProps> = ({
   profile,
   isOwnProfile,
+  handleOnChat = () => {},
 }) => {
   const { data: beacons, isLoading: beaconsLoading } = useGetBeaconsQuery({
     userId: profile.UserId,
@@ -209,7 +211,10 @@ export const ProfilePage: FC<ProfilePageProps> = ({
                   title={profile.displayName}
                   rightContent={
                     !isOwnProfile && (
-                      <Button className="bg-primary hover:bg-primary/90 rounded-full text-white">
+                      <Button 
+                        className="bg-primary hover:bg-primary/90 rounded-full text-white"
+                        onClick={handleOnChat}
+                      >
                         Contact {profile.displayName.split(" ")[0]}
                       </Button>
                     )
