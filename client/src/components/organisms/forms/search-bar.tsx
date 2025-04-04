@@ -48,7 +48,7 @@ const SearchBar = ({
             value={values.QueryString}
             onChange={handleChange}
             placeholder="Search by name, description, category, or location..."
-            className="pl-10 py-3 rounded-xl border-border/50 w-full"
+            className="pl-10 py-3 rounded-xl border-border/50 w-full h-[48px]"
           />
           {values.QueryString && (
             <button
@@ -68,7 +68,7 @@ const SearchBar = ({
           onChange={handleChange}
           options={categories}
           categoryOptionsIsLoading={loadingCategories}
-          className="min-w-[200px]"
+          className="min-w-[180px] md:min-w-[200px]"
         />
 
         {/* Search Button */}
