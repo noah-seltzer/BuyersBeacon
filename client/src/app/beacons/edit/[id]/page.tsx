@@ -46,10 +46,18 @@ const EditBeaconPage: FC = () => {
   useEffect(() => {
     if (beacon) {
       console.log("Setting beacon values:", beacon);
+
+      const images = beacon.imageSet?.images || [];
+      const transformedImages = images.map(img => ({
+        ...img,
+        file: img.imageUrl || undefined
+      }));
+      
       setValues({
         ...beacon,
         CategoryId: beacon.CategoryId || "",
         ItemPrice: beacon.ItemPrice || 0,
+        Images: transformedImages,
       });
     }
   }, [beacon, setValues]);
@@ -69,12 +77,19 @@ const EditBeaconPage: FC = () => {
       </div>
     );
   }
+  
+  const previewBeacon = {
+    ...values,
+    Category: values.CategoryId ? {
+      CategoryName: categoryOptions.find(cat => cat.value === values.CategoryId)?.label || beacon?.Category?.CategoryName || "Category"
+    } : beacon?.Category
+  };
 
   return (
     <CreateBeaconTemplate
       handleSubmit={handleSubmit}
       handleChange={handleChange}
-      values={values}
+      values={previewBeacon}
       errors={errors}
       touched={touched}
       categoryOptions={categoryOptions}
