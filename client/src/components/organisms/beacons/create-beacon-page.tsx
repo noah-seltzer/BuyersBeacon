@@ -10,6 +10,7 @@ import {
 import { navigateToBeaconDetailsPage } from "@/helpers/navigation";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
+import { handleApiError } from "@/lib/utils";
 
 
 const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
@@ -66,9 +67,17 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     try {
       setDraftError(null);
 
+      // For drafts, only title is required
+      if (!values.ItemName?.trim()) {
+        setDraftError("Please provide a title for your beacon draft.");
+        return;
+      }
+
       const draftData = {
         ...values,
+        ItemDescription: values.ItemDescription || "Draft description",
         ItemPrice: values.ItemPrice || 0,
+        CategoryId: values.CategoryId || (categoryOptions.length > 0 ? categoryOptions[0].value : "00000000-0000-0000-0000-000000000001"),
         IsDraft: true,
         UserId: user?.UserId,
         LastDraftSave: new Date().toISOString()
@@ -77,9 +86,10 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       await createBeacon(draftData).unwrap();
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save draft:", error);
-      setDraftError("Failed to save draft. Please try again.");
+      
+      handleApiError(error, setDraftError);
     }
   };
 
