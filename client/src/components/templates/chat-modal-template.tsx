@@ -81,7 +81,7 @@ const ChatModalTemplate: React.FC<ChatModalTemplateProps> = ({ clu, messages, se
                                         messages.map((message, index) => (
                                             <div
                                                 key={index}
-                                                className={`flex ${message.UserId === clu?.UserId ? 'justify-end' : 'justify-start'}`}
+                                                className={`flex ${message.UserId === clu?.UserId ? 'justify-end' : 'justify-start'} mb-3`}
                                             >
                                                 <div
                                                     className={`

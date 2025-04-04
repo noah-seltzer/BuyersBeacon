@@ -15,11 +15,11 @@ const PostRegisterPage: FC = async () => {
     const url = process.env.API_URL + "users/clerk/" + clerkUserId
     console.log('url', url)
     const beaconUser = await fetch(
-      process.env.API_URL + "users/clerk/" + clerkUserId,
-      {
-        headers,
-        method: "POST",
-      }
+        process.env.API_URL + "users/clerk/" + clerkUserId,
+        {
+            headers,
+            method: "POST",
+        }
     );
 
     const text = await beaconUser.text()

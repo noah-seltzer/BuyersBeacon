@@ -23,9 +23,9 @@ namespace server.Controllers
         private IImageService _imageService;
         private IClerkService _clerkService;
 
-        public BeaconsController(ApplicationDbContext context, 
-            ICategoryService categoryService, 
-            IBeaconService beaconService, 
+        public BeaconsController(ApplicationDbContext context,
+            ICategoryService categoryService,
+            IBeaconService beaconService,
             IImageService imageService,
             IClerkService clerkService)
         {
@@ -36,7 +36,7 @@ namespace server.Controllers
             _imageService = imageService;
             _clerkService = clerkService;
         }
-        
+
         /// <summary>
         /// Gets all beacons
         /// </summary>
@@ -44,11 +44,21 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons([FromQuery] bool drafts = false, [FromQuery] string? userId = null)
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
+            [FromQuery] bool drafts = false,
+            [FromQuery] string? userId = null,
+            [FromQuery] Guid? CategoryId = null,
+            [FromQuery] string? QueryString = null
+            )
         {
-            try 
+            try
             {
-                var beacons = await _beaconService.GetList(userId != null ? new Guid(userId) : null, drafts);
+                var beacons = await _beaconService.GetList(
+                    userId != null ? new Guid(userId) : null,
+                    drafts,
+                    CategoryId, 
+                    QueryString
+                    );
                 return Ok(beacons);
             }
             catch (Exception ex)
@@ -118,13 +128,14 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (beacon.CategoryId == null) {
+            if (beacon.CategoryId == null)
+            {
                 ModelState.AddModelError(nameof(beacon.CategoryId), "Please select valid category id.");
                 return BadRequest(ModelState);
             }
 
             // Im only extracting the value becuase of the null check above.
-            var category = await _categoryService.GetById((System.Guid) beacon.CategoryId);
+            var category = await _categoryService.GetById((System.Guid)beacon.CategoryId);
 
             if (beacon.CategoryId.HasValue && category == null)
             {
@@ -246,7 +257,7 @@ namespace server.Controllers
                     {
                         _context.Images.RemoveRange(beacon.ImageSet.Images);
                     }
-                    
+
                     _context.ImageSets.Remove(beacon.ImageSet);
                 }
 

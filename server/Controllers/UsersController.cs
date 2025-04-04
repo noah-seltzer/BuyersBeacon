@@ -60,8 +60,9 @@ namespace server.Controllers
 
             // Get Clerk user data if available
             var clerkUser = await _clerkService.GetClerkUserFromToken(HttpContext.Request);
-            
-            return Ok(new {
+
+            return Ok(new
+            {
                 userId = user.UserId,
                 clerkId = user.ClerkId,
                 displayName = user.DisplayName,
@@ -353,7 +354,7 @@ namespace server.Controllers
             user.DisplayName = profile.DisplayName;
             user.Bio = profile.Bio;
             user.Location = profile.Location;
-            
+
             // Update avatar URL if provided
             if (!string.IsNullOrEmpty(profile.AvatarUrl))
             {
@@ -376,37 +377,37 @@ namespace server.Controllers
             {
                 return Unauthorized();
             }
-            
+
             // Find the user
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.ClerkId == clerkId);
-                
+
             if (user == null)
             {
                 return NotFound("User not found");
             }
-            
+
             // Check if there's an image in the request
             if (Request.Form.Files.Count == 0)
             {
                 return BadRequest("No image file provided");
             }
-            
+
             var imageFile = Request.Form.Files[0];
             if (imageFile.Length == 0)
             {
                 return BadRequest("Empty image file");
             }
-            
+
             try
             {
                 // Upload image to blob storage
                 var imageUrl = await imageService.UploadImageAsync(imageFile);
-                
+
                 // Update user's avatar URL
                 user.AvatarUrl = imageUrl;
                 await _context.SaveChangesAsync();
-                
+
                 return Ok(new { url = imageUrl });
             }
             catch (Exception ex)

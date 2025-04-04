@@ -1,5 +1,4 @@
 import { User } from "@/types/user";
-
 export interface BeaconImage {
   imageId?: string;
   imageSetId?: string;
