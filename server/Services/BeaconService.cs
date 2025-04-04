@@ -34,12 +34,26 @@ namespace server.Services
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                 .ThenInclude(i => i.Images)
-                .Include(b => b.User)
-                .Where(b => b.IsDraft == drafts);
+                .AsQueryable();
 
+            // If user_id is provided, filter by user regardless of draft status
             if (user_id.HasValue)
             {
-                beacons = beacons.Where(b => b.UserId == user_id);
+                query = query.Where(b => b.UserId == user_id.Value);
+            }
+            
+            // Filter by draft status
+            query = query.Where(b => b.IsDraft == drafts);
+            
+            // Apply additional filters for search parameters
+            if (CategoryId.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == CategoryId.Value);
+            }
+
+            if (!String.IsNullOrEmpty(QueryString))
+            {
+                query = query.Where(b => b.ItemName.Contains(QueryString));
             }
 
             return await beacons.ToListAsync();
