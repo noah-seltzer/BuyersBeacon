@@ -67,15 +67,15 @@ client/src/
 - `layout.tsx` defines shared UI for segments. `page.tsx` defines the unique UI for a route.
 - `loading.tsx` and `error.tsx` (if present) handle loading and error states within segments.
 - `not-found.tsx` provides a custom 404 page.
-- `middleware.ts` intercepts requests, likely used for protecting routes based on authentication status via Clerk.
+- `middleware.ts` intercepts requests for protecting routes based on authentication status via Clerk.
 
 ### State Management (Redux)
 
 - Uses Redux Toolkit (`@reduxjs/toolkit`) for managing global application state.
 - The store is configured in `src/redux/store.ts`.
 - State is organized into slices (e.g., `auth-slice.ts`).
-- RTK Query might be used for data fetching and caching via `src/redux/api.ts`.
-- The `<Providers>` component in `src/components/providers.tsx` likely wraps the application with the Redux Provider.
+- RTK Query is used for data fetching and caching via `src/redux/api.ts`.
+- The `<Providers>` component in `src/components/providers.tsx` wraps the application with the Redux Provider.
 
 ### UI Components (shadcn/ui & Radix)
 
@@ -90,16 +90,16 @@ client/src/
 ### Authentication (Clerk)
 
 - Uses `@clerk/nextjs` for user authentication and management.
-- Clerk components (`<SignIn>`, `<SignUp>`, `<UserButton>`) are likely used within the auth routes (`src/app/auth/`) and the navbar (`src/components/navbar.tsx`).
-- The `<ClerkProvider>` is likely included in `src/components/providers.tsx` or the root layout.
-- `middleware.ts` probably integrates with Clerk's `authMiddleware` to protect routes.
+- Clerk components (`<SignIn>`, `<SignUp>`, `<UserButton>`) are used within the auth routes (`src/app/auth/`) and the navbar (`src/components/navbar.tsx`).
+- The `<ClerkProvider>` is included in `src/components/providers.tsx` or the root layout.
+- `middleware.ts` integrates with Clerk's `authMiddleware` to protect routes.
 - Client fetches user information using Clerk hooks (`useUser`, `useAuth`).
-- Authentication state might also be reflected in the Redux store (`auth-slice.ts`).
+- Authentication state is reflected in the Redux store (`auth-slice.ts`).
 
 ### Real-time Communication (SignalR)
 
-- The `@microsoft/signalr` client library is used to connect to the backend SignalR hub (likely `ChatHub`).
-- Connection logic and event handling are likely managed within `src/services/chat.ts` and potentially wrapped in a context provider (`src/components/providers/chat-provider.tsx`).
+- The `@microsoft/signalr` client library is used to connect to the backend SignalR hub (`ChatHub`).
+- Connection logic and event handling are managed within `src/services/chat.ts` and wrapped in a context provider (`src/components/providers/chat-provider.tsx`).
 - Chat components (`src/components/molecules/chat/`) interact with this service/provider to send and receive messages.
 
 ## Configuration

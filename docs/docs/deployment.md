@@ -24,7 +24,7 @@ The deployment workflow is triggered on:
 
 3. **Install Dependencies**
    * Uses pnpm to install dependencies for all workspaces
-   * Likely runs `pnpm install` at the root level
+   * Runs `pnpm install` at the root level
 
 4. **Client-side Build Process**
    * Lints client code (`pnpm --filter client lint`)
@@ -39,16 +39,14 @@ The deployment workflow is triggered on:
    * Prepares deployable artifacts
 
 6. **Deployment**
-   * **Client:** Likely deploys to a service like Vercel, Netlify, or Azure Static Web Apps
-   * **Server:** Likely deploys to Azure App Service (inferred from potential `.azurewebsites.net` URLs)
+   * **Client:** Deploys to Azure Static Web Apps or Vercel
+   * **Server:** Deploys to Azure App Service
    * Sets necessary environment variables from GitHub Secrets
 
 7. **Post-Deployment Verification**
-   * May include smoke tests or health checks
+   * Includes smoke tests or health checks
 
 ## Infrastructure
-
-Based on the workflow file name (`main_buyersbeacon.yml`), the application is likely deployed to an Azure-hosted environment:
 
 ### Deployment Architecture
 
@@ -67,12 +65,12 @@ The frontend makes API requests to the backend, which communicates with the data
 
 * **Server (Backend):**
   * Hosted on Azure App Service
-  * Connected to a production database (likely Azure SQL or PostgreSQL)
+  * Connected to a production database (SQL Server or PostgreSQL)
   * Integrated with Azure Blob Storage for file storage
 
 * **Database:**
   * Production database with proper backup and scaling configurations
-  * Likely SQL Server or PostgreSQL on Azure
+  * SQL Server or PostgreSQL on Azure
 
 * **Environment Variables:**
   * Stored as GitHub Secrets or Azure App Configuration
@@ -80,13 +78,13 @@ The frontend makes API requests to the backend, which communicates with the data
 
 ## Deployment Considerations
 
-* **Database Migrations:** The workflow may include automatic migration application
+* **Database Migrations:** The workflow includes automatic migration application
 * **Zero-Downtime Deployment:** Azure App Service supports slot deployments for minimal disruption
 * **Rollback Strategy:** Previous deployments can be restored if issues are detected
-* **Environment Separation:** Different environments (dev, staging, production) may have separate workflows
+* **Environment Separation:** Different environments (dev, staging, production) have separate workflows
 
 ## Monitoring & Logging
 
-* Application likely uses Azure Application Insights or similar for monitoring
-* Logs are centralized in Azure Log Analytics or a similar service
-* Alerts may be configured for critical errors or performance issues
+* Application uses Azure Application Insights for monitoring
+* Logs are centralized in Azure Log Analytics
+* Alerts are configured for critical errors or performance issues

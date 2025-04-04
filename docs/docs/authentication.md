@@ -23,7 +23,7 @@ BuyersBeacon uses Clerk for authentication, which provides a secure, fully-manag
    * Frontend retrieves user information using Clerk hooks:
      * `useUser()` provides user profile data
      * `useAuth()` provides authentication status and token
-   * This data is likely stored in Redux (`auth-slice.ts`) for global access
+   * This data is stored in Redux (`auth-slice.ts`) for global access
 
 ## Server-side Authentication
 
