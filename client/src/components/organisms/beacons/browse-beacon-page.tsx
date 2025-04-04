@@ -1,8 +1,7 @@
 "use client";
 import { GetBeaconQueryInput, useGetAllCategoriesQuery, useGetBeaconsQuery } from "@/redux/api";
 import { FC, useCallback, useState } from "react";
-import { Search, X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { BeaconThumbnail } from "@/components/molecules/beacon-thumbnail";
 import { Category } from "@/types/beacon";
 import EmptyState from "@/components/molecules/empty-state";
@@ -61,10 +60,6 @@ const BrowseBeaconsPage: FC = () => {
           title="Browse Beacons"
           subtitle={`${beacons ? beacons.length: 0} Beacons ${query ? 'found' : 'available'}`}
         />
-      </PageContainer>
-
-      {/* Main Content */}
-      <PageContainer>
         {/* Search Bar */}
         <SearchBar
           values={values}
@@ -80,6 +75,10 @@ const BrowseBeaconsPage: FC = () => {
           onClearSearch={handleClearSearch}
           loadingCategories={isCategoriesLoading}
         />
+      </PageContainer>
+
+      {/* Main Content */}
+      <PageContainer>
 
         {/* No Results */}
         {beacons?.length === 0 && <EmptyState primaryText={"No Beacons found"} />}
