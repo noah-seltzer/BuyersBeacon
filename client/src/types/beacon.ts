@@ -1,3 +1,4 @@
+import { User } from "@/types/user";
 export interface BeaconImage {
   imageId?: string;
   imageSetId?: string;
@@ -30,14 +31,9 @@ export interface Beacon {
   LocRegion?: string;
   LocCountry?: string;
   LocPostalCode?: string;
-<<<<<<< HEAD
-  imageSet: ImageSet;
-}
-=======
   imageSet?: ImageSet;
 };
 
->>>>>>> main
 
 export interface Category {
   CategoryName: string;

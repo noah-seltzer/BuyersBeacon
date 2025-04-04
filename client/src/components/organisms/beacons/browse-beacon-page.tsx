@@ -18,7 +18,7 @@ const initialValues: SearchBarInputs = {
 const BrowseBeaconsPage: FC = () => {
   const router = useRouter();
   const [query, setQuery] = useState<GetBeaconQueryInput>({
-    Drafts: false,
+    drafts: false,
   });
   const { data: categories, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
   const { data: beacons } = useGetBeaconsQuery(query)

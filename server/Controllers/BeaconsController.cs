@@ -45,25 +45,20 @@ namespace server.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
-            [FromQuery] Guid? CategoryId,
-            [FromQuery] string? QueryString
+            [FromQuery] bool drafts = false,
+            [FromQuery] string? userId = null,
+            [FromQuery] Guid? CategoryId = null,
+            [FromQuery] string? QueryString = null
             )
         {
             try
             {
-                var query = _context.Beacons.AsQueryable();
-
-                if (!(CategoryId == null))
-                {
-                    query = query.Where(b => b.CategoryId == CategoryId);
-                }
-
-                if (!String.IsNullOrEmpty(QueryString))
-                {
-                    query = query.Where(b => b.ItemName.Contains(QueryString));
-                }
-
-                var beacons = await query.ToListAsync();
+                var beacons = await _beaconService.GetList(
+                    userId != null ? new Guid(userId) : null,
+                    drafts,
+                    CategoryId, 
+                    QueryString
+                    );
                 return Ok(beacons);
             }
             catch (Exception ex)

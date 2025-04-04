@@ -28,21 +28,37 @@ namespace server.Services
             return beacon;
         }
 
-        public async Task<IEnumerable<Beacon>> GetList(Guid? user_id = null, bool drafts = false)
+        public async Task<IEnumerable<Beacon>> GetList(
+            Guid? user_id = null,
+            bool drafts = false,
+            Guid? CategoryId = null, 
+            string? QueryString = null
+            )
         {
-            var beacons = _context.Beacons
-                .Include(b => b.Category)
-                .Include(b => b.ImageSet)
-                .ThenInclude(i => i.Images)
-                .Include(b => b.User)
-                .Where(b => b.IsDraft == drafts);
+            var query = _context.Beacons.AsQueryable();
 
-            if (user_id.HasValue)
+            //If getting list of drafts, then check for User ID as well
+            if (drafts && user_id.HasValue)
             {
-                beacons = beacons.Where(b => b.UserId == user_id);
-            }
+                query = query.Where(b => b.UserId == user_id.Value);
+                query = query.Where(b => b.IsDraft == drafts); 
+            } 
+            else
+            {
+                //If not retrieving drafts, then filter query by search parameters
+                if (CategoryId.HasValue)
+                {
+                    query = query.Where(b => b.CategoryId == CategoryId.Value);
+                }
 
-            return await beacons.ToListAsync();
+                if (!String.IsNullOrEmpty(QueryString))
+                {
+                    query = query.Where(b => b.ItemName.Contains(QueryString));
+                }
+
+                query = query.Where(b => b.IsDraft == drafts);
+            }
+            return await query.ToListAsync();
         }
 
 

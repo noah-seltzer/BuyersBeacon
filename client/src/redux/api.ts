@@ -28,8 +28,8 @@ enum CACHES {
 export const LIST_ID = "LIST";
 
 export interface GetBeaconQueryInput {
-  Drafts?: boolean;
-  ClerkId?: string;
+  drafts?: boolean;
+  userId?: string;
   CategoryId?: string;
   QueryString?: string;
 }
@@ -116,8 +116,8 @@ export const beaconApi = createApi({
     getBeacons: builder.query<Beacon[], GetBeaconQueryInput | void>({
       query: (params = {}) => {
         const queryParams = new URLSearchParams();
-        if (params?.ClerkId) queryParams.append("ClerkId", params.ClerkId);
-        if (params?.Drafts) queryParams.append("Drafts", "true");
+        if (params?.userId) queryParams.append("userId", params.userId);
+        if (params?.drafts) queryParams.append("drafts", "true");
         if (params?.CategoryId) queryParams.append("CategoryId", params.CategoryId);
         if (params?.QueryString) queryParams.append("QueryString", params.QueryString);
         return `${ENDPOINTS.BEACONS}?${queryParams.toString()}`;
