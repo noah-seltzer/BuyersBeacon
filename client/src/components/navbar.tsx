@@ -72,7 +72,7 @@ export function Navbar() {
     e?.preventDefault();
     if (inputValue.trim()) {
       router.push(
-        `/beacons/browse?query=${encodeURIComponent(inputValue.trim())}`
+        `/beacons/browse?QueryString=${encodeURIComponent(inputValue.trim())}`
       );
       setIsFocused(false);
     }
