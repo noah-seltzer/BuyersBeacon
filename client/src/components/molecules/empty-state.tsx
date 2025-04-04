@@ -9,15 +9,15 @@ interface EmptyStateProps {
 }
 
 const EmptyState = ({
-    iconH,
-    iconW,
+    iconH = 70,
+    iconW = 70,
     primaryText,
     className = ""
 }: EmptyStateProps) => {
     return (
         <div className={`flex flex-col items-center justify-center text-center ${className}`}>
             <LightHouseSVG height={iconH} width={iconW} />
-            <SubTitle className="mt-4">{primaryText}</SubTitle>
+            <SubTitle className="mt-2">{primaryText}</SubTitle>
         </div>
     );
 };
