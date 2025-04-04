@@ -45,6 +45,12 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     async (beacon: Beacon, helpers: FormikHelpers<Beacon>) => {
       try {
         helpers.setSubmitting(true);
+        
+        if (!beacon.CategoryId) {
+          helpers.setFieldError("CategoryId", "Please select a category");
+          return;
+        }
+        
         const payload = { ...beacon }
         if (user) {
           payload.UserId = user.UserId
@@ -55,6 +61,11 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
         console.error("Failed to create beacon:", error);
         if (error.data?.errors) {
           console.error("Validation errors:", error.data.errors);
+          
+          // Display validation errors to the user
+          if (error.data.errors.CategoryId) {
+            helpers.setFieldError("CategoryId", "Please select a valid category");
+          }
         }
       } finally {
         helpers.setSubmitting(false);
@@ -95,6 +106,24 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
 
 
 
+  const validateForm = (values: Beacon) => {
+    const errors: { [key: string]: string } = {};
+    
+    if (!values.ItemName?.trim()) {
+      errors.ItemName = "Title is required";
+    }
+    
+    if (!values.CategoryId) {
+      errors.CategoryId = "Please select a category";
+    }
+    
+    if (!values.ItemDescription?.trim()) {
+      errors.ItemDescription = "Description is required";
+    }
+    
+    return errors;
+  };
+
   const {
     handleChange,
     handleSubmit,
@@ -103,6 +132,7 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
     touched,
     setFieldValue,
     isSubmitting,
+    setErrors
   } = useFormik({
     initialValues: {
       ItemName: "",
@@ -112,7 +142,19 @@ const CreateBeaconPage: FC<{ user: User }> = ({ user }) => {
       ItemPrice: 0,
       imageSet: {}
     } as unknown as Beacon,
-    onSubmit: processSubmit,
+    validate: validateForm,
+    validateOnBlur: true,
+    validateOnChange: false,
+    onSubmit: async (values, helpers) => {
+      const validationErrors = validateForm(values);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+      
+      processSubmit(values, helpers);
+    },
   });
 
   return (

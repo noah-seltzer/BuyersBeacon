@@ -55,7 +55,9 @@ export function BeaconForm({
             className="mt-2"
           />
           {touched.ItemName && errors.ItemName && (
-            <p className="text-sm text-destructive mt-1">{errors.ItemName}</p>
+            <div className="flex items-center mt-2">
+              <span className="text-sm font-medium text-red-600 dark:text-red-500">{errors.ItemName}</span>
+            </div>
           )}
         </div>
 
@@ -82,9 +84,11 @@ export function BeaconForm({
             className="mt-2 min-h-[150px]"
           />
           {touched.ItemDescription && errors.ItemDescription && (
-            <p className="text-sm text-destructive mt-1">
-              {errors.ItemDescription}
-            </p>
+            <div className="flex items-center mt-2">
+              <span className="text-sm font-medium text-red-600 dark:text-red-500">
+                {errors.ItemDescription}
+              </span>
+            </div>
           )}
         </div>
 
@@ -101,7 +105,9 @@ export function BeaconForm({
             className="mt-2"
           />
           {touched.ItemPrice && errors.ItemPrice && (
-            <p className="text-sm text-destructive mt-1">{errors.ItemPrice}</p>
+            <div className="flex items-center mt-2">
+              <span className="text-sm font-medium text-red-600 dark:text-red-500">{errors.ItemPrice}</span>
+            </div>
           )}
         </div>
 
@@ -173,9 +179,11 @@ export function BeaconForm({
             maxImages={6}
           />
           {touched.Images && errors.Images && (
-            <p className="text-sm text-destructive mt-1">
-              {errors.Images.toString()}
-            </p>
+            <div className="flex items-center mt-2">
+              <span className="text-sm font-medium text-red-600 dark:text-red-500">
+                {errors.Images.toString()}
+              </span>
+            </div>
           )}
         </div>
       </div>
@@ -210,7 +218,9 @@ export function BeaconForm({
       </div>
 
       {draftError && (
-        <p className="text-sm text-destructive mt-2">{draftError}</p>
+        <div className="flex items-center mt-2">
+          <span className="text-sm font-medium text-red-600 dark:text-red-500">{draftError}</span>
+        </div>
       )}
 
       {draftSaved && (

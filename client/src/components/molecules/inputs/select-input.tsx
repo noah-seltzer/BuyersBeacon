@@ -37,9 +37,10 @@ const SelectInput: React.FC<SelectInputProps> = ({
                     value={value}
                     onChange={onChange}
                     className={cn(
-                        "appearance-none h-[48px] w-full rounded-xl border border-input bg-background px-4 py-2 text-sm",
-                        "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                        "disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+                        "appearance-none h-[48px] w-full rounded-xl border bg-background px-4 py-2 text-sm",
+                        "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                        "disabled:cursor-not-allowed disabled:opacity-50 pr-10",
+                        error ? "border-red-500 focus-visible:ring-red-500" : "border-input focus-visible:ring-ring"
                     )}
                 >
                     {categoryOptionsIsLoading ? (
@@ -58,7 +59,11 @@ const SelectInput: React.FC<SelectInputProps> = ({
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none text-muted-foreground" />
             </div>
             
-            {error && <span className="text-sm text-destructive mt-1 block">{error}</span>}
+            {error && (
+                <div className="flex items-center mt-2">
+                    <span className="text-sm font-medium text-red-600 dark:text-red-500">{error}</span>
+                </div>
+            )}
         </div>
     );
 };
