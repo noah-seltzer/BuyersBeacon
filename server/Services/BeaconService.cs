@@ -55,13 +55,8 @@ namespace server.Services
                     query = query.Where(b => b.CategoryId == CategoryId.Value);
                 }
 
-                if (!String.IsNullOrEmpty(QueryString))
-                {
-                    query = query.Where(b => b.ItemName.Contains(QueryString));
-                }
-
-                query = query.Where(b => b.IsDraft == drafts);
-            }
+            query = query.Where(b => b.IsDraft == drafts);
+            
             return await query.ToListAsync();
         }
 
