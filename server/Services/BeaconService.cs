@@ -14,21 +14,21 @@ namespace server.Services
         }
 
 
-        public async Task<Beacon?> GetById(Guid id)
+        public Beacon? GetById(Guid id)
         {
-            var beacon = await _context.Beacons
+            var beacon = _context.Beacons
                 .Where(b => b.BeaconId == id)
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                     .ThenInclude(i => i.Images)
                 .Include(b => b.User)
-                .FirstOrDefaultAsync();
+                .First();
 
             Console.WriteLine($"DEBUG: Beacon User Data: {beacon?.User?.DisplayName ?? "null"}");
             return beacon;
         }
 
-        public async Task<IEnumerable<Beacon>> GetList(
+        public IEnumerable<Beacon> GetList(
             Guid? user_id = null,
             bool drafts = false,
             Guid? CategoryId = null, 
@@ -54,7 +54,6 @@ namespace server.Services
                 {
                     query = query.Where(b => b.CategoryId == CategoryId.Value);
                 }
-
                 if (!String.IsNullOrEmpty(QueryString))
                 {
                     query = query.Where(b => b.ItemName.Contains(QueryString));
@@ -62,11 +61,11 @@ namespace server.Services
 
                 query = query.Where(b => b.IsDraft == drafts);
             }
-            return await query.ToListAsync();
+            return query.ToList();
         }
 
 
-        public async Task<Beacon> Create(Beacon beacon)
+        public Beacon Create(Beacon beacon)
         {
             var newBeacon = new Beacon
             {

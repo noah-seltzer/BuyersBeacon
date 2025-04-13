@@ -7,19 +7,20 @@ namespace server.Data
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext() : base() { }
 
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Beacon> Beacons { get; set; }
-        public DbSet<Image> Images { get; set; }
-        public DbSet<ImageSet> ImageSets { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Chat> Chats { get; set; }
-        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Beacon> Beacons { get; set; }
+        public virtual DbSet<Image> Images { get; set; }
+        public virtual DbSet<ImageSet> ImageSets { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Chat> Chats { get; set; }
+        public virtual DbSet<ChatMessage> ChatMessages { get; set; }
 
-        public DbSet<Review> Reviews { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<ReviewTag> ReviewTags { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
+        public virtual DbSet<ReviewTag> ReviewTags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

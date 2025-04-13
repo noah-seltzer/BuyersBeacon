@@ -12,13 +12,12 @@ namespace server.Services
     {
         const string BlobStorageURLBase = "https://buyersbeaconstorage.blob.core.windows.net/images";
         private readonly ApplicationDbContext _context;
-        private BlobServiceManager _blobServiceManager;
+        protected BlobServiceManager _blobServiceManager;
 
         public ImageService(ApplicationDbContext context)
         {
             _context = context;
             _blobServiceManager = new BlobServiceManager();
-
         }
 
         public string GenerateGuidFilename()
@@ -72,7 +71,7 @@ namespace server.Services
                 await Task.WhenAll(uploadPromises);
             }
 
-            else if (beaconInput.Image != null)
+            else if (beaconInput.Image != null)   
             {
                 var image = this.GenerateImage(beacon.Image, imageSet);
                 _context.Images.Add(image);

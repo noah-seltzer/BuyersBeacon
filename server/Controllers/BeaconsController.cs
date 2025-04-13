@@ -44,7 +44,7 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
+        public ActionResult<IEnumerable<Beacon>> GetBeacons(
             [FromQuery] bool drafts = false,
             [FromQuery] string? userId = null,
             [FromQuery] Guid? CategoryId = null,
@@ -53,7 +53,7 @@ namespace server.Controllers
         {
             try
             {
-                var beacons = await _beaconService.GetList(
+                var beacons = _beaconService.GetList(
                     userId != null ? new Guid(userId) : null,
                     drafts,
                     CategoryId, 
@@ -79,7 +79,7 @@ namespace server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Beacon>> GetBeacon(Guid id)
         {
-            var beacon = await _beaconService.GetById(id);
+            var beacon =  _beaconService.GetById(id);
 
             if (beacon == null)
             {
@@ -106,7 +106,7 @@ namespace server.Controllers
                 return Unauthorized(new { error = "Not authenticated" });
             }
 
-            var drafts = await _beaconService.GetList(authedClerkUser.UserId, true);
+            var drafts = _beaconService.GetList(authedClerkUser.UserId, true);
             return Ok(drafts);
         }
 
@@ -134,7 +134,7 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Im only extracting the value becuase of the null check above.
+            // I'm only extracting the value becuase of the null check above.
             var category = await _categoryService.GetById((System.Guid)beacon.CategoryId);
 
             if (beacon.CategoryId.HasValue && category == null)
@@ -152,7 +152,7 @@ namespace server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var newBeacon = await _beaconService.Create(beacon);
+            var newBeacon = _beaconService.Create(beacon);
 
             _context.Beacons.Add(newBeacon);
             await _context.SaveChangesAsync();
