@@ -5,7 +5,11 @@ using dotenv.net;
 
 namespace server.Util
 {
-    public class BlobServiceManager
+    public interface IBlobServiceManager
+    {
+        Task<BlobContentInfo> uploadFile(string name, Stream fileStream, string MimeType);
+    }
+    public class BlobServiceManager: IBlobServiceManager
     {
         public BlobServiceManager()
         {
@@ -15,11 +19,8 @@ namespace server.Util
                 str = DotEnv.Read()["AZURE_STORAGE_CONNECTION_STRING"];
             }
 
-            if (str != null)
-            {
-                this.Client = new BlobServiceClient(str);
-                this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
-            }
+            this.Client = new BlobServiceClient(str);
+            this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
         }
 
         private BlobServiceClient Client;

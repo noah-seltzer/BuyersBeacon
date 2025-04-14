@@ -9,10 +9,8 @@ using server.Data;
 using Moq;
 using Azure.Storage.Blobs.Models;
 
-public class MockBlobServiceManager: BlobServiceManager
+public class MockBlobServiceManager: IBlobServiceManager
 {
-    public MockBlobServiceManager() { }
-    
     public async Task<BlobContentInfo> uploadFile(string name, Stream fileStream, string MimeType)
     {
         return null; 
