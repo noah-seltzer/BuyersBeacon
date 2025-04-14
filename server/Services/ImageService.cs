@@ -11,7 +11,7 @@ namespace server.Services
     public class ImageService: IImageService
     {
         const string BlobStorageURLBase = "https://buyersbeaconstorage.blob.core.windows.net/images";
-        private readonly ApplicationDbContext _context;
+        protected ApplicationDbContext _context;
         protected IBlobServiceManager _blobServiceManager;
 
         public ImageService(ApplicationDbContext context)

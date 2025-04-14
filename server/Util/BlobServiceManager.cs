@@ -8,10 +8,16 @@ namespace server.Util
     public interface IBlobServiceManager
     {
         Task<BlobContentInfo> uploadFile(string name, Stream fileStream, string MimeType);
+        void init();
     }
     public class BlobServiceManager: IBlobServiceManager
     {
         public BlobServiceManager()
+        {
+            init();
+        }
+
+        public void init()
         {
             var str = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
             if (str == null)
