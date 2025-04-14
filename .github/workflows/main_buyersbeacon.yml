@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: debug env
+        run: env
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
@@ -27,7 +30,7 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
       
-      - name: Run unit tests
+      - name: Run unit tests 
         run: dotnet test
       
       - name: dotnet publish
