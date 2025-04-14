@@ -14,8 +14,12 @@ namespace server.Util
             {
                 str = DotEnv.Read()["AZURE_STORAGE_CONNECTION_STRING"];
             }
-            this.Client = new BlobServiceClient(str);
-            this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
+
+            if (str != null)
+            {
+                this.Client = new BlobServiceClient(str);
+                this.ImagesContainerClient = this.Client.GetBlobContainerClient("images");
+            }
         }
 
         private BlobServiceClient Client;
