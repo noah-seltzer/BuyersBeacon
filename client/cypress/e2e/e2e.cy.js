@@ -3,7 +3,7 @@
 describe('e2e tests', {defaultCommandTimeout: 30000}, () => {
     //Setup homepage navigation before all tests
     beforeEach(() => {
-      cy.visit('http://localhost:3000/')
+      cy.visit({url:Cypress.env('BASEURL')})
       cy.contains('h1', 'Find What You Need')
         .should('be.visible')
     })

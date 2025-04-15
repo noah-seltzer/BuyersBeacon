@@ -42,3 +42,6 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Cypress screenshots (auto generated during tests)
+/cypress/screenshots
