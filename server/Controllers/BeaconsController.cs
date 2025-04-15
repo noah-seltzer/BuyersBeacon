@@ -44,7 +44,7 @@ namespace server.Controllers
         /// <response code="200">Returns the list of beacons</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<Beacon>> GetBeacons(
+        public async Task<ActionResult<IEnumerable<Beacon>>> GetBeacons(
             [FromQuery] bool drafts = false,
             [FromQuery] string? userId = null,
             [FromQuery] Guid? CategoryId = null,
@@ -53,7 +53,7 @@ namespace server.Controllers
         {
             try
             {
-                var beacons = _beaconService.GetList(
+                var beacons = await _beaconService.GetList(
                     userId != null ? new Guid(userId) : null,
                     drafts,
                     CategoryId, 
@@ -106,7 +106,7 @@ namespace server.Controllers
                 return Unauthorized(new { error = "Not authenticated" });
             }
 
-            var drafts = _beaconService.GetList(authedClerkUser.UserId, true);
+            var drafts = await _beaconService.GetList(authedClerkUser.UserId, true);
             return Ok(drafts);
         }
 
