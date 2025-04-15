@@ -14,21 +14,21 @@ namespace server.Services
         }
 
 
-        public async Task<Beacon?> GetById(Guid id)
+        public Beacon? GetById(Guid id)
         {
-            var beacon = await _context.Beacons
+            var beacon = _context.Beacons
                 .Where(b => b.BeaconId == id)
                 .Include(b => b.Category)
                 .Include(b => b.ImageSet)
                     .ThenInclude(i => i.Images)
                 .Include(b => b.User)
-                .FirstOrDefaultAsync();
+                .First();
 
             Console.WriteLine($"DEBUG: Beacon User Data: {beacon?.User?.DisplayName ?? "null"}");
             return beacon;
         }
 
-        public async Task<IEnumerable<Beacon>> GetList(
+        public IEnumerable<Beacon> GetList(
             Guid? user_id = null,
             bool drafts = false,
             Guid? CategoryId = null, 
@@ -41,9 +41,8 @@ namespace server.Services
                 .ThenInclude(i => i.Images)
                 .AsQueryable();
 
-
-            // If user_id is provided, filter by user regardless of draft status
-            if (user_id.HasValue)
+            //If getting list of drafts, then check for User ID as well
+            if (drafts && user_id.HasValue)
             {
                 query = query.Where(b => b.UserId == user_id.Value);
             }
@@ -68,7 +67,7 @@ namespace server.Services
         }
 
 
-        public async Task<Beacon> Create(Beacon beacon)
+        public Beacon Create(Beacon beacon)
         {
             var newBeacon = new Beacon
             {

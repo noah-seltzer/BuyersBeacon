@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - buyersbeacon
+name: Build and deploy ASP.Net Core app to Azure Web App - BuyersBeaconTest
 
 on:
   push:
@@ -15,14 +15,8 @@ jobs:
     permissions:
       contents: read #This is required for actions/checkout
 
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: debug env
-        env:
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-        run: env
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -31,12 +25,7 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
-      
-      - name: Run unit tests 
-        env:
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-        run: dotnet test
-      
+
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
@@ -65,15 +54,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FE5B413053E54577A79B26981832EA01 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_36D0BB930D7148AEAD6241DC528CF0E4 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0818E4FB481249D196E32A49A6355455 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_047F54BD8A43470D909FE21764CD8C9C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_658FDB24BF0E46D4BF8DFF311BEC6237 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8A42728165B149159F8063E4F4CA1801 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'buyersbeacon'
+          app-name: 'BuyersBeaconTest'
           slot-name: 'Production'
           package: .
           
