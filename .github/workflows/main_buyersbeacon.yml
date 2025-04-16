@@ -125,7 +125,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Cypress Tests
-        run 
+        run: pnpm e2e
           
 
   build:
