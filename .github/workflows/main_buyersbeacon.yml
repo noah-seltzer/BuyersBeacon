@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter client
       - name: Install Cypress
-        run: pnpm install cypress --save-dev
+        run: pnpm ie2e
       - name: Run Cypress Tests
         run: pnpm e2e
   unit-test:

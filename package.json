@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "pnpm -r run dev",
     "e2e": "pnpm --filter client test-e2e",
+    "ie2e": "pnpm --filter client install-e2e",
     "start": "echo starting\n"
   },
   "keywords": [],
