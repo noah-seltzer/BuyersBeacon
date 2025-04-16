@@ -92,7 +92,7 @@ jobs:
 
   e2e-test-deploy-client:
     runs-on: ubuntu-latest
-    needs: e2e-test-deploy-server
+    needs: unit-test
     permissions: 
       contents: read
       id-token: write #This is required for requesting the JWT
@@ -114,7 +114,7 @@ jobs:
   
   run-e2e-tests:
     runs-on: ubuntu-latest
-    needs: e2e-test-deploy-client
+    needs: [e2e-test-deploy-client, e2e-test-deploy-client]
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -130,7 +130,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: e2e-test-deploy-client
+    needs: run-e2e-tests
     permissions:
       contents: read #This is required for actions/checkout
     steps:
@@ -187,7 +187,7 @@ jobs:
           
   deploy-client:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: run-e2e-tests
     permissions:
       contents: read
     env: 
