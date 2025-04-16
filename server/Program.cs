@@ -47,7 +47,12 @@ builder.Services.AddCors(options =>
                              "http://localhost:3000", 
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
                              "http://buyers-beacon-client-git-main-noahseltzers-projects.vercel.app",
-                             "https://buyers-beacon-client.vercel.app")
+                             "https://buyers-beacon-client-test-git-main-noahseltzers-projects.vercel.app",
+                             "http://buyers-beacon-client-test-git-main-noahseltzers-projects.vercel.app",
+                             "http://buyers-beacon-client.vercel.app",
+                             "https://buyers-beacon-client.vercel.app",
+                             "http://buyers-beacon-client-test.vercel.app",
+                             "https://buyers-beacon-client-test.vercel.app")
                              .AllowAnyHeader()
                              .AllowCredentials()
                              .AllowAnyMethod();

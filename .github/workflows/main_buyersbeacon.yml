@@ -3,6 +3,12 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - buyersbeacon
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  CYPRESS_BASE_URL: ${{ secrets.CYPRESS_BASE_URL }}
+  AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+
 on:
   push:
     branches:
@@ -10,6 +16,91 @@ on:
   workflow_dispatch:
 
 jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Run unit tests
+        run: dotnet test
+
+  e2e-test-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps: 
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        env:
+        run: dotnet test
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/testapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app-test
+          path: ${{env.DOTNET_ROOT}}/testapp
+  
+  e2e-test-deploy-server:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app-test
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_047F54BD8A43470D909FE21764CD8C9C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_658FDB24BF0E46D4BF8DFF311BEC6237 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8A42728165B149159F8063E4F4CA1801 }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'BuyersBeaconTest'
+          slot-name: 'Production'
+          package: .
+
+  e2e-test-deploy-client:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Install Vercel CLI
+        run: pnpm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -77,3 +168,22 @@ jobs:
           slot-name: 'Production'
           package: .
           
+  deploy-client:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env: 
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROD_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Install Vercel CLI
+        run: pnpm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
