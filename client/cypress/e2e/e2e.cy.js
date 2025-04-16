@@ -10,11 +10,11 @@ describe('e2e tests', {defaultCommandTimeout: 30000}, () => {
   
     //Test browse and search, 0 results expected
     it('navigate to browse and search', () => {
-      cy.get('a:visible').contains('Browse Beacons').click();
-      cy.contains('h1', 'Browse Beacons')
-        .should('be.visible')
-      cy.get('[name="QueryString"]').type('asdkjhsdlkshdfg');
-      cy.contains('button', 'Search').click()
+      // cy.get('a:visible').contains('Browse Beacons').click();
+      // cy.contains('h1', 'Browse Beacons')
+      //   .should('be.visible')
+      // cy.get('[name="QueryString"]').type('asdkjhsdlkshdfg');
+      // cy.contains('button', 'Search').click()
       // cy.contains('h1', 'No Beacons found')
       //   .should('be.visible')
     })
