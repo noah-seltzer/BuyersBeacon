@@ -3,8 +3,7 @@
 describe('e2e tests', {defaultCommandTimeout: 30000}, () => {
     //Setup homepage navigation before all tests
     beforeEach(() => {
-        console.log('base url', Cypress.env('BASEURL'));
-      cy.visit({url:Cypress.env('BASEURL')})
+      cy.visit({url:'https://buyers-beacon-client-test.vercel.app/'})
       cy.contains('h1', 'Find What You Need')
         .should('be.visible')
     })
