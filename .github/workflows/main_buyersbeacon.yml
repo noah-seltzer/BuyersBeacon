@@ -88,6 +88,7 @@ jobs:
     needs: e2e-test-deploy-server
     permissions: 
       contents: read
+      id-token: write #This is required for requesting the JWT
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
