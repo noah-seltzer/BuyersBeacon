@@ -31,10 +31,11 @@ jobs:
           version: 10
       - name: Install dependencies
         run: pnpm install --filter client
-      - name: Install Cypress
-        run: pnpm ie2e
+      - name: Initialize Cypress
+        run: ./client/node_modules/.bin/cypress install
       - name: Run Cypress Tests
-        run: pnpm e2e
+        working-directory: ./client
+        run: ./node_modules/.bin/cypress run
   unit-test:
     runs-on: ubuntu-latest
     permissions:
