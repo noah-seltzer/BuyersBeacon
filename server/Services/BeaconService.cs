@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Models;
+using System.Threading.Tasks;
 
 namespace server.Services
 {
@@ -28,7 +29,7 @@ namespace server.Services
             return beacon;
         }
 
-        public IEnumerable<Beacon> GetList(
+        public async Task<IEnumerable<Beacon>> GetList(
             Guid? user_id = null,
             bool drafts = false,
             Guid? CategoryId = null, 
@@ -41,27 +42,29 @@ namespace server.Services
                 .ThenInclude(i => i.Images)
                 .AsQueryable();
 
-            //If getting list of drafts, then check for User ID as well
-            if (drafts && user_id.HasValue)
+            // Filter by user ID if provided
+            if (user_id.HasValue)
             {
                 query = query.Where(b => b.UserId == user_id.Value);
-                query = query.Where(b => b.IsDraft == drafts); 
-            } 
-            else
-            {
-                //If not retrieving drafts, then filter query by search parameters
-                if (CategoryId.HasValue)
-                {
-                    query = query.Where(b => b.CategoryId == CategoryId.Value);
-                }
-                if (!String.IsNullOrEmpty(QueryString))
-                {
-                    query = query.Where(b => b.ItemName.Contains(QueryString));
-                }
-
-                query = query.Where(b => b.IsDraft == drafts);
             }
-            return query.ToList();
+            
+            // Filter by draft status
+            query = query.Where(b => b.IsDraft == drafts);
+            
+            // Apply additional filters for search parameters
+            if (CategoryId.HasValue)
+            {
+                query = query.Where(b => b.CategoryId == CategoryId.Value);
+            }
+
+            if (!String.IsNullOrEmpty(QueryString))
+            {
+                query = query.Where(b => b.ItemName.Contains(QueryString));
+            }
+
+            query = query.Where(b => b.IsDraft == drafts);
+            
+            return await query.ToListAsync();
         }
 
 
