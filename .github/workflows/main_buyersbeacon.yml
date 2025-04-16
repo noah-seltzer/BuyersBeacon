@@ -31,6 +31,8 @@ jobs:
           version: 10
       - name: Install dependencies
         run: pnpm install --filter client
+      - name: Install Cypress
+        run: pnpm install cypress --save-dev
       - name: Run Cypress Tests
         run: pnpm e2e
   unit-test:
