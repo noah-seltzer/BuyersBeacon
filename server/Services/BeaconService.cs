@@ -29,7 +29,7 @@ namespace server.Services
             return beacon;
         }
 
-        public async Task<IEnumerable<Beacon>> GetList(
+        public IEnumerable<Beacon> GetList(
             Guid? user_id = null,
             bool drafts = false,
             Guid? CategoryId = null, 
@@ -64,7 +64,7 @@ namespace server.Services
 
             query = query.Where(b => b.IsDraft == drafts);
             
-            return await query.ToListAsync();
+            return query.ToList();
         }
 
 

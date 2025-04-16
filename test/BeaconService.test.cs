@@ -57,7 +57,7 @@ namespace test
         }
 
         [Fact(DisplayName = "Get List of Beacons")]
-        public void TestGetList()
+        public async void TestGetList()
         {
             var service = createMockBeaconService().service;
             var beacons = service.GetList();

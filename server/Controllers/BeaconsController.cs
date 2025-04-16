@@ -53,7 +53,7 @@ namespace server.Controllers
         {
             try
             {
-                var beacons = await _beaconService.GetList(
+                var beacons = _beaconService.GetList(
                     userId != null ? new Guid(userId) : null,
                     drafts,
                     CategoryId, 
@@ -106,7 +106,7 @@ namespace server.Controllers
                 return Unauthorized(new { error = "Not authenticated" });
             }
 
-            var drafts = await _beaconService.GetList(authedClerkUser.UserId, true);
+            var drafts = _beaconService.GetList(authedClerkUser.UserId, true);
             return Ok(drafts);
         }
 
