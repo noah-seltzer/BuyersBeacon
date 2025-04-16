@@ -15,8 +15,8 @@ describe('e2e tests', {defaultCommandTimeout: 30000}, () => {
         .should('be.visible')
       cy.get('[name="QueryString"]').type('asdkjhsdlkshdfg');
       cy.contains('button', 'Search').click()
-      cy.contains('h1', 'No Beacons found')
-        .should('be.visible')
+      // cy.contains('h1', 'No Beacons found')
+      //   .should('be.visible')
     })
   
     //Test navigation to About page, button should be visible

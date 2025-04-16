@@ -140,8 +140,11 @@ jobs:
           version: 10
       - name: Install dependencies
         run: pnpm install --filter client
+      - name: Initialize Cypress
+        run: ./client/node_modules/.bin/cypress install
       - name: Run Cypress Tests
-        run: pnpm e2e
+        working-directory: ./client
+        run: ./node_modules/.bin/cypress run
           
 
   build:
