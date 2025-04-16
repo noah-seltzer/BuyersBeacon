@@ -59,6 +59,9 @@ jobs:
   e2e-test-deploy-server:
     runs-on: ubuntu-latest
     needs: e2e-test-build-server
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp-test.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
@@ -76,7 +79,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8A42728165B149159F8063E4F4CA1801 }}
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
+        id: deploy-to-webapp-test
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'BuyersBeaconTest'
